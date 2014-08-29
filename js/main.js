@@ -22,7 +22,7 @@ function bind(scope, fn) { return function() { return fn.apply(scope, arguments)
 /**
  *
  * @param q Sélecteur
- * @param el Scope dans lequel effectuer la requête
+ * @param [el=null] Scope dans lequel effectuer la requête
  * @returns NodeList
  */
 function $(q, el)

@@ -170,7 +170,81 @@ Jeu.prototype = {
     );
 
     /* Démarrage - TMP */
-    this.demarrer();
+//    this.demarrer();
+
+    /* TMP */
+    this.tracer_niveau1();
+
+    /* Retour de l'instance */
+    return this;
+  },
+
+  tracer_niveau1: function() {
+
+    var niveau1 = new Niveaux().niveau1();
+
+    /* Context global */
+    var ctx = this.getCanvas().getContext();
+
+    var width = 40;
+
+    var bloc = null;
+    var ligne = null;
+    var taille = null;
+
+    var canvas_object = new Canvas();
+    var canvas_tmp = canvas_object
+      .init()
+      .getElement();
+    var ctx_tmp = null;
+
+    /* Chaque bloc */
+    for(var i = 0, l = niveau1.length ; i < l ; ++i)
+    {
+      /* Le bloc courant */
+      bloc = niveau1[i];
+
+      /* On prend la dernière case qui contient les dimensions */
+      taille = bloc.pop();
+      canvas_tmp.width = taille.width * width + 10;
+      canvas_tmp.height = taille.height * width + 10;
+
+      /* Récupération du context */
+      ctx_tmp = canvas_object.getContext();
+
+      /* Translation pour ne pas couper les bordures */
+      ctx_tmp.translate(5, 5);
+
+      /* Propriété du context */
+      ctx_tmp.strokeStyle = "#012EB6";
+      ctx_tmp.fillStyle = "#012EB6";
+      ctx_tmp.lineJoin = "round";
+      ctx_tmp.lineWidth = 2;
+
+      /* Démarrage du tracé */
+      ctx_tmp.beginPath();
+
+      /* Chaque ligne d'un bloc */
+      for(var j = 0, k = bloc.length ; j < k ; ++j)
+      {
+        /* Ligne courante */
+        ligne = bloc[j];
+
+        /* Nouvelle ligne */
+        ctx_tmp.lineTo(ligne[0] * width, ligne[1] * width);
+      }
+
+      /* On ferme le tracé */
+      ctx_tmp.lineTo(bloc[0][0] * width, bloc[0][1] * width);
+
+      /* Remplissage */
+      ctx_tmp.stroke();
+
+      /* Dessin dans le canvas de base */
+      ctx.drawImage(canvas_tmp, taille.x * width, taille.y * width);
+
+      /* On scale et on redissine pour faire une double bordure */
+    }
 
     /* Retour de l'instance */
     return this;

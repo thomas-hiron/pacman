@@ -40,7 +40,7 @@ function Canvas()
   /**
    * Getter
    *
-   * @returns Node
+   * @returns HTMLElement
    */
   this.getElement = function() {
     return element;

@@ -299,9 +299,15 @@ Pacman.prototype = {
     return this;
   },
 
+  /**
+   * Handler pour l'appui sur une flèche
+   *
+   * @param Event e
+   * @returns {Pacman}
+   */
   rotate: function(e) {
 
-    /* Le code touché */
+    /* Le code d la flèche touchée */
     var code = e.keyCode;
 
     /* Les directions */
