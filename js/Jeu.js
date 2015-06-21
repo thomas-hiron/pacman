@@ -32,6 +32,11 @@ function Jeu()
   /* La taille d'une seule case */
   var caseWidth = 40;
 
+  /* Les niveaux */
+  var levels = new Niveaux();
+  var currentLevel = null;
+  var currentCasesLevel = null;
+
   /**
    * Getter
    *
@@ -137,6 +142,55 @@ function Jeu()
   this.getCaseWidth = function() {
     return caseWidth;
   }
+
+  /**
+   * Getter
+   *
+   * @returns {Niveaux}
+   */
+  this.getLevels = function() {
+    return levels;
+  }
+
+  /**
+   * Getter
+   *
+   * @returns {Niveaux}
+   */
+  this.getCurrentLevel = function() {
+    return currentLevel;
+  }
+
+  /**
+   * Setter
+   *
+   * @returns {Jeu}
+   */
+  this.setCurrentLevel = function(param) {
+    currentLevel = param;
+
+    return this;
+  }
+
+  /**
+   * Getter
+   *
+   * @returns {Niveaux}
+   */
+  this.getCurrentCasesLevel = function() {
+    return currentCasesLevel;
+  }
+
+  /**
+   * Setter
+   *
+   * @returns {Jeu}
+   */
+  this.setCurrentCasesLevel = function(param) {
+    currentCasesLevel = param;
+
+    return this;
+  }
 }
 
 /**
@@ -184,16 +238,19 @@ Jeu.prototype = {
     /* Démarrage - TMP */
     this.demarrer();
 
-    /* TMP */
-    this.tracer_niveau1();
+    /* Dessin du premier niveau */
+    var level1 = this.getLevels().niveau1();
+    this.setCurrentLevel(level1[0]);
+    this.setCurrentCasesLevel(level1[1]);
+    this.drawLevel();
 
     /* Retour de l'instance */
     return this;
   },
 
-  tracer_niveau1: function() {
+  drawLevel: function() {
 
-    var niveau1 = new Niveaux().niveau1();
+    var level = this.getCurrentLevel();
 
     /* Context global */
     var ctx = this.getCanvas().getContext();
@@ -210,14 +267,24 @@ Jeu.prototype = {
       .getElement();
     var ctx_tmp = null;
 
+    /* Remplissage des cases */
+    var blocs = new Array(20);
+    for(var i = 0, l = blocs.length ; i < l ; ++i)
+    {
+      blocs[i] = new Array(15);
+
+      for(var j = 0, k = blocs[i].length ; j < k ; ++j)
+        blocs[i][j] = new Case();
+    }
+
     /* Chaque bloc */
-    for(var i = 0, l = niveau1.length ; i < l ; ++i)
+    for(i = 0, l = level.length ; i < l ; ++i)
     {
       /* Le bloc courant */
-      bloc = niveau1[i];
+      bloc = level[i];
 
       /* On prend la dernière case qui contient les dimensions */
-      taille = bloc.pop();
+      taille = bloc[bloc.length - 1];
       canvas_tmp.width = taille.width * width + 10;
       canvas_tmp.height = taille.height * width + 10;
 
@@ -237,7 +304,7 @@ Jeu.prototype = {
       ctx_tmp.beginPath();
 
       /* Chaque ligne d'un bloc */
-      for(var j = 0, k = bloc.length ; j < k ; ++j)
+      for(j = 0, k = bloc.length ; j < k ; ++j)
       {
         /* Ligne courante */
         ligne = bloc[j];
@@ -255,6 +322,8 @@ Jeu.prototype = {
       /* Dessin dans le canvas de base */
       ctx.drawImage(canvas_tmp, taille.x * width, taille.y * width);
     }
+
+    //console.log(blocs);
 
     /* Retour de l'instance */
     return this;
@@ -306,5 +375,20 @@ Jeu.prototype = {
 
     /* Retour de l'instance */
     return this;
+  },
+
+  /**
+   * Vérifie qu'il n'y a pas de collision
+   *
+   * @param x
+   * @param y
+   *
+   * @returns {boolean}
+   */
+  checkCollision: function(x, y)
+  {
+    var currentCasesLevel = this.getCurrentCasesLevel();
+
+    return currentCasesLevel[y][x].isAWall();
   }
 }

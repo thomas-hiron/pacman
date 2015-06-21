@@ -443,9 +443,21 @@ Pacman.prototype = {
         if(y % caseWidth == 0)
         {
           if(currentDirection == directions.LEFT)
-            this.setX(x - this.getPas());
+            newX = x - this.getPas();
           else
-            this.setX(x + this.getPas());
+            newX = x + this.getPas();
+
+          /* Vérification de collision */
+          var caseNumberX = parseInt(x / caseWidth);
+          var caseNumberY = parseInt(y / caseWidth);
+
+          if(currentDirection == directions.RIGHT)
+            ++caseNumberX;
+
+          var collide = jeu.checkCollision(caseNumberX, caseNumberY);
+
+          if(!collide)
+            this.setX(newX);
 
           /* Changement de la direction */
           if(currentDirection == directions.LEFT || currentDirection == directions.RIGHT)
@@ -466,13 +478,25 @@ Pacman.prototype = {
         if(x % caseWidth == 0)
         {
           if(currentDirection == directions.UP)
-            this.setY(y - this.getPas());
+            newY = y - this.getPas();
           else
-            this.setY(y + this.getPas());
+            newY = y + this.getPas();
+
+          /* Vérification de collision */
+          var caseNumberX = parseInt(x / caseWidth);
+          var caseNumberY = parseInt(y / caseWidth);
+
+          if(currentDirection == directions.DOWN)
+            ++caseNumberY;
+
+          var collide = jeu.checkCollision(caseNumberX, caseNumberY);
+
+          if(!collide)
+            this.setY(newY);
 
           /* Changement de la direction */
           if(currentDirection == directions.UP || currentDirection == directions.DOWN)
-          this.setDirection(currentDirection);
+            this.setDirection(currentDirection);
         }
 
         /* Teste si sens inverse */
