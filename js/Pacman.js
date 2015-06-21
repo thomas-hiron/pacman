@@ -279,7 +279,7 @@ Pacman.prototype = {
     this.setDirection(jeu.getDirections().DOWN);
 
     /* Ajout de l'event des flèches */
-    window.addEventListener("keydown", bind(this, this.rotate), false);
+    window.addEventListener("keydown", this.rotate.bind(this), false);
 
     /* Retour de l'instance */
     return this;
@@ -293,7 +293,7 @@ Pacman.prototype = {
   start: function() {
 
     /* Request anim frame */
-    requestAnimFrame(bind(this, this.animate));
+    requestAnimFrame(this.animate.bind(this));
 
     /* Retour de l'instance */
     return this;
@@ -347,7 +347,7 @@ Pacman.prototype = {
     }
 
     /* Animation suivante */
-    requestAnimFrame(bind(this, this.animate));
+    requestAnimFrame(this.animate.bind(this));
 
     /* Retour de l'instance */
     return this;

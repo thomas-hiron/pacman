@@ -13,11 +13,6 @@ function init()
   new Jeu().init();
 }
 
-/* Fonctions */
-!function(){window.log=Function.prototype.bind.call(console.log,console);}();
-
-function bind(scope, fn) { return function() { return fn.apply(scope, arguments); } }
-
 /* $("selector") --> querySelectorAll */
 /**
  *

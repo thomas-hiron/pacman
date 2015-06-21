@@ -242,8 +242,6 @@ Jeu.prototype = {
 
       /* Dessin dans le canvas de base */
       ctx.drawImage(canvas_tmp, taille.x * width, taille.y * width);
-
-      /* On scale et on redissine pour faire une double bordure */
     }
 
     /* Retour de l'instance */
@@ -264,7 +262,7 @@ Jeu.prototype = {
     this.getPacman().start();
 
     /* RequestAnimationFrame pour le pacman, les fantomes */
-    requestAnimFrame(bind(this, this.draw));
+    requestAnimFrame(this.draw.bind(this));
 
     /* Retour de l'instance */
     return this;
@@ -291,7 +289,7 @@ Jeu.prototype = {
     }
 
     /* Animation suivante */
-    requestAnimFrame(bind(this, this.draw));
+    requestAnimFrame(this.draw.bind(this));
 
     /* Retour de l'instance */
     return this;
