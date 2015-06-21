@@ -291,9 +291,10 @@ Jeu.prototype = {
     if(+new Date() - this.getTime() > this.getInterval())
     {
       var pacman = this.getPacman();
+      var margin = this.getCaseWidth() - pacman.getSize().w;
 
       /* Suppression puis dessin du pacman */
-      this.getCanvas().getContext().clearRect(pacman.getX(), pacman.getY(), pacman.getSize().w, pacman.getSize().h);
+      this.getCanvas().getContext().clearRect(pacman.getX() + margin, pacman.getY() + margin, pacman.getSize().w, pacman.getSize().h);
       this.getPacman().draw();
 
       /* Mise à jour du temps */

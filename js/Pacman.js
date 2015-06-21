@@ -511,8 +511,11 @@ Pacman.prototype = {
     ctx.arc(size.w / 2, size.h / 2, size.w / 2, inclinaison2 * Math.PI, (inclinaison2 + 1) * Math.PI, false);
     ctx.fill();
 
+    /* La marge */
+    var margin = caseWidth - size.w;
+
     /* Dessin dans le canvas du jeu */
-    ctx_jeu.drawImage(ctx.canvas, this.getX(), this.getY());
+    ctx_jeu.drawImage(ctx.canvas, this.getX() + margin, this.getY() + margin);
 
     /* Restauration du context */
     ctx.restore();
