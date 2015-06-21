@@ -27,7 +27,10 @@ function Jeu()
   var time = null;
 
   /* L'interval pour le requestAnimationFrame */
-  var interval = 15;
+  var interval = 100;
+
+  /* La taille d'une seule case */
+  var caseWidth = 40;
 
   /**
    * Getter
@@ -125,6 +128,15 @@ function Jeu()
     /* Retour de l'instance */
     return this;
   }
+
+  /**
+   * Getter
+   *
+   * @returns {number}
+   */
+  this.getCaseWidth = function() {
+    return caseWidth;
+  }
 }
 
 /**
@@ -170,7 +182,7 @@ Jeu.prototype = {
     );
 
     /* Démarrage - TMP */
-//    this.demarrer();
+    this.demarrer();
 
     /* TMP */
     this.tracer_niveau1();
@@ -186,7 +198,7 @@ Jeu.prototype = {
     /* Context global */
     var ctx = this.getCanvas().getContext();
 
-    var width = 40;
+    var width = this.getCaseWidth();
 
     var bloc = null;
     var ligne = null;

@@ -12,7 +12,7 @@ function Pacman()
   /* Le jeu */
   var jeu = null;
 
-  /* Le canvas (non présent dans le DOM */
+  /* Le canvas (non présent dans le DOM) */
   var canvas = null;
 
   /* Taille du pacman */
@@ -23,12 +23,13 @@ function Pacman()
 
   /* Les coordonnées */
   var coordonnees = {
-    x: 50,
-    y: 50
+    x: 7 * 40,
+    y: 11 * 40
   };
 
   /* La direction courante */
   var direction = null;
+  var nextDirection = null;
 
   /* L'étape courante pour le dessin */
   var etape = null;
@@ -40,7 +41,7 @@ function Pacman()
   var interval = 40;
 
   /* Le pas de décalage de px */
-  var pas = 3;
+  var pas = 2;
 
   /* Le temps courant */
   var time = null;
@@ -153,6 +154,28 @@ function Pacman()
   /**
    * Getter
    *
+   * @returns int
+   */
+  this.getNextDirection = function() {
+    return nextDirection;
+  }
+
+  /**
+   * Setter
+   *
+   * @param int param
+   * @returns Pacman
+   */
+  this.setNextDirection = function(param) {
+    nextDirection = param;
+
+    /* Retour de l'instance */
+    return this;
+  }
+
+  /**
+   * Getter
+   *
    * @returns Canvas
    */
   this.getCanvas = function() {
@@ -207,6 +230,8 @@ function Pacman()
    */
   this.setX = function(param) {
     coordonnees.x = param;
+
+    return this;
   }
 
   /**
@@ -217,6 +242,8 @@ function Pacman()
    */
   this.setY = function(param) {
     coordonnees.y = param;
+
+    return this;
   }
 
   /**
@@ -276,7 +303,7 @@ Pacman.prototype = {
     canvas.height= this.getSize().h;
 
     /* Initialisation de la direction */
-    this.setDirection(jeu.getDirections().DOWN);
+    this.setNextDirection(jeu.getDirections().RIGHT);
 
     /* Ajout de l'event des flèches */
     window.addEventListener("keydown", this.rotate.bind(this), false);
@@ -307,6 +334,8 @@ Pacman.prototype = {
    */
   rotate: function(e) {
 
+    e.preventDefault();
+
     /* Le code d la flèche touchée */
     var code = e.keyCode;
 
@@ -316,10 +345,10 @@ Pacman.prototype = {
     /* Selon la flèche, on change le direction */
     switch(code)
     {
-      case 37 : this.setDirection(directions.LEFT);   break;
-      case 38 : this.setDirection(directions.UP);     break;
-      case 39 : this.setDirection(directions.RIGHT);  break;
-      case 40 : this.setDirection(directions.DOWN);   break;
+      case 37 : this.setNextDirection(directions.LEFT);   break;
+      case 38 : this.setNextDirection(directions.UP);     break;
+      case 39 : this.setNextDirection(directions.RIGHT);  break;
+      case 40 : this.setNextDirection(directions.DOWN);   break;
     }
 
     /* Retour de l'instance */
@@ -395,14 +424,63 @@ Pacman.prototype = {
     /* Coordonnées */
     var x = this.getCoordonnes().x;
     var y = this.getCoordonnes().y;
+    var newX = x;
+    var newY = y;
+    var currentDirection = this.getDirection();
+    var caseWidth = this.getJeu().getCaseWidth();
 
-    /* Temporaire le temps de mettre les cases */
-    switch(this.getDirection())
+    /* On peut changer de direction */
+    if(x % caseWidth == 0 && y % caseWidth == 0)
+      currentDirection = this.getNextDirection();
+
+    /* Selon la direction */
+    switch(currentDirection)
     {
-      case directions.LEFT  : this.setX(x - this.getPas()); break;
-      case directions.UP    : this.setY(y - this.getPas()); break;
-      case directions.RIGHT : this.setX(x + this.getPas()); break;
-      case directions.DOWN  : this.setY(y + this.getPas()); break;
+      case directions.LEFT  :
+      case directions.RIGHT :
+
+        /* Y OK, on change le X */
+        if(y % caseWidth == 0)
+        {
+          if(currentDirection == directions.LEFT)
+            this.setX(x - this.getPas());
+          else
+            this.setX(x + this.getPas());
+
+          /* Changement de la direction */
+          if(currentDirection == directions.LEFT || currentDirection == directions.RIGHT)
+            this.setDirection(currentDirection);
+        }
+
+        /* Teste si sens inverse */
+        if(this.getDirection() == directions.LEFT && this.getNextDirection() == directions.RIGHT ||
+          this.getDirection() == directions.RIGHT && this.getNextDirection() == directions.LEFT)
+          this.setDirection(this.getNextDirection());
+
+        break;
+
+      case directions.UP    :
+      case directions.DOWN  :
+
+        /* X OK, on change le Y */
+        if(x % caseWidth == 0)
+        {
+          if(currentDirection == directions.UP)
+            this.setY(y - this.getPas());
+          else
+            this.setY(y + this.getPas());
+
+          /* Changement de la direction */
+          if(currentDirection == directions.UP || currentDirection == directions.DOWN)
+          this.setDirection(currentDirection);
+        }
+
+        /* Teste si sens inverse */
+        if(this.getDirection() == directions.UP && this.getNextDirection() == directions.DOWN ||
+          this.getDirection() == directions.DOWN && this.getNextDirection() == directions.UP)
+          this.setDirection(this.getNextDirection());
+
+        break;
     }
 
     /* Enregistrement du context */
