@@ -19,14 +19,17 @@ class Levels
   private constructLevel1():void
   {
     /* Les blocs avec cases */
-    var cases:Array<Array<Case>> = new Array (20);
+    var cases:Array<Array<Case>> = new Array(20);
 
     for (var i = 0, l = cases.length; i < l; ++i)
     {
-      cases[i] = new Array (15);
+      cases[i] = new Array(15);
 
-      for(var j = 0, k = cases[i].length ; j < k ; ++j)
+      for (var j = 0, k = cases[i].length; j < k; ++j)
+      {
         cases[i][j] = new Case();
+        cases[i][j].setCoordinates(j, i);
+      }
     }
 
     /* On rempli toutes les cases murs */
@@ -139,5 +142,17 @@ class Levels
 
     /* Ajout des cases */
     this.levels.push(cases);
+  }
+
+  /**
+   * Retourne le tableau désiré
+   *
+   * @param currentLevel
+   */
+  get(currentLevel:number):Array<Array<Case>>
+  {
+    var level:Array<Array<Case>> = this.levels[currentLevel - 1] || null;
+
+    return level;
   }
 }

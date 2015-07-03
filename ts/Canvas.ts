@@ -35,4 +35,14 @@ class Canvas
     /* Retour de l'instance */
     return this;
   }
+
+  /**
+   * Getter du contexte
+   *
+   * @returns {CanvasRenderingContext2D}
+   */
+  public getContext():CanvasRenderingContext2D
+  {
+    return this.context;
+  }
 }

@@ -24,6 +24,14 @@ var Canvas = (function () {
         /* Retour de l'instance */
         return this;
     };
+    /**
+     * Getter du contexte
+     *
+     * @returns {CanvasRenderingContext2D}
+     */
+    Canvas.prototype.getContext = function () {
+        return this.context;
+    };
     return Canvas;
 })();
 /**
@@ -32,6 +40,15 @@ var Canvas = (function () {
 var Case = (function () {
     function Case() {
         this.wall = false;
+        this.coordinates = {
+            x: 0,
+            y: 0
+        };
+        /* Initialisation des bordures */
+        this.borderLeft = true;
+        this.borderRight = true;
+        this.borderTop = true;
+        this.borderBottom = true;
     }
     /**
      * Getter/Setter
@@ -39,10 +56,66 @@ var Case = (function () {
      * @returns {boolean}
      */
     Case.prototype.isAWall = function (isAWall) {
+        if (isAWall === void 0) { isAWall = null; }
         if (isAWall !== null)
             this.wall = isAWall;
         return this.wall;
     };
+    /**
+     * S'il y a une bordure à gauche
+     */
+    Case.prototype.hasBorderLeft = function (hasBorder) {
+        if (hasBorder === void 0) { hasBorder = null; }
+        if (hasBorder !== null)
+            this.borderLeft = hasBorder;
+        return this.borderLeft;
+    };
+    /**
+     * S'il y a une bordure à droite
+     */
+    Case.prototype.hasBorderRight = function (hasBorder) {
+        if (hasBorder === void 0) { hasBorder = null; }
+        if (hasBorder !== null)
+            this.borderRight = hasBorder;
+        return this.borderRight;
+    };
+    /**
+     * S'il y a une bordure en haut
+     */
+    Case.prototype.hasBorderTop = function (hasBorder) {
+        if (hasBorder === void 0) { hasBorder = null; }
+        if (hasBorder !== null)
+            this.borderTop = hasBorder;
+        return this.borderTop;
+    };
+    /**
+     * S'il y a une bordure en bas
+     */
+    Case.prototype.hasBorderBottom = function (hasBorder) {
+        if (hasBorder === void 0) { hasBorder = null; }
+        if (hasBorder !== null)
+            this.borderBottom = hasBorder;
+        return this.borderBottom;
+    };
+    /**
+     * Les coordonnées
+     *
+     * @param i
+     * @param j
+     */
+    Case.prototype.setCoordinates = function (i, j) {
+        this.coordinates.x = i;
+        this.coordinates.y = j;
+    };
+    /**
+     * Retourne les coordonnées
+     *
+     * @returns {Point}
+     */
+    Case.prototype.getCoordinates = function () {
+        return this.coordinates;
+    };
+    Case.CASE_WIDTH = 40;
     return Case;
 })();
 /**
@@ -55,6 +128,9 @@ var oDirections;
     oDirections[oDirections["Up"] = 2] = "Up";
     oDirections[oDirections["Down"] = 3] = "Down";
 })(oDirections || (oDirections = {}));
+/**
+ * Created by thiron on 03/07/2015.
+ */
 /**
  * Created by thiron on 03/07/2015.
  */
@@ -100,8 +176,10 @@ var Levels = (function () {
         var cases = new Array(20);
         for (var i = 0, l = cases.length; i < l; ++i) {
             cases[i] = new Array(15);
-            for (var j = 0, k = cases[i].length; j < k; ++j)
+            for (var j = 0, k = cases[i].length; j < k; ++j) {
                 cases[i][j] = new Case();
+                cases[i][j].setCoordinates(j, i);
+            }
         }
         /* On rempli toutes les cases murs */
         cases[0][7].isAWall(true);
@@ -213,6 +291,15 @@ var Levels = (function () {
         /* Ajout des cases */
         this.levels.push(cases);
     };
+    /**
+     * Retourne le tableau désiré
+     *
+     * @param currentLevel
+     */
+    Levels.prototype.get = function (currentLevel) {
+        var level = this.levels[currentLevel - 1] || null;
+        return level;
+    };
     return Levels;
 })();
 /**
@@ -229,7 +316,74 @@ var LevelsManager = (function () {
      * @param canvas
      */
     LevelsManager.prototype.draw = function (canvas) {
+        var currentLevel = this.levels.get(this.currentLevel);
+        /* Prévention de bug */
+        if (currentLevel == null)
+            return this;
+        for (var i = 0, l = currentLevel.length; i < l; ++i) {
+            var row = currentLevel[i];
+            for (var j = 0, k = row.length; j < k; ++j) {
+                var currentCase = row[j];
+                /* Détermination des bordures à supprimer */
+                var leftCase = row[j - 1] || null;
+                var rightCase = row[j + 1] || null;
+                var upCase = currentLevel[i - 1] != null ? currentLevel[i - 1][j] : null;
+                var downCase = currentLevel[i + 1] != null ? currentLevel[i + 1][j] : null;
+                /* Suppression des bordures */
+                currentCase.hasBorderLeft(leftCase != null && currentCase.isAWall() && !leftCase.isAWall());
+                currentCase.hasBorderRight(rightCase != null && currentCase.isAWall() && !rightCase.isAWall());
+                currentCase.hasBorderTop(upCase != null && currentCase.isAWall() && !upCase.isAWall());
+                currentCase.hasBorderBottom(downCase != null && currentCase.isAWall() && !downCase.isAWall());
+                /* Dessine la case courante */
+                this.drawCase(canvas, currentCase);
+            }
+        }
         return this;
+    };
+    /**
+     * Dessine la case courante
+     *
+     * @param currentCase
+     */
+    LevelsManager.prototype.drawCase = function (canvas, currentCase) {
+        var context = canvas.getContext();
+        context.strokeStyle = "#012EB6";
+        context.fillStyle = "#012EB6";
+        context.lineJoin = "round";
+        context.lineWidth = 2;
+        var coordinates = currentCase.getCoordinates();
+        if (currentCase.hasBorderLeft()) {
+            /* Démarrage du tracé */
+            context.beginPath();
+            context.moveTo(coordinates.x * Case.CASE_WIDTH, coordinates.y * Case.CASE_WIDTH);
+            context.lineTo(coordinates.x * Case.CASE_WIDTH, (coordinates.y + 1) * Case.CASE_WIDTH);
+            context.stroke();
+            context.closePath();
+        }
+        if (currentCase.hasBorderRight()) {
+            /* Démarrage du tracé */
+            context.beginPath();
+            context.moveTo((coordinates.x + 1) * Case.CASE_WIDTH, coordinates.y * Case.CASE_WIDTH);
+            context.lineTo((coordinates.x + 1) * Case.CASE_WIDTH, (coordinates.y + 1) * Case.CASE_WIDTH);
+            context.stroke();
+            context.closePath();
+        }
+        if (currentCase.hasBorderTop()) {
+            /* Démarrage du tracé */
+            context.beginPath();
+            context.moveTo(coordinates.x * Case.CASE_WIDTH, coordinates.y * Case.CASE_WIDTH);
+            context.lineTo((coordinates.x + 1) * Case.CASE_WIDTH, coordinates.y * Case.CASE_WIDTH);
+            context.stroke();
+            context.closePath();
+        }
+        if (currentCase.hasBorderBottom()) {
+            /* Démarrage du tracé */
+            context.beginPath();
+            context.moveTo(coordinates.x * Case.CASE_WIDTH, (coordinates.y + 1) * Case.CASE_WIDTH);
+            context.lineTo((coordinates.x + 1) * Case.CASE_WIDTH, (coordinates.y + 1) * Case.CASE_WIDTH);
+            context.stroke();
+            context.closePath();
+        }
     };
     return LevelsManager;
 })();
