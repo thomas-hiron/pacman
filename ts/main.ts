@@ -10,6 +10,7 @@ window.addEventListener("load", init, false);
 function init()
 {
   var jeu:Jeu = new Jeu();
+  jeu.init();
 }
 
 /* RequestAnimationFrame */
