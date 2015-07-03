@@ -24,7 +24,6 @@ class Jeu
     }
     catch (e)
     {
-
       /* Une erreur s'est produite, alert puis redirection */
       alert(e.message);
       window.location.href = "http://www.thomas-hiron.com";
@@ -32,6 +31,7 @@ class Jeu
       /* Retour de l'instance pour ne pas continuer le temps de la redirection */
       return this;
     }
+
     /* Les niveaux */
     this.levelsManager = new LevelsManager();
     this.levelsManager.draw(this.canvas);

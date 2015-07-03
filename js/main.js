@@ -353,37 +353,27 @@ var LevelsManager = (function () {
         context.lineWidth = 2;
         var coordinates = currentCase.getCoordinates();
         if (currentCase.hasBorderLeft()) {
-            /* Démarrage du tracé */
-            context.beginPath();
             context.moveTo(coordinates.x * Case.CASE_WIDTH, coordinates.y * Case.CASE_WIDTH);
             context.lineTo(coordinates.x * Case.CASE_WIDTH, (coordinates.y + 1) * Case.CASE_WIDTH);
-            context.stroke();
-            context.closePath();
         }
+        /* Bordure droite */
         if (currentCase.hasBorderRight()) {
-            /* Démarrage du tracé */
-            context.beginPath();
             context.moveTo((coordinates.x + 1) * Case.CASE_WIDTH, coordinates.y * Case.CASE_WIDTH);
             context.lineTo((coordinates.x + 1) * Case.CASE_WIDTH, (coordinates.y + 1) * Case.CASE_WIDTH);
-            context.stroke();
-            context.closePath();
         }
+        /* Bordure haut */
         if (currentCase.hasBorderTop()) {
-            /* Démarrage du tracé */
-            context.beginPath();
             context.moveTo(coordinates.x * Case.CASE_WIDTH, coordinates.y * Case.CASE_WIDTH);
             context.lineTo((coordinates.x + 1) * Case.CASE_WIDTH, coordinates.y * Case.CASE_WIDTH);
-            context.stroke();
-            context.closePath();
         }
+        /* Bordure bas */
         if (currentCase.hasBorderBottom()) {
-            /* Démarrage du tracé */
-            context.beginPath();
             context.moveTo(coordinates.x * Case.CASE_WIDTH, (coordinates.y + 1) * Case.CASE_WIDTH);
             context.lineTo((coordinates.x + 1) * Case.CASE_WIDTH, (coordinates.y + 1) * Case.CASE_WIDTH);
-            context.stroke();
-            context.closePath();
         }
+        /* Bordure et fermeture du path */
+        context.stroke();
+        context.closePath();
     };
     return LevelsManager;
 })();
