@@ -1,38 +1,24 @@
 /**
- * Created by ThomasHiron on 28/08/2014.
+ * Created by thiron on 03/07/2015.
  */
-
-/* Ajout du listener window ready */
+var Jeu = (function () {
+    function Jeu() {
+    }
+    return Jeu;
+})();
+/**
+ * Created by thiron on 03/07/2015.
+ */
 window.addEventListener("load", init, false);
-
 /**
  * Chargement de la fenêtre, initialisation
  */
-function init()
-{
-  new Jeu().init();
+function init() {
+    var jeu = new Jeu();
 }
-
-/* $("selector") --> querySelectorAll */
-/**
- *
- * @param q Sélecteur
- * @param [el=null] Scope dans lequel effectuer la requête
- * @returns NodeList
- */
-function $(q, el)
-{
-  return el ?
-    el.querySelectorAll(q) :
-    document.querySelectorAll(q);
-}
-
 /* RequestAnimationFrame */
-window.requestAnimFrame = (function(){
-  return  window.requestAnimationFrame ||
-    window.webkitRequestAnimationFrame ||
-    window.mozRequestAnimationFrame    ||
-    function( callback ){
-      window.setTimeout(callback, 1000 / 60);
+var requestAnimFrame = (function () {
+    return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (callback) {
+        window.setTimeout(callback, 1000 / 60, new Date().getTime());
     };
 })();

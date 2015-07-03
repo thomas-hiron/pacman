@@ -27,7 +27,7 @@ function Jeu()
   var time = null;
 
   /* L'interval pour le requestAnimationFrame */
-  var interval = 100;
+  var interval = 50;
 
   /* La taille d'une seule case */
   var caseWidth = 40;
