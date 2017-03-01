@@ -64,7 +64,6 @@ class LevelsManager
   {
     var context:CanvasRenderingContext2D = canvas.getContext();
 
-    context.globalCompositeOperation = 'source-over';
     context.strokeStyle = "#012EB6";
     context.lineWidth = 4;
 
@@ -104,6 +103,9 @@ class LevelsManager
     context.globalCompositeOperation = 'destination-out';
     context.lineWidth = 2;
     context.stroke();
+
+    /* Le contexte par défaut */
+    context.globalCompositeOperation = 'source-over';
 
     /* Fermeture du path */
     context.closePath();
