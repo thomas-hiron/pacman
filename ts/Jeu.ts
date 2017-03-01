@@ -15,7 +15,7 @@ class Jeu
   public constructor()
   {
     this.time = +new Date();
-    this.interval = 20;
+    this.interval = 10;
   }
 
   /**
