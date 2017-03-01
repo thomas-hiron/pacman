@@ -35,5 +35,9 @@ class Jeu
     /* Les niveaux */
     this.levelsManager = new LevelsManager();
     this.levelsManager.draw(this.canvas);
+
+    /* Pacman */
+    var pacman:Pacman = new Pacman(this.canvas);
+    //pacman.set
   }
 }

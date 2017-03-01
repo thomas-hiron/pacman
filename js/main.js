@@ -156,6 +156,9 @@ var Jeu = (function () {
         /* Les niveaux */
         this.levelsManager = new LevelsManager();
         this.levelsManager.draw(this.canvas);
+        /* Pacman */
+        var pacman = new Pacman(this.canvas);
+        //pacman.set
     };
     Jeu.INTERVAL = 50;
     return Jeu;
@@ -401,4 +404,28 @@ var requestAnimFrame = (function () {
     return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (callback) {
         window.setTimeout(callback, 1000 / 60, new Date().getTime());
     };
+})();
+/**
+ * Created by thiron on 01/03/2017.
+ */
+var Pacman = (function () {
+    /**
+     * Le constructeur qui initialise les variables
+     */
+    function Pacman(canvas) {
+        this.size = {
+            w: 30,
+            h: 30
+        };
+        this.coordinates = {
+            x: 7 * Case.CASE_WIDTH,
+            y: 11 * Case.CASE_WIDTH
+        };
+        this.canvas = canvas;
+        this.stepNumber = 6;
+        this.interval = 40;
+        this.stepPx = 2;
+        this.time = +new Date();
+    }
+    return Pacman;
 })();
