@@ -20,7 +20,7 @@ class Pacman
   private size:Size;
 
   /**
-   * Les coordonnées de départ
+   * Les coordonnÃ©es de dÃ©part
    */
   private coordinates:Point;
 
@@ -31,7 +31,7 @@ class Pacman
   private nextDirection:number;
 
   /**
-   * L'étape courante pour le dessin et le nombre d'animations
+   * L'Ã©tape courante pour le dessin et le nombre d'animations
    */
   private currentStep:number;
   private stepNumber:number;
@@ -42,7 +42,7 @@ class Pacman
   private interval:number;
 
   /**
-   * Le décalage en px lors du mouvement
+   * Le dÃ©calage en px lors du mouvement
    */
   private stepPx:number;
 
@@ -82,7 +82,7 @@ class Pacman
    */
   public init()
   {
-    /* Création du canvas */
+    /* CrÃ©ation du canvas */
     this.canvas = new Canvas(document.createElement('CANVAS'));
     this.canvas.init();
 
@@ -94,7 +94,7 @@ class Pacman
     /* Initialisation de la direction */
     this.nextDirection = Directions.Right;
 
-    /* Ajout de l'event des flèches */
+    /* Ajout de l'event des flÃ¨ches */
     window.addEventListener("keydown", this.rotate.bind(this), false);
 
     /* Retour de l'instance */
@@ -112,13 +112,13 @@ class Pacman
   {
     e.preventDefault();
 
-    /* Le code de la flèche touchée */
+    /* Le code de la flÃ¨che touchÃ©e */
     var code = e.keyCode;
 
     /* Les directions */
     var directions = Directions;
 
-    /* Selon la flèche, on change le direction */
+    /* Selon la flÃ¨che, on change le direction */
     switch (code)
     {
       case 37 :
@@ -140,14 +140,14 @@ class Pacman
   }
 
   /**
-   * Démarre le requestAnimationFrame
+   * DÃ©marre le requestAnimationFrame
    *
    * @returns {Pacman}
    */
   public start()
   {
     /* Animation suivante */
-    requestAnimFrame(this.animate);
+    requestAnimFrame(this.animate.bind(this));
 
     return this;
   }
@@ -159,6 +159,22 @@ class Pacman
    */
   public animate()
   {
+    /* Si l'interval a Ã©tÃ© atteind */
+    if (+new Date() - this.time > this.interval)
+    {
+      /* On augmente l'Ã©tape */
+      this.currentStep++;
+
+      /* RÃ©initialisation de l'Ã©tape si besoin */
+      if (this.currentStep % this.stepNumber == 0)
+        this.currentStep = 0;
+
+      /* Mise Ã  jour du temps */
+      this.time = +new Date();
+    }
+
+    /* Animation suivante */
+    requestAnimFrame(this.animate.bind(this));
 
     /* Retour de l'instance */
     return this;

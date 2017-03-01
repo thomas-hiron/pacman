@@ -445,7 +445,7 @@ var Pacman = (function () {
      * @returns {Pacman}
      */
     Pacman.prototype.init = function () {
-        /* Cr�ation du canvas */
+        /* Création du canvas */
         this.canvas = new Canvas(document.createElement('CANVAS'));
         this.canvas.init();
         /* Initialisation de la taille du canvas */
@@ -454,7 +454,7 @@ var Pacman = (function () {
         canvas.height = this.size.h;
         /* Initialisation de la direction */
         this.nextDirection = 1 /* Right */;
-        /* Ajout de l'event des fl�ches */
+        /* Ajout de l'event des flèches */
         window.addEventListener("keydown", this.rotate.bind(this), false);
         /* Retour de l'instance */
         return this;
@@ -468,7 +468,7 @@ var Pacman = (function () {
      */
     Pacman.prototype.rotate = function (e) {
         e.preventDefault();
-        /* Le code de la fl�che touch�e */
+        /* Le code de la flèche touchée */
         var code = e.keyCode;
         /* Les directions */
         var directions = Directions;
@@ -490,13 +490,13 @@ var Pacman = (function () {
         return this;
     };
     /**
-     * D�marre le requestAnimationFrame
+     * Démarre le requestAnimationFrame
      *
      * @returns {Pacman}
      */
     Pacman.prototype.start = function () {
         /* Animation suivante */
-        requestAnimFrame(this.animate);
+        requestAnimFrame(this.animate.bind(this));
         return this;
     };
     /**
@@ -505,6 +505,18 @@ var Pacman = (function () {
      * @returns {Pacman}
      */
     Pacman.prototype.animate = function () {
+        /* Si l'interval a été atteind */
+        if (+new Date() - this.time > this.interval) {
+            /* On augmente l'étape */
+            this.currentStep++;
+            /* Réinitialisation de l'étape si besoin */
+            if (this.currentStep % this.stepNumber == 0)
+                this.currentStep = 0;
+            /* Mise à jour du temps */
+            this.time = +new Date();
+        }
+        /* Animation suivante */
+        requestAnimFrame(this.animate.bind(this));
         /* Retour de l'instance */
         return this;
     };
