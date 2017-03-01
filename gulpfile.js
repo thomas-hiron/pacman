@@ -8,7 +8,7 @@ var ts = require('gulp-typescript');
 /**
  * Par défaut, on watch
  */
-gulp.task('default', ['watch']);
+gulp.task('default', ['watch', 'typescript']);
 
 /**
  * Watchers
