@@ -10,11 +10,6 @@ class Pacman
   private canvas:Canvas;
 
   /**
-   * Le canvas du jeu
-   */
-  private gameCanvas:Canvas;
-
-  /**
    * La taille de pacman
    */
   private size:Size;
@@ -52,11 +47,35 @@ class Pacman
   private time:number;
 
   /**
+   * @returns {Size}
+   */
+  public getSize()
+  {
+    return this.size;
+  }
+
+  /**
+   * @returns {number}
+   */
+  public getX()
+  {
+    return this.coordinates.x;
+  }
+
+  /**
+   * @returns {number}
+   */
+  public getY()
+  {
+    return this.coordinates.y;
+  }
+
+  /**
    * Le constructeur qui initialise les variables
    *
    * @param gameCanvas
    */
-  public constructor(gameCanvas:Canvas)
+  public constructor()
   {
     this.size = {
       w: 30,
@@ -68,7 +87,7 @@ class Pacman
       y: 11 * Case.CASE_WIDTH
     };
 
-    this.gameCanvas = gameCanvas;
+    this.currentStep = 0;
     this.stepNumber = 6;
     this.interval = 40;
     this.stepPx = 2;
@@ -175,6 +194,174 @@ class Pacman
 
     /* Animation suivante */
     requestAnimFrame(this.animate.bind(this));
+
+    /* Retour de l'instance */
+    return this;
+  }
+
+  /**
+   * Dessine le Pacman
+   *
+   * @returns {Pacman}
+   */
+  public draw(gameCtx:CanvasRenderingContext2D)
+  {
+    /* L'angle du dessin */
+    var angle = 0;
+
+    /* Le context du pacman */
+    var ctx = this.canvas.getContext();
+
+    /* Les directions */
+    var directions = Directions;
+
+    /* Taille */
+    var size = this.size;
+
+    /* Suppression du context */
+    ctx.clearRect(0, 0, size.w, size.h);
+
+    /* Changement de l'angle en fonction de la direction */
+    switch (this.direction)
+    {
+      case directions.Left:
+        angle = 180;
+        break;
+      case directions.Up:
+        angle = 270;
+        break;
+      case directions.Right:
+        angle = 0;
+        break;
+      case directions.Down:
+        angle = 90;
+        break;
+    }
+
+    /* -- Dessin du pacman dans le context courant -- */
+
+    /* Coordonnées */
+    var x = this.coordinates.x;
+    var y = this.coordinates.y;
+    var newX = x;
+    var newY = y;
+    var currentDirection = this.direction;
+    var caseWidth = Case.CASE_WIDTH;
+
+    /* On peut changer de direction */
+    if (x % caseWidth == 0 && y % caseWidth == 0)
+      currentDirection = this.nextDirection;
+
+    /* Selon la direction */
+    switch (currentDirection)
+    {
+      case directions.Left  :
+      case directions.Right :
+
+        /* Y OK, on change le X */
+        if (y % caseWidth == 0)
+        {
+          if (currentDirection == directions.Left)
+            newX = x - this.stepPx;
+          else
+            newX = x + this.stepPx;
+
+          /* Vérification de collision */
+          var caseNumberX = parseInt(x / caseWidth);
+          var caseNumberY = parseInt(y / caseWidth);
+
+          if (currentDirection == directions.Right)
+            ++caseNumberX;
+
+          //var collide = jeu.checkCollision(caseNumberX, caseNumberY);
+          //
+          //if (!collide)
+          this.coordinates.x = newX;
+
+          /* Changement de la direction */
+          if (currentDirection == directions.Left || currentDirection == directions.Right)
+            this.direction = currentDirection;
+        }
+
+        /* Teste si sens inverse */
+        if (this.direction == directions.Left && this.nextDirection == directions.Right ||
+          this.direction == directions.Right && this.nextDirection == directions.Left)
+          this.direction = this.nextDirection;
+
+        break;
+
+      case directions.Up    :
+      case directions.Down  :
+
+        /* X OK, on change le Y */
+        if (x % caseWidth == 0)
+        {
+          if (currentDirection == directions.Up)
+            newY = y - this.stepPx;
+          else
+            newY = y + this.stepPx;
+
+          /* Vérification de collision */
+          var caseNumberX = parseInt(x / caseWidth);
+          var caseNumberY = parseInt(y / caseWidth);
+
+          if (currentDirection == directions.Down)
+            ++caseNumberY;
+
+          //var collide = jeu.checkCollision(caseNumberX, caseNumberY);
+          //
+          //if (!collide)
+          this.coordinates.y = newY;
+
+          /* Changement de la direction */
+          if (currentDirection == directions.Up || currentDirection == directions.Down)
+            this.direction = currentDirection;
+        }
+
+        /* Teste si sens inverse */
+        if (this.direction == directions.Up && this.nextDirection == directions.Down ||
+          this.direction == directions.Down && this.nextDirection == directions.Up)
+          this.direction = this.nextDirection;
+
+        break;
+    }
+
+    /* Enregistrement du context */
+    ctx.save();
+
+    /* Translation */
+    ctx.translate(size.w / 2, size.h / 2);
+
+    /* Rotation */
+    ctx.rotate(angle * Math.PI / 180);
+
+    /* Translation inverse pour le remettre comme avant */
+    ctx.translate(-size.w / 2, -size.h / 2);
+
+    /* Couleur */
+    ctx.fillStyle = "#FFFF00";
+
+    /* Calcul pour le dessin */
+    var et           = this.currentStep,
+        inclinaison  = et * 0.25 / (this.stepNumber - 1),
+        inclinaison2 = 1 - inclinaison;
+
+    /* Dessin */
+    ctx.beginPath();
+    ctx.arc(size.w / 2, size.h / 2, size.w / 2, inclinaison * Math.PI, (inclinaison + 1) * Math.PI, false);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(size.w / 2, size.h / 2, size.w / 2, inclinaison2 * Math.PI, (inclinaison2 + 1) * Math.PI, false);
+    ctx.fill();
+
+    /* La marge */
+    var margin = caseWidth - size.w;
+
+    /* Dessin dans le canvas du jeu */
+    gameCtx.drawImage(ctx.canvas, this.getX() + margin, this.getY() + margin);
+
+    /* Restauration du context */
+    ctx.restore();
 
     /* Retour de l'instance */
     return this;

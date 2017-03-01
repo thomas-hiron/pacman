@@ -144,6 +144,8 @@ var Directions;
  */
 var Jeu = (function () {
     function Jeu() {
+        this.time = +new Date();
+        this.interval = 20;
     }
     /**
      * Initialise le jeu
@@ -165,10 +167,33 @@ var Jeu = (function () {
         this.levelsManager = new LevelsManager();
         this.levelsManager.draw(this.canvas);
         /* Pacman */
-        var pacman = new Pacman(this.canvas);
-        pacman.init();
+        this.pacman = new Pacman();
+        this.pacman.init();
         /* TMP - d�marrage du jeu */
-        pacman.start();
+        this.pacman.start();
+        /* RequestAnimationFrame pour le pacman, les fantomes */
+        requestAnimFrame(this.draw.bind(this));
+        return this;
+    };
+    /**
+     * Dessine les diff�rents �l�ments du jeu
+     *
+     * @returns {Jeu}
+     */
+    Jeu.prototype.draw = function () {
+        /* Si l'interval a �t� atteind */
+        if (+new Date() - this.time > this.interval) {
+            var pacman = this.pacman;
+            var margin = Case.CASE_WIDTH - pacman.getSize().w;
+            /* Suppression puis dessin du pacman */
+            this.canvas.getContext().clearRect(pacman.getX() + margin, pacman.getY() + margin, pacman.getSize().w, pacman.getSize().h);
+            pacman.draw(this.canvas.getContext());
+            /* Mise � jour du temps */
+            this.time = +new Date();
+        }
+        /* Animation suivante */
+        requestAnimFrame(this.draw.bind(this));
+        return this;
     };
     Jeu.INTERVAL = 50;
     return Jeu;
@@ -364,7 +389,6 @@ var LevelsManager = (function () {
      */
     LevelsManager.prototype.drawCase = function (canvas, currentCase) {
         var context = canvas.getContext();
-        context.globalCompositeOperation = 'source-over';
         context.strokeStyle = "#012EB6";
         context.lineWidth = 4;
         var coordinates = currentCase.getCoordinates();
@@ -393,6 +417,8 @@ var LevelsManager = (function () {
         context.globalCompositeOperation = 'destination-out';
         context.lineWidth = 2;
         context.stroke();
+        /* Le contexte par défaut */
+        context.globalCompositeOperation = 'source-over';
         /* Fermeture du path */
         context.closePath();
     };
@@ -424,7 +450,7 @@ var Pacman = (function () {
      *
      * @param gameCanvas
      */
-    function Pacman(gameCanvas) {
+    function Pacman() {
         this.size = {
             w: 30,
             h: 30
@@ -433,12 +459,30 @@ var Pacman = (function () {
             x: 7 * Case.CASE_WIDTH,
             y: 11 * Case.CASE_WIDTH
         };
-        this.gameCanvas = gameCanvas;
+        this.currentStep = 0;
         this.stepNumber = 6;
         this.interval = 40;
         this.stepPx = 2;
         this.time = +new Date();
     }
+    /**
+     * @returns {Size}
+     */
+    Pacman.prototype.getSize = function () {
+        return this.size;
+    };
+    /**
+     * @returns {number}
+     */
+    Pacman.prototype.getX = function () {
+        return this.coordinates.x;
+    };
+    /**
+     * @returns {number}
+     */
+    Pacman.prototype.getY = function () {
+        return this.coordinates.y;
+    };
     /**
      * Initialisation
      *
@@ -517,6 +561,127 @@ var Pacman = (function () {
         }
         /* Animation suivante */
         requestAnimFrame(this.animate.bind(this));
+        /* Retour de l'instance */
+        return this;
+    };
+    /**
+     * Dessine le Pacman
+     *
+     * @returns {Pacman}
+     */
+    Pacman.prototype.draw = function (gameCtx) {
+        /* L'angle du dessin */
+        var angle = 0;
+        /* Le context du pacman */
+        var ctx = this.canvas.getContext();
+        /* Les directions */
+        var directions = Directions;
+        /* Taille */
+        var size = this.size;
+        /* Suppression du context */
+        ctx.clearRect(0, 0, size.w, size.h);
+        switch (this.direction) {
+            case 0 /* Left */:
+                angle = 180;
+                break;
+            case 2 /* Up */:
+                angle = 270;
+                break;
+            case 1 /* Right */:
+                angle = 0;
+                break;
+            case 3 /* Down */:
+                angle = 90;
+                break;
+        }
+        /* -- Dessin du pacman dans le context courant -- */
+        /* Coordonnées */
+        var x = this.coordinates.x;
+        var y = this.coordinates.y;
+        var newX = x;
+        var newY = y;
+        var currentDirection = this.direction;
+        var caseWidth = Case.CASE_WIDTH;
+        /* On peut changer de direction */
+        if (x % caseWidth == 0 && y % caseWidth == 0)
+            currentDirection = this.nextDirection;
+        switch (currentDirection) {
+            case 0 /* Left */:
+            case 1 /* Right */:
+                /* Y OK, on change le X */
+                if (y % caseWidth == 0) {
+                    if (currentDirection == 0 /* Left */)
+                        newX = x - this.stepPx;
+                    else
+                        newX = x + this.stepPx;
+                    /* Vérification de collision */
+                    var caseNumberX = parseInt(x / caseWidth);
+                    var caseNumberY = parseInt(y / caseWidth);
+                    if (currentDirection == 1 /* Right */)
+                        ++caseNumberX;
+                    //var collide = jeu.checkCollision(caseNumberX, caseNumberY);
+                    //
+                    //if (!collide)
+                    this.coordinates.x = newX;
+                    /* Changement de la direction */
+                    if (currentDirection == 0 /* Left */ || currentDirection == 1 /* Right */)
+                        this.direction = currentDirection;
+                }
+                /* Teste si sens inverse */
+                if (this.direction == 0 /* Left */ && this.nextDirection == 1 /* Right */ || this.direction == 1 /* Right */ && this.nextDirection == 0 /* Left */)
+                    this.direction = this.nextDirection;
+                break;
+            case 2 /* Up */:
+            case 3 /* Down */:
+                /* X OK, on change le Y */
+                if (x % caseWidth == 0) {
+                    if (currentDirection == 2 /* Up */)
+                        newY = y - this.stepPx;
+                    else
+                        newY = y + this.stepPx;
+                    /* Vérification de collision */
+                    var caseNumberX = parseInt(x / caseWidth);
+                    var caseNumberY = parseInt(y / caseWidth);
+                    if (currentDirection == 3 /* Down */)
+                        ++caseNumberY;
+                    //var collide = jeu.checkCollision(caseNumberX, caseNumberY);
+                    //
+                    //if (!collide)
+                    this.coordinates.y = newY;
+                    /* Changement de la direction */
+                    if (currentDirection == 2 /* Up */ || currentDirection == 3 /* Down */)
+                        this.direction = currentDirection;
+                }
+                /* Teste si sens inverse */
+                if (this.direction == 2 /* Up */ && this.nextDirection == 3 /* Down */ || this.direction == 3 /* Down */ && this.nextDirection == 2 /* Up */)
+                    this.direction = this.nextDirection;
+                break;
+        }
+        /* Enregistrement du context */
+        ctx.save();
+        /* Translation */
+        ctx.translate(size.w / 2, size.h / 2);
+        /* Rotation */
+        ctx.rotate(angle * Math.PI / 180);
+        /* Translation inverse pour le remettre comme avant */
+        ctx.translate(-size.w / 2, -size.h / 2);
+        /* Couleur */
+        ctx.fillStyle = "#FFFF00";
+        /* Calcul pour le dessin */
+        var et = this.currentStep, inclinaison = et * 0.25 / (this.stepNumber - 1), inclinaison2 = 1 - inclinaison;
+        /* Dessin */
+        ctx.beginPath();
+        ctx.arc(size.w / 2, size.h / 2, size.w / 2, inclinaison * Math.PI, (inclinaison + 1) * Math.PI, false);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(size.w / 2, size.h / 2, size.w / 2, inclinaison2 * Math.PI, (inclinaison2 + 1) * Math.PI, false);
+        ctx.fill();
+        /* La marge */
+        var margin = caseWidth - size.w;
+        /* Dessin dans le canvas du jeu */
+        gameCtx.drawImage(ctx.canvas, this.getX() + margin, this.getY() + margin);
+        /* Restauration du context */
+        ctx.restore();
         /* Retour de l'instance */
         return this;
     };

@@ -7,9 +7,16 @@ class Jeu
   private static INTERVAL = 50;
 
   private canvas:Canvas;
-  private pacman:Object;
+  private pacman:Pacman;
   private time:number;
+  private interval:number;
   private levelsManager:LevelsManager;
+
+  public constructor()
+  {
+    this.time = +new Date();
+    this.interval = 20;
+  }
 
   /**
    * Initialise le jeu
@@ -37,10 +44,41 @@ class Jeu
     this.levelsManager.draw(this.canvas);
 
     /* Pacman */
-    var pacman:Pacman = new Pacman(this.canvas);
-    pacman.init();
+    this.pacman = new Pacman();
+    this.pacman.init();
 
     /* TMP - démarrage du jeu */
-    pacman.start();
+    this.pacman.start();
+    /* RequestAnimationFrame pour le pacman, les fantomes */
+    requestAnimFrame(this.draw.bind(this));
+
+    return this;
+  }
+
+  /**
+   * Dessine les différents éléments du jeu
+   *
+   * @returns {Jeu}
+   */
+  public draw()
+  {
+    /* Si l'interval a été atteind */
+    if (+new Date() - this.time > this.interval)
+    {
+      var pacman = this.pacman;
+      var margin = Case.CASE_WIDTH - pacman.getSize().w;
+
+      /* Suppression puis dessin du pacman */
+      this.canvas.getContext().clearRect(pacman.getX() + margin, pacman.getY() + margin, pacman.getSize().w, pacman.getSize().h);
+      pacman.draw(this.canvas.getContext());
+
+      /* Mise à jour du temps */
+      this.time = +new Date();
+    }
+
+    /* Animation suivante */
+    requestAnimFrame(this.draw.bind(this));
+
+    return this;
   }
 }
