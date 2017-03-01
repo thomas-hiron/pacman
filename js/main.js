@@ -439,6 +439,8 @@ var Pacman = (function () {
     }
     /**
      * Initialisation
+     *
+     * @returns {Pacman}
      */
     Pacman.prototype.init = function () {
         /* Cr�ation du canvas */
@@ -456,10 +458,34 @@ var Pacman = (function () {
         return this;
     };
     /**
-     * Effectue la rotation, ind�pendant du mouvement
+     * Modifie la valeur de nextDirection, ne fait rien d'autre
+     *
+     * @param e:KeyboardEvent
+     *
+     * @returns {Pacman}
      */
-    Pacman.prototype.rotate = function () {
-        console.log('rotate');
+    Pacman.prototype.rotate = function (e) {
+        e.preventDefault();
+        /* Le code de la fl�che touch�e */
+        var code = e.keyCode;
+        /* Les directions */
+        var directions = Directions;
+        switch (code) {
+            case 37:
+                this.nextDirection = 0 /* Left */;
+                break;
+            case 38:
+                this.nextDirection = 2 /* Up */;
+                break;
+            case 39:
+                this.nextDirection = 1 /* Right */;
+                break;
+            case 40:
+                this.nextDirection = 3 /* Down */;
+                break;
+        }
+        /* Retour de l'instance */
+        return this;
     };
     return Pacman;
 })();

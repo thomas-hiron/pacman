@@ -77,6 +77,8 @@ class Pacman
 
   /**
    * Initialisation
+   *
+   * @returns {Pacman}
    */
   public init()
   {
@@ -100,10 +102,40 @@ class Pacman
   }
 
   /**
-   * Effectue la rotation, indépendant du mouvement
+   * Modifie la valeur de nextDirection, ne fait rien d'autre
+   *
+   * @param e:KeyboardEvent
+   *
+   * @returns {Pacman}
    */
-  public rotate()
+  public rotate(e:KeyboardEvent)
   {
-    console.log('rotate');
+    e.preventDefault();
+
+    /* Le code de la flèche touchée */
+    var code = e.keyCode;
+
+    /* Les directions */
+    var directions = Directions;
+
+    /* Selon la flèche, on change le direction */
+    switch (code)
+    {
+      case 37 :
+        this.nextDirection = directions.Left;
+        break;
+      case 38 :
+        this.nextDirection = directions.Up;
+        break;
+      case 39 :
+        this.nextDirection = directions.Right;
+        break;
+      case 40 :
+        this.nextDirection = directions.Down;
+        break;
+    }
+
+    /* Retour de l'instance */
+    return this;
   }
 }

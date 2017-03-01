@@ -33,7 +33,7 @@ class Levels
     }
 
     /* On rempli toutes les cases murs */
-    var casesCoords:Array = [
+    var casesCoords:Array<Array> = [
       [0, 7],
       [1, 1], [1, 2], [1, 4], [1, 5], [1, 7], [1, 9], [1, 10], [1, 12], [1, 13],
       [3, 1], [3, 2], [3, 3], [3, 4], [3, 5], [3, 7], [3, 9], [3, 10], [3, 11], [3, 12], [3, 13],
