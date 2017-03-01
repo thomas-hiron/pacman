@@ -45,6 +45,7 @@ class Jeu
 
     /* Pacman */
     this.pacman = new Pacman();
+    this.pacman.setCollideFunction(this.checkCollision.bind(this));
     this.pacman.init();
 
     /* TMP - démarrage du jeu */
@@ -80,5 +81,20 @@ class Jeu
     requestAnimFrame(this.draw.bind(this));
 
     return this;
+  }
+
+  /**
+   * Vérifie qu'il n'y a pas de collision
+   *
+   * @param x
+   * @param y
+   *
+   * @returns {boolean}
+   */
+  public checkCollision(x, y)
+  {
+    var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
+
+    return currentCasesLevel[y][x].isAWall();
   }
 }

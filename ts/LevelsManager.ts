@@ -110,4 +110,14 @@ class LevelsManager
     /* Fermeture du path */
     context.closePath();
   }
+
+  /**
+   * Récupère toutes les cases du niveau courant
+   *
+   * @returns {Array<Array<Case>>}
+   */
+  public getCurrentCasesLevel()
+  {
+    return this.levels.get(this.currentLevel);
+  }
 }

@@ -47,6 +47,22 @@ class Pacman
   private time:number;
 
   /**
+   * Pour détecter une collision (fonction dans Jeu)
+   */
+  private checkCollision;
+
+  /**
+   * @param callback
+   *
+   * @returns {Pacman}
+   */
+  public setCollideFunction(callback)
+  {
+    this.checkCollision = callback;
+    return this;
+  }
+
+  /**
    * @returns {Size}
    */
   public getSize()
@@ -273,10 +289,10 @@ class Pacman
           if (currentDirection == directions.Right)
             ++caseNumberX;
 
-          //var collide = jeu.checkCollision(caseNumberX, caseNumberY);
-          //
-          //if (!collide)
-          this.coordinates.x = newX;
+          var collide = this.checkCollision(caseNumberX, caseNumberY);
+
+          if (!collide)
+            this.coordinates.x = newX;
 
           /* Changement de la direction */
           if (currentDirection == directions.Left || currentDirection == directions.Right)
@@ -308,10 +324,10 @@ class Pacman
           if (currentDirection == directions.Down)
             ++caseNumberY;
 
-          //var collide = jeu.checkCollision(caseNumberX, caseNumberY);
-          //
-          //if (!collide)
-          this.coordinates.y = newY;
+          var collide = this.checkCollision(caseNumberX, caseNumberY);
+
+          if (!collide)
+            this.coordinates.y = newY;
 
           /* Changement de la direction */
           if (currentDirection == directions.Up || currentDirection == directions.Down)

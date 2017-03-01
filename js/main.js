@@ -168,6 +168,7 @@ var Jeu = (function () {
         this.levelsManager.draw(this.canvas);
         /* Pacman */
         this.pacman = new Pacman();
+        this.pacman.setCollideFunction(this.checkCollision.bind(this));
         this.pacman.init();
         /* TMP - d�marrage du jeu */
         this.pacman.start();
@@ -194,6 +195,18 @@ var Jeu = (function () {
         /* Animation suivante */
         requestAnimFrame(this.draw.bind(this));
         return this;
+    };
+    /**
+     * V�rifie qu'il n'y a pas de collision
+     *
+     * @param x
+     * @param y
+     *
+     * @returns {boolean}
+     */
+    Jeu.prototype.checkCollision = function (x, y) {
+        var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
+        return currentCasesLevel[y][x].isAWall();
     };
     Jeu.INTERVAL = 50;
     return Jeu;
@@ -422,6 +435,14 @@ var LevelsManager = (function () {
         /* Fermeture du path */
         context.closePath();
     };
+    /**
+     * Récupère toutes les cases du niveau courant
+     *
+     * @returns {Array<Array<Case>>}
+     */
+    LevelsManager.prototype.getCurrentCasesLevel = function () {
+        return this.levels.get(this.currentLevel);
+    };
     return LevelsManager;
 })();
 /**
@@ -465,6 +486,15 @@ var Pacman = (function () {
         this.stepPx = 2;
         this.time = +new Date();
     }
+    /**
+     * @param callback
+     *
+     * @returns {Pacman}
+     */
+    Pacman.prototype.setCollideFunction = function (callback) {
+        this.checkCollision = callback;
+        return this;
+    };
     /**
      * @returns {Size}
      */
@@ -619,10 +649,9 @@ var Pacman = (function () {
                     var caseNumberY = parseInt(y / caseWidth);
                     if (currentDirection == 1 /* Right */)
                         ++caseNumberX;
-                    //var collide = jeu.checkCollision(caseNumberX, caseNumberY);
-                    //
-                    //if (!collide)
-                    this.coordinates.x = newX;
+                    var collide = this.checkCollision(caseNumberX, caseNumberY);
+                    if (!collide)
+                        this.coordinates.x = newX;
                     /* Changement de la direction */
                     if (currentDirection == 0 /* Left */ || currentDirection == 1 /* Right */)
                         this.direction = currentDirection;
@@ -644,10 +673,9 @@ var Pacman = (function () {
                     var caseNumberY = parseInt(y / caseWidth);
                     if (currentDirection == 3 /* Down */)
                         ++caseNumberY;
-                    //var collide = jeu.checkCollision(caseNumberX, caseNumberY);
-                    //
-                    //if (!collide)
-                    this.coordinates.y = newY;
+                    var collide = this.checkCollision(caseNumberX, caseNumberY);
+                    if (!collide)
+                        this.coordinates.y = newY;
                     /* Changement de la direction */
                     if (currentDirection == 2 /* Up */ || currentDirection == 3 /* Down */)
                         this.direction = currentDirection;
