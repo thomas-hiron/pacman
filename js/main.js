@@ -167,6 +167,8 @@ var Jeu = (function () {
         /* Pacman */
         var pacman = new Pacman(this.canvas);
         pacman.init();
+        /* TMP - d�marrage du jeu */
+        pacman.start();
     };
     Jeu.INTERVAL = 50;
     return Jeu;
@@ -484,6 +486,25 @@ var Pacman = (function () {
                 this.nextDirection = 3 /* Down */;
                 break;
         }
+        /* Retour de l'instance */
+        return this;
+    };
+    /**
+     * D�marre le requestAnimationFrame
+     *
+     * @returns {Pacman}
+     */
+    Pacman.prototype.start = function () {
+        /* Animation suivante */
+        requestAnimFrame(this.animate);
+        return this;
+    };
+    /**
+     * Anime le pacman
+     *
+     * @returns {Pacman}
+     */
+    Pacman.prototype.animate = function () {
         /* Retour de l'instance */
         return this;
     };
