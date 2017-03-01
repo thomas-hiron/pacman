@@ -38,6 +38,6 @@ class Jeu
 
     /* Pacman */
     var pacman:Pacman = new Pacman(this.canvas);
-    //pacman.set
+    pacman.init();
   }
 }

@@ -32,6 +32,14 @@ var Canvas = (function () {
     Canvas.prototype.getContext = function () {
         return this.context;
     };
+    /**
+     * Getter de l'�l�ment
+     *
+     * @returns {HTMLCanvasElement}
+     */
+    Canvas.prototype.getElement = function () {
+        return this.element;
+    };
     return Canvas;
 })();
 /**
@@ -121,13 +129,13 @@ var Case = (function () {
 /**
  * Created by thiron on 03/07/2015.
  */
-var oDirections;
-(function (oDirections) {
-    oDirections[oDirections["Left"] = 0] = "Left";
-    oDirections[oDirections["Right"] = 1] = "Right";
-    oDirections[oDirections["Up"] = 2] = "Up";
-    oDirections[oDirections["Down"] = 3] = "Down";
-})(oDirections || (oDirections = {}));
+var Directions;
+(function (Directions) {
+    Directions[Directions["Left"] = 0] = "Left";
+    Directions[Directions["Right"] = 1] = "Right";
+    Directions[Directions["Up"] = 2] = "Up";
+    Directions[Directions["Down"] = 3] = "Down";
+})(Directions || (Directions = {}));
 /**
  * Created by thiron on 03/07/2015.
  */
@@ -158,7 +166,7 @@ var Jeu = (function () {
         this.levelsManager.draw(this.canvas);
         /* Pacman */
         var pacman = new Pacman(this.canvas);
-        //pacman.set
+        pacman.init();
     };
     Jeu.INTERVAL = 50;
     return Jeu;
@@ -411,8 +419,10 @@ var requestAnimFrame = (function () {
 var Pacman = (function () {
     /**
      * Le constructeur qui initialise les variables
+     *
+     * @param gameCanvas
      */
-    function Pacman(canvas) {
+    function Pacman(gameCanvas) {
         this.size = {
             w: 30,
             h: 30
@@ -421,11 +431,35 @@ var Pacman = (function () {
             x: 7 * Case.CASE_WIDTH,
             y: 11 * Case.CASE_WIDTH
         };
-        this.canvas = canvas;
+        this.gameCanvas = gameCanvas;
         this.stepNumber = 6;
         this.interval = 40;
         this.stepPx = 2;
         this.time = +new Date();
     }
+    /**
+     * Initialisation
+     */
+    Pacman.prototype.init = function () {
+        /* Cr�ation du canvas */
+        this.canvas = new Canvas(document.createElement('CANVAS'));
+        this.canvas.init();
+        /* Initialisation de la taille du canvas */
+        var canvas = this.canvas.getElement();
+        canvas.width = this.size.w;
+        canvas.height = this.size.h;
+        /* Initialisation de la direction */
+        this.nextDirection = 1 /* Right */;
+        /* Ajout de l'event des fl�ches */
+        window.addEventListener("keydown", this.rotate.bind(this), false);
+        /* Retour de l'instance */
+        return this;
+    };
+    /**
+     * Effectue la rotation, ind�pendant du mouvement
+     */
+    Pacman.prototype.rotate = function () {
+        console.log('rotate');
+    };
     return Pacman;
 })();
