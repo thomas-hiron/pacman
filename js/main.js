@@ -351,10 +351,9 @@ var LevelsManager = (function () {
      */
     LevelsManager.prototype.drawCase = function (canvas, currentCase) {
         var context = canvas.getContext();
+        context.globalCompositeOperation = 'source-over';
         context.strokeStyle = "#012EB6";
-        context.fillStyle = "#012EB6";
-        context.lineJoin = "round";
-        context.lineWidth = 2;
+        context.lineWidth = 4;
         var coordinates = currentCase.getCoordinates();
         if (currentCase.hasBorderLeft()) {
             context.moveTo(coordinates.x * Case.CASE_WIDTH, coordinates.y * Case.CASE_WIDTH);
@@ -375,8 +374,13 @@ var LevelsManager = (function () {
             context.moveTo(coordinates.x * Case.CASE_WIDTH, (coordinates.y + 1) * Case.CASE_WIDTH);
             context.lineTo((coordinates.x + 1) * Case.CASE_WIDTH, (coordinates.y + 1) * Case.CASE_WIDTH);
         }
-        /* Bordure et fermeture du path */
+        /* Bordure */
         context.stroke();
+        /* Pour faire la bordure double */
+        context.globalCompositeOperation = 'destination-out';
+        context.lineWidth = 2;
+        context.stroke();
+        /* Fermeture du path */
         context.closePath();
     };
     return LevelsManager;
