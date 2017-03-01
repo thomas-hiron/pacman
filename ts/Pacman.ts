@@ -138,4 +138,36 @@ class Pacman
     /* Retour de l'instance */
     return this;
   }
+
+  /**
+   * Démarre le requestAnimationFrame
+   *
+   * @returns {Pacman}
+   */
+  public start()
+  {
+    /* Si l'interval a été atteind */
+    if (+new Date() - this.time > this.interval)
+    {
+      /* On augmente l'étape */
+      this.currentStep++;
+
+      /* Réinitialisation de l'étape si besoin */
+      if (this.currentStep % this.stepNumber == 0)
+        this.currentStep = 0;
+
+      /* Mise à jour du temps */
+      this.time = +new Date();
+    }
+
+    /* Animation suivante */
+    requestAnimFrame(this.animate.bind(this));
+
+    return this;
+  }
+
+  public animate()
+  {
+
+  }
 }

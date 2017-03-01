@@ -39,5 +39,8 @@ class Jeu
     /* Pacman */
     var pacman:Pacman = new Pacman(this.canvas);
     pacman.init();
+
+    /* TMP - démarrage du jeu */
+    pacman.start();
   }
 }
