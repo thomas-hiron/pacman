@@ -66,7 +66,7 @@ class Jeu
     if (+new Date() - this.time > this.interval)
     {
       var pacman = this.pacman;
-      var margin = Case.CASE_WIDTH - pacman.getSize().w;
+      var margin = (Case.CASE_WIDTH - pacman.getSize().w) / 2;
 
       /* Suppression puis dessin du pacman */
       this.canvas.getContext().clearRect(pacman.getX() + margin, pacman.getY() + margin, pacman.getSize().w, pacman.getSize().h);

@@ -184,7 +184,7 @@ var Jeu = (function () {
         /* Si l'interval a �t� atteind */
         if (+new Date() - this.time > this.interval) {
             var pacman = this.pacman;
-            var margin = Case.CASE_WIDTH - pacman.getSize().w;
+            var margin = (Case.CASE_WIDTH - pacman.getSize().w) / 2;
             /* Suppression puis dessin du pacman */
             this.canvas.getContext().clearRect(pacman.getX() + margin, pacman.getY() + margin, pacman.getSize().w, pacman.getSize().h);
             pacman.draw(this.canvas.getContext());
@@ -452,8 +452,8 @@ var Pacman = (function () {
      */
     function Pacman() {
         this.size = {
-            w: 30,
-            h: 30
+            w: 24,
+            h: 24
         };
         this.coordinates = {
             x: 7 * Case.CASE_WIDTH,
@@ -677,7 +677,7 @@ var Pacman = (function () {
         ctx.arc(size.w / 2, size.h / 2, size.w / 2, inclinaison2 * Math.PI, (inclinaison2 + 1) * Math.PI, false);
         ctx.fill();
         /* La marge */
-        var margin = caseWidth - size.w;
+        var margin = (caseWidth - size.w) / 2;
         /* Dessin dans le canvas du jeu */
         gameCtx.drawImage(ctx.canvas, this.getX() + margin, this.getY() + margin);
         /* Restauration du context */
