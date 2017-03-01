@@ -45,4 +45,14 @@ class Canvas
   {
     return this.context;
   }
+
+  /**
+   * Getter de l'élément
+   *
+   * @returns {HTMLCanvasElement}
+   */
+  public getElement():HTMLCanvasElement
+  {
+    return this.element;
+  }
 }
