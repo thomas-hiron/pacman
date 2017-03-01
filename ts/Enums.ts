@@ -2,7 +2,7 @@
  * Created by thiron on 03/07/2015.
  */
 
-enum oDirections {
+enum Directions {
   Left,
   Right,
   Up,
