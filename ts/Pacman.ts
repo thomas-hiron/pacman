@@ -232,9 +232,6 @@ class Pacman
     /* Taille */
     var size:Size = this.size;
 
-    /* Suppression du context */
-    ctx.clearRect(0, 0, size.w, size.h);
-
     /* Largeur de la case */
     var caseWidth:number = Case.CASE_WIDTH;
 
@@ -249,6 +246,7 @@ class Pacman
     /* Si dans une case, on change de direction, si possible */
     if (this.coordinates.x % caseWidth == 0 && this.coordinates.y % caseWidth == 0)
     {
+      /* Les cases suivantes en fonction de la direction courante et suivante */
       var nextCaseCoordsWithNextDirection:Point = this.getNextCaseCoords(this.nextDirection);
       var nextCaseCoordsWithCurrentDirection:Point = this.getNextCaseCoords(this.direction);
 
@@ -256,7 +254,7 @@ class Pacman
       collisionWithNextDirection = this.checkCollision(nextCaseCoordsWithNextDirection.x, nextCaseCoordsWithNextDirection.y);
       collisionWithCurrentDirection = this.checkCollision(nextCaseCoordsWithCurrentDirection.x, nextCaseCoordsWithCurrentDirection.y);
 
-      /* Changement de direction que si pas de collision */
+      /* Changement de direction que si pas de collision avec la prochaine direction */
       if (!collisionWithNextDirection)
         this.direction = this.nextDirection;
     }
@@ -289,6 +287,9 @@ class Pacman
       this.coordinates.y = newY;
     }
 
+    /* Suppression du context */
+    ctx.clearRect(0, 0, size.w, size.h);
+
     /* Enregistrement du context */
     ctx.save();
 
@@ -305,9 +306,8 @@ class Pacman
     ctx.fillStyle = "#FFFF00";
 
     /* Calcul pour le dessin */
-    var et           = this.currentStep,
-        inclinaison  = et * 0.25 / (this.stepNumber - 1),
-        inclinaison2 = 1 - inclinaison;
+    var inclinaison:number = this.currentStep * 0.25 / (this.stepNumber - 1);
+    var inclinaison2:number = 1 - inclinaison;
 
     /* Dessin */
     ctx.beginPath();
