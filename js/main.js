@@ -206,7 +206,7 @@ var Jeu = (function () {
      */
     Jeu.prototype.checkCollision = function (x, y) {
         var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
-        return currentCasesLevel[y][x].isAWall();
+        return currentCasesLevel[y] == void 0 || currentCasesLevel[y][x] === void 0 || currentCasesLevel[y][x].isAWall();
     };
     Jeu.INTERVAL = 50;
     return Jeu;

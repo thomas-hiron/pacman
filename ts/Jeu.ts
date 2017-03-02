@@ -93,8 +93,8 @@ class Jeu
    */
   public checkCollision(x, y)
   {
-    var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
+    var currentCasesLevel:Array<Array> = this.levelsManager.getCurrentCasesLevel();
 
-    return currentCasesLevel[y][x].isAWall();
+    return currentCasesLevel[y] == void 0 || currentCasesLevel[y][x] === void 0 || currentCasesLevel[y][x].isAWall();
   }
 }
