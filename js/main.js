@@ -142,6 +142,9 @@ var Directions;
 /**
  * Created by thiron on 03/07/2015.
  */
+/**
+ * Initialise le jeu, créer les niveaux, lance pacman, les fantomes,...
+ */
 var Jeu = (function () {
     function Jeu() {
         this.time = +new Date();
@@ -212,6 +215,9 @@ var Jeu = (function () {
 })();
 /**
  * Created by thiron on 03/07/2015.
+ */
+/**
+ * Gère le design des niveaux
  */
 var Levels = (function () {
     function Levels() {
@@ -364,6 +370,9 @@ var Levels = (function () {
 /**
  * Created by thiron on 03/07/2015.
  */
+/**
+ * Gère et dessine les niveaux
+ */
 var LevelsManager = (function () {
     function LevelsManager() {
         this.currentLevel = 1;
@@ -469,6 +478,9 @@ var requestAnimFrame = (function () {
 })();
 /**
  * Created by thiron on 01/03/2017.
+ */
+/**
+ * Le pacman, il gère tout seul le mouvement et l'animation pour manger
  */
 var Pacman = (function () {
     /**

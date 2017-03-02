@@ -2,6 +2,9 @@
  * Created by thiron on 03/07/2015.
  */
 
+/**
+ * Gère le design des niveaux
+ */
 class Levels
 {
   private levels:Array<Array<Array<Case>>>;

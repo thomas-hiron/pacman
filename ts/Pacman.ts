@@ -2,6 +2,9 @@
  * Created by thiron on 01/03/2017.
  */
 
+/**
+ * Le pacman, il gère tout seul le mouvement et l'animation pour manger
+ */
 class Pacman
 {
   /**

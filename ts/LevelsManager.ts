@@ -2,6 +2,9 @@
  * Created by thiron on 03/07/2015.
  */
 
+/**
+ * Gère et dessine les niveaux
+ */
 class LevelsManager
 {
   private currentLevel:number = 1;

@@ -2,6 +2,9 @@
  * Created by thiron on 03/07/2015.
  */
 
+/**
+ * Initialise le jeu, créer les niveaux, lance pacman, les fantomes,...
+ */
 class Jeu
 {
   private static INTERVAL:number = 10;
