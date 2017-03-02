@@ -48,7 +48,7 @@ class Jeu
     this.pacman.setCollideFunction(this.checkCollision.bind(this));
     this.pacman.init();
 
-    /* TMP - démarrage du jeu */
+    /* TMP - dÃ©marrage du jeu */
     this.pacman.start();
     /* RequestAnimationFrame pour le pacman, les fantomes */
     requestAnimFrame(this.draw.bind(this));
@@ -57,13 +57,13 @@ class Jeu
   }
 
   /**
-   * Dessine les différents éléments du jeu
+   * Dessine les diffÃ©rents Ã©lÃ©ments du jeu
    *
    * @returns {Jeu}
    */
   public draw()
   {
-    /* Si l'interval a été atteind */
+    /* Si l'interval a Ã©tÃ© atteind */
     if (+new Date() - this.time > this.interval)
     {
       var pacman = this.pacman;
@@ -73,7 +73,7 @@ class Jeu
       this.canvas.getContext().clearRect(pacman.getX() + margin, pacman.getY() + margin, pacman.getSize().w, pacman.getSize().h);
       pacman.draw(this.canvas.getContext());
 
-      /* Mise à jour du temps */
+      /* Mise ï¿½ jour du temps */
       this.time = +new Date();
     }
 
@@ -84,7 +84,7 @@ class Jeu
   }
 
   /**
-   * Vérifie qu'il n'y a pas de collision
+   * VÃ©rifie qu'il n'y a pas de collision
    *
    * @param x
    * @param y
