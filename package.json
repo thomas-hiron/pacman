@@ -10,6 +10,8 @@
   "license": "ISC",
   "devDependencies": {
     "gulp": "^3.9.0",
-    "gulp-typescript": "^2.7.8"
+    "gulp-rename": "^1.2.2",
+    "gulp-typescript": "^2.7.8",
+    "gulp-uglify": "^2.0.1"
   }
 }

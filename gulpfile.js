@@ -4,6 +4,8 @@
 
 var gulp = require('gulp');
 var ts = require('gulp-typescript');
+var uglify = require('gulp-uglify');
+var rename = require('gulp-rename');
 
 /**
  * Par défaut, on watch
@@ -30,4 +32,15 @@ gulp.task('typescript', function ()
       target: 'ES6'
     }));
   return tsResult.js.pipe(gulp.dest('./js'));
+});
+
+/**
+ * Minify
+ */
+gulp.task('minify', function ()
+{
+  return gulp.src('./js/main.js')
+    .pipe(uglify())
+    .pipe(rename('main.min.js'))
+    .pipe(gulp.dest('./js/'));
 });
