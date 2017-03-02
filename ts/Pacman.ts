@@ -49,14 +49,14 @@ class Pacman
   /**
    * Pour détecter une collision (fonction dans Jeu)
    */
-  private checkCollision;
+  private checkCollision:any;
 
   /**
    * @param callback
    *
    * @returns {Pacman}
    */
-  public setCollideFunction(callback)
+  public setCollideFunction(callback:any)
   {
     this.checkCollision = callback;
     return this;
@@ -65,7 +65,7 @@ class Pacman
   /**
    * @returns {Size}
    */
-  public getSize()
+  public getSize():Size
   {
     return this.size;
   }
@@ -73,7 +73,7 @@ class Pacman
   /**
    * @returns {number}
    */
-  public getX()
+  public getX():number
   {
     return this.coordinates.x;
   }
@@ -81,7 +81,7 @@ class Pacman
   /**
    * @returns {number}
    */
-  public getY()
+  public getY():number
   {
     return this.coordinates.y;
   }
@@ -115,14 +115,14 @@ class Pacman
    *
    * @returns {Pacman}
    */
-  public init()
+  public init():Pacman
   {
     /* Création du canvas */
     this.canvas = new Canvas(document.createElement('CANVAS'));
     this.canvas.init();
 
     /* Initialisation de la taille du canvas */
-    var canvas = this.canvas.getElement();
+    var canvas:HTMLCanvasElement = this.canvas.getElement();
     canvas.width = this.size.w;
     canvas.height = this.size.h;
 
@@ -144,30 +144,27 @@ class Pacman
    *
    * @returns {Pacman}
    */
-  public rotate(e:KeyboardEvent)
+  public rotate(e:KeyboardEvent):Pacman
   {
     e.preventDefault();
 
     /* Le code de la flèche touchée */
-    var code = e.keyCode;
-
-    /* Les directions */
-    var directions = Directions;
+    var code:number = e.keyCode;
 
     /* Selon la flèche, on change le direction */
     switch (code)
     {
       case 37 :
-        this.nextDirection = directions.Left;
+        this.nextDirection = Directions.Left;
         break;
       case 38 :
-        this.nextDirection = directions.Up;
+        this.nextDirection = Directions.Up;
         break;
       case 39 :
-        this.nextDirection = directions.Right;
+        this.nextDirection = Directions.Right;
         break;
       case 40 :
-        this.nextDirection = directions.Down;
+        this.nextDirection = Directions.Down;
         break;
     }
 
@@ -180,7 +177,7 @@ class Pacman
    *
    * @returns {Pacman}
    */
-  public start()
+  public start():Pacman
   {
     /* Animation suivante */
     requestAnimFrame(this.animate.bind(this));
@@ -193,7 +190,7 @@ class Pacman
    *
    * @returns {Pacman}
    */
-  public animate()
+  public animate():Pacman
   {
     /* Si l'interval a été atteind */
     if (+new Date() - this.time > this.interval)
@@ -221,7 +218,7 @@ class Pacman
    *
    * @returns {Pacman}
    */
-  public draw(gameCtx:CanvasRenderingContext2D)
+  public draw(gameCtx:CanvasRenderingContext2D):Pacman
   {
     /* L'angle du dessin */
     var angle:number = 0;
@@ -240,8 +237,8 @@ class Pacman
     var collisionWithCurrentDirection:boolean = false;
 
     /* Les nouvelles coordonnées */
-    var newX = this.coordinates.x;
-    var newY = this.coordinates.y;
+    var newX:number = this.coordinates.x;
+    var newY:number = this.coordinates.y;
 
     /* Si dans une case, on change de direction, si possible */
     if (this.coordinates.x % caseWidth == 0 && this.coordinates.y % caseWidth == 0)
@@ -329,7 +326,7 @@ class Pacman
     ctx.fill();
 
     /* La marge */
-    var margin = (caseWidth - size.w) / 2;
+    var margin:number = (caseWidth - size.w) / 2;
 
     /* Dessin dans le canvas du jeu */
     gameCtx.drawImage(ctx.canvas, this.getX() + margin, this.getY() + margin);
@@ -348,7 +345,7 @@ class Pacman
    *
    * @returns {Point}
    */
-  private getNextCaseCoords(direction:number)
+  private getNextCaseCoords(direction:number):Point
   {
     /* La case suivante avec la prochaine direction */
     var nextCaseCoords:Point = {

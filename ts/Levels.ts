@@ -15,13 +15,15 @@ class Levels
 
   /**
    * Niveau 1
+   *
+   * @returns {Levels}
    */
-  private constructLevel1():void
+  private constructLevel1():Levels
   {
     /* Les blocs avec cases */
     var cases:Array<Array<Case>> = new Array(20);
 
-    for (var i = 0, l = cases.length; i < l; ++i)
+    for (var i:number = 0, l:number = cases.length; i < l; ++i)
     {
       cases[i] = new Array(15);
 
@@ -33,7 +35,7 @@ class Levels
     }
 
     /* On rempli toutes les cases murs */
-    var casesCoords:Array<Array> = [
+    var casesCoords:Array<Array<number>> = [
       [0, 7],
       [1, 1], [1, 2], [1, 4], [1, 5], [1, 7], [1, 9], [1, 10], [1, 12], [1, 13],
       [3, 1], [3, 2], [3, 3], [3, 4], [3, 5], [3, 7], [3, 9], [3, 10], [3, 11], [3, 12], [3, 13],
@@ -58,14 +60,18 @@ class Levels
 
     /* Ajout des cases */
     this.levels.push(cases);
+
+    return this;
   }
 
   /**
    * Retourne le tableau désiré
    *
    * @param currentLevel
+   *
+   * @returns {Array<Array<Case>>}
    */
-  get(currentLevel:number):Array<Array<Case>>
+  public get(currentLevel:number):Array<Array<Case>>
   {
     var level:Array<Array<Case>> = this.levels[currentLevel - 1] || null;
 

@@ -145,7 +145,6 @@ var Directions;
 var Jeu = (function () {
     function Jeu() {
         this.time = +new Date();
-        this.interval = 10;
     }
     /**
      * Initialise le jeu
@@ -182,8 +181,8 @@ var Jeu = (function () {
      * @returns {Jeu}
      */
     Jeu.prototype.draw = function () {
-        /* Si l'interval a été atteind */
-        if (+new Date() - this.time > this.interval) {
+        /* Si l'interval a été atteint */
+        if (+new Date() - this.time > Jeu.INTERVAL) {
             var pacman = this.pacman;
             var margin = (Case.CASE_WIDTH - pacman.getSize().w) / 2;
             /* Suppression puis dessin du pacman */
@@ -208,7 +207,7 @@ var Jeu = (function () {
         var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
         return currentCasesLevel[y] == void 0 || currentCasesLevel[y][x] === void 0 || currentCasesLevel[y][x].isAWall();
     };
-    Jeu.INTERVAL = 50;
+    Jeu.INTERVAL = 10;
     return Jeu;
 })();
 /**
@@ -221,6 +220,8 @@ var Levels = (function () {
     }
     /**
      * Niveau 1
+     *
+     * @returns {Levels}
      */
     Levels.prototype.constructLevel1 = function () {
         /* Les blocs avec cases */
@@ -345,11 +346,14 @@ var Levels = (function () {
             cases[casesCoords[i][0]][casesCoords[i][1]].isAWall(true);
         /* Ajout des cases */
         this.levels.push(cases);
+        return this;
     };
     /**
      * Retourne le tableau désiré
      *
      * @param currentLevel
+     *
+     * @returns {Array<Array<Case>>}
      */
     Levels.prototype.get = function (currentLevel) {
         var level = this.levels[currentLevel - 1] || null;
@@ -434,6 +438,7 @@ var LevelsManager = (function () {
         context.globalCompositeOperation = 'source-over';
         /* Fermeture du path */
         context.closePath();
+        return this;
     };
     /**
      * Récupère toutes les cases du niveau courant
@@ -545,8 +550,6 @@ var Pacman = (function () {
         e.preventDefault();
         /* Le code de la flèche touchée */
         var code = e.keyCode;
-        /* Les directions */
-        var directions = Directions;
         switch (code) {
             case 37:
                 this.nextDirection = 0 /* Left */;

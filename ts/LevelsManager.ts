@@ -60,7 +60,7 @@ class LevelsManager
    *
    * @param currentCase
    */
-  private drawCase(canvas:Canvas, currentCase:Case):void
+  private drawCase(canvas:Canvas, currentCase:Case):LevelsManager
   {
     var context:CanvasRenderingContext2D = canvas.getContext();
 
@@ -109,6 +109,8 @@ class LevelsManager
 
     /* Fermeture du path */
     context.closePath();
+
+    return this;
   }
 
   /**
@@ -116,7 +118,7 @@ class LevelsManager
    *
    * @returns {Array<Array<Case>>}
    */
-  public getCurrentCasesLevel()
+  public getCurrentCasesLevel():Array<Array<Case>>
   {
     return this.levels.get(this.currentLevel);
   }

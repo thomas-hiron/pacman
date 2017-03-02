@@ -4,24 +4,22 @@
 
 class Jeu
 {
-  private static INTERVAL = 50;
+  private static INTERVAL:number = 10;
 
   private canvas:Canvas;
   private pacman:Pacman;
   private time:number;
-  private interval:number;
   private levelsManager:LevelsManager;
 
   public constructor()
   {
     this.time = +new Date();
-    this.interval = 10;
   }
 
   /**
    * Initialise le jeu
    */
-  public init()
+  public init():Jeu
   {
     try
     {
@@ -61,13 +59,13 @@ class Jeu
    *
    * @returns {Jeu}
    */
-  public draw()
+  public draw():Jeu
   {
-    /* Si l'interval a été atteind */
-    if (+new Date() - this.time > this.interval)
+    /* Si l'interval a été atteint */
+    if (+new Date() - this.time > Jeu.INTERVAL)
     {
-      var pacman = this.pacman;
-      var margin = (Case.CASE_WIDTH - pacman.getSize().w) / 2;
+      var pacman:Pacman = this.pacman;
+      var margin:number = (Case.CASE_WIDTH - pacman.getSize().w) / 2;
 
       /* Suppression puis dessin du pacman */
       this.canvas.getContext().clearRect(pacman.getX() + margin, pacman.getY() + margin, pacman.getSize().w, pacman.getSize().h);
@@ -91,9 +89,9 @@ class Jeu
    *
    * @returns {boolean}
    */
-  public checkCollision(x, y)
+  public checkCollision(x:number, y:number):boolean
   {
-    var currentCasesLevel:Array<Array> = this.levelsManager.getCurrentCasesLevel();
+    var currentCasesLevel:Array<Array<Case>> = this.levelsManager.getCurrentCasesLevel();
 
     return currentCasesLevel[y] == void 0 || currentCasesLevel[y][x] === void 0 || currentCasesLevel[y][x].isAWall();
   }
