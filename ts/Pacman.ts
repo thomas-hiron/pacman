@@ -258,6 +258,17 @@ class Pacman
       if (!collisionWithNextDirection)
         this.direction = this.nextDirection;
     }
+    else
+    {
+      /* Si on veut changer dans la direction opposée, faut le faire immédiatement */
+      if (
+        this.direction == Directions.Left && this.nextDirection == Directions.Right ||
+        this.direction == Directions.Right && this.nextDirection == Directions.Left ||
+        this.direction == Directions.Up && this.nextDirection == Directions.Down ||
+        this.direction == Directions.Down && this.nextDirection == Directions.Up
+      )
+        this.direction = this.nextDirection
+    }
 
     /* En fonction de la direction, modification des coords et de l'angle */
     switch (this.direction)

@@ -607,8 +607,6 @@ var Pacman = (function () {
         var ctx = this.canvas.getContext();
         /* Taille */
         var size = this.size;
-        /* Suppression du context */
-        ctx.clearRect(0, 0, size.w, size.h);
         /* Largeur de la case */
         var caseWidth = Case.CASE_WIDTH;
         /* Pas de collision par défaut */
@@ -619,13 +617,19 @@ var Pacman = (function () {
         var newY = this.coordinates.y;
         /* Si dans une case, on change de direction, si possible */
         if (this.coordinates.x % caseWidth == 0 && this.coordinates.y % caseWidth == 0) {
+            /* Les cases suivantes en fonction de la direction courante et suivante */
             var nextCaseCoordsWithNextDirection = this.getNextCaseCoords(this.nextDirection);
             var nextCaseCoordsWithCurrentDirection = this.getNextCaseCoords(this.direction);
             /* Vérification que pas de collision */
             collisionWithNextDirection = this.checkCollision(nextCaseCoordsWithNextDirection.x, nextCaseCoordsWithNextDirection.y);
             collisionWithCurrentDirection = this.checkCollision(nextCaseCoordsWithCurrentDirection.x, nextCaseCoordsWithCurrentDirection.y);
-            /* Changement de direction que si pas de collision */
+            /* Changement de direction que si pas de collision avec la prochaine direction */
             if (!collisionWithNextDirection)
+                this.direction = this.nextDirection;
+        }
+        else {
+            /* Si on veut changer dans la direction opposée, faut le faire immédiatement */
+            if (this.direction == 0 /* Left */ && this.nextDirection == 1 /* Right */ || this.direction == 1 /* Right */ && this.nextDirection == 0 /* Left */ || this.direction == 2 /* Up */ && this.nextDirection == 3 /* Down */ || this.direction == 3 /* Down */ && this.nextDirection == 2 /* Up */)
                 this.direction = this.nextDirection;
         }
         switch (this.direction) {
@@ -651,6 +655,8 @@ var Pacman = (function () {
             this.coordinates.x = newX;
             this.coordinates.y = newY;
         }
+        /* Suppression du context */
+        ctx.clearRect(0, 0, size.w, size.h);
         /* Enregistrement du context */
         ctx.save();
         /* Translation */
@@ -662,7 +668,8 @@ var Pacman = (function () {
         /* Couleur */
         ctx.fillStyle = "#FFFF00";
         /* Calcul pour le dessin */
-        var et = this.currentStep, inclinaison = et * 0.25 / (this.stepNumber - 1), inclinaison2 = 1 - inclinaison;
+        var inclinaison = this.currentStep * 0.25 / (this.stepNumber - 1);
+        var inclinaison2 = 1 - inclinaison;
         /* Dessin */
         ctx.beginPath();
         ctx.arc(size.w / 2, size.h / 2, size.w / 2, inclinaison * Math.PI, (inclinaison + 1) * Math.PI, false);
