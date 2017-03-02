@@ -127,7 +127,8 @@ class Pacman
     canvas.height = this.size.h;
 
     /* Initialisation de la direction */
-    this.nextDirection = Directions.Right;
+    this.direction = Directions.Right;
+    this.nextDirection = this.direction;
 
     /* Ajout de l'event des flèches */
     window.addEventListener("keydown", this.rotate.bind(this), false);
@@ -223,123 +224,69 @@ class Pacman
   public draw(gameCtx:CanvasRenderingContext2D)
   {
     /* L'angle du dessin */
-    var angle = 0;
+    var angle:number = 0;
 
     /* Le context du pacman */
-    var ctx = this.canvas.getContext();
-
-    /* Les directions */
-    var directions = Directions;
+    var ctx:CanvasRenderingContext2D = this.canvas.getContext();
 
     /* Taille */
-    var size = this.size;
+    var size:Size = this.size;
 
     /* Suppression du context */
     ctx.clearRect(0, 0, size.w, size.h);
 
-    /* Changement de l'angle en fonction de la direction */
+    /* Largeur de la case */
+    var caseWidth:number = Case.CASE_WIDTH;
+
+    /* Pas de collision par défaut */
+    var collisionWithNextDirection:boolean = false;
+    var collisionWithCurrentDirection:boolean = false;
+
+    /* Les nouvelles coordonnées */
+    var newX = this.coordinates.x;
+    var newY = this.coordinates.y;
+
+    /* Si dans une case, on change de direction, si possible */
+    if (this.coordinates.x % caseWidth == 0 && this.coordinates.y % caseWidth == 0)
+    {
+      var nextCaseCoordsWithNextDirection:Point = this.getNextCaseCoords(this.nextDirection);
+      var nextCaseCoordsWithCurrentDirection:Point = this.getNextCaseCoords(this.direction);
+
+      /* Vérification que pas de collision */
+      collisionWithNextDirection = this.checkCollision(nextCaseCoordsWithNextDirection.x, nextCaseCoordsWithNextDirection.y);
+      collisionWithCurrentDirection = this.checkCollision(nextCaseCoordsWithCurrentDirection.x, nextCaseCoordsWithCurrentDirection.y);
+
+      /* Changement de direction que si pas de collision */
+      if (!collisionWithNextDirection)
+        this.direction = this.nextDirection;
+    }
+
+    /* En fonction de la direction, modification des coords et de l'angle */
     switch (this.direction)
     {
-      case directions.Left:
+      case Directions.Left:
+        newX -= this.stepPx;
         angle = 180;
         break;
-      case directions.Up:
-        angle = 270;
-        break;
-      case directions.Right:
+      case Directions.Right:
+        newX += this.stepPx;
         angle = 0;
         break;
-      case directions.Down:
+      case Directions.Up:
+        newY -= this.stepPx;
+        angle = 270;
+        break;
+      case Directions.Down:
+        newY += this.stepPx;
         angle = 90;
         break;
     }
 
-    /* -- Dessin du pacman dans le context courant -- */
-
-    /* Coordonnées */
-    var x = this.coordinates.x;
-    var y = this.coordinates.y;
-    var newX = x;
-    var newY = y;
-    var currentDirection = this.direction;
-    var caseWidth = Case.CASE_WIDTH;
-
-    /* On peut changer de direction */
-    if (x % caseWidth == 0 && y % caseWidth == 0)
-      currentDirection = this.nextDirection;
-
-    /* Selon la direction */
-    switch (currentDirection)
+    /* Pas de collision, changement des coordonnées */
+    if (!collisionWithNextDirection || !collisionWithCurrentDirection)
     {
-      case directions.Left  :
-      case directions.Right :
-
-        /* Y OK, on change le X */
-        if (y % caseWidth == 0)
-        {
-          if (currentDirection == directions.Left)
-            newX = x - this.stepPx;
-          else
-            newX = x + this.stepPx;
-
-          /* Vérification de collision */
-          var caseNumberX = parseInt(x / caseWidth);
-          var caseNumberY = parseInt(y / caseWidth);
-
-          if (currentDirection == directions.Right)
-            ++caseNumberX;
-
-          var collide = this.checkCollision(caseNumberX, caseNumberY);
-
-          if (!collide)
-            this.coordinates.x = newX;
-
-          /* Changement de la direction */
-          if (currentDirection == directions.Left || currentDirection == directions.Right)
-            this.direction = currentDirection;
-        }
-
-        /* Teste si sens inverse */
-        if (this.direction == directions.Left && this.nextDirection == directions.Right ||
-          this.direction == directions.Right && this.nextDirection == directions.Left)
-          this.direction = this.nextDirection;
-
-        break;
-
-      case directions.Up    :
-      case directions.Down  :
-
-        /* X OK, on change le Y */
-        if (x % caseWidth == 0)
-        {
-          if (currentDirection == directions.Up)
-            newY = y - this.stepPx;
-          else
-            newY = y + this.stepPx;
-
-          /* Vérification de collision */
-          var caseNumberX = parseInt(x / caseWidth);
-          var caseNumberY = parseInt(y / caseWidth);
-
-          if (currentDirection == directions.Down)
-            ++caseNumberY;
-
-          var collide = this.checkCollision(caseNumberX, caseNumberY);
-
-          if (!collide)
-            this.coordinates.y = newY;
-
-          /* Changement de la direction */
-          if (currentDirection == directions.Up || currentDirection == directions.Down)
-            this.direction = currentDirection;
-        }
-
-        /* Teste si sens inverse */
-        if (this.direction == directions.Up && this.nextDirection == directions.Down ||
-          this.direction == directions.Down && this.nextDirection == directions.Up)
-          this.direction = this.nextDirection;
-
-        break;
+      this.coordinates.x = newX;
+      this.coordinates.y = newY;
     }
 
     /* Enregistrement du context */
@@ -381,5 +328,40 @@ class Pacman
 
     /* Retour de l'instance */
     return this;
+  }
+
+  /**
+   * Récupère les coordonnées de la case suivante en fonction d'une direction donnée
+   *
+   * @param direction
+   *
+   * @returns {Point}
+   */
+  private getNextCaseCoords(direction:number)
+  {
+    /* La case suivante avec la prochaine direction */
+    var nextCaseCoords:Point = {
+      x: this.coordinates.x / Case.CASE_WIDTH,
+      y: this.coordinates.y / Case.CASE_WIDTH
+    };
+
+    /* Modification de la case suivante */
+    switch (direction)
+    {
+      case Directions.Left:
+        nextCaseCoords.x--;
+        break;
+      case Directions.Right:
+        nextCaseCoords.x++;
+        break;
+      case Directions.Up:
+        nextCaseCoords.y--;
+        break;
+      case Directions.Down:
+        nextCaseCoords.y++;
+        break;
+    }
+
+    return nextCaseCoords;
   }
 }

@@ -73,7 +73,7 @@ class Jeu
       this.canvas.getContext().clearRect(pacman.getX() + margin, pacman.getY() + margin, pacman.getSize().w, pacman.getSize().h);
       pacman.draw(this.canvas.getContext());
 
-      /* Mise � jour du temps */
+      /* Mise à jour du temps */
       this.time = +new Date();
     }
 

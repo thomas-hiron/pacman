@@ -170,26 +170,26 @@ var Jeu = (function () {
         this.pacman = new Pacman();
         this.pacman.setCollideFunction(this.checkCollision.bind(this));
         this.pacman.init();
-        /* TMP - d�marrage du jeu */
+        /* TMP - démarrage du jeu */
         this.pacman.start();
         /* RequestAnimationFrame pour le pacman, les fantomes */
         requestAnimFrame(this.draw.bind(this));
         return this;
     };
     /**
-     * Dessine les diff�rents �l�ments du jeu
+     * Dessine les différents éléments du jeu
      *
      * @returns {Jeu}
      */
     Jeu.prototype.draw = function () {
-        /* Si l'interval a �t� atteind */
+        /* Si l'interval a été atteind */
         if (+new Date() - this.time > this.interval) {
             var pacman = this.pacman;
             var margin = (Case.CASE_WIDTH - pacman.getSize().w) / 2;
             /* Suppression puis dessin du pacman */
             this.canvas.getContext().clearRect(pacman.getX() + margin, pacman.getY() + margin, pacman.getSize().w, pacman.getSize().h);
             pacman.draw(this.canvas.getContext());
-            /* Mise � jour du temps */
+            /* Mise à jour du temps */
             this.time = +new Date();
         }
         /* Animation suivante */
@@ -197,7 +197,7 @@ var Jeu = (function () {
         return this;
     };
     /**
-     * V�rifie qu'il n'y a pas de collision
+     * Vérifie qu'il n'y a pas de collision
      *
      * @param x
      * @param y
@@ -527,7 +527,8 @@ var Pacman = (function () {
         canvas.width = this.size.w;
         canvas.height = this.size.h;
         /* Initialisation de la direction */
-        this.nextDirection = 1 /* Right */;
+        this.direction = 1 /* Right */;
+        this.nextDirection = this.direction;
         /* Ajout de l'event des flèches */
         window.addEventListener("keydown", this.rotate.bind(this), false);
         /* Retour de l'instance */
@@ -604,86 +605,51 @@ var Pacman = (function () {
         var angle = 0;
         /* Le context du pacman */
         var ctx = this.canvas.getContext();
-        /* Les directions */
-        var directions = Directions;
         /* Taille */
         var size = this.size;
         /* Suppression du context */
         ctx.clearRect(0, 0, size.w, size.h);
+        /* Largeur de la case */
+        var caseWidth = Case.CASE_WIDTH;
+        /* Pas de collision par défaut */
+        var collisionWithNextDirection = false;
+        var collisionWithCurrentDirection = false;
+        /* Les nouvelles coordonnées */
+        var newX = this.coordinates.x;
+        var newY = this.coordinates.y;
+        /* Si dans une case, on change de direction, si possible */
+        if (this.coordinates.x % caseWidth == 0 && this.coordinates.y % caseWidth == 0) {
+            var nextCaseCoordsWithNextDirection = this.getNextCaseCoords(this.nextDirection);
+            var nextCaseCoordsWithCurrentDirection = this.getNextCaseCoords(this.direction);
+            /* Vérification que pas de collision */
+            collisionWithNextDirection = this.checkCollision(nextCaseCoordsWithNextDirection.x, nextCaseCoordsWithNextDirection.y);
+            collisionWithCurrentDirection = this.checkCollision(nextCaseCoordsWithCurrentDirection.x, nextCaseCoordsWithCurrentDirection.y);
+            /* Changement de direction que si pas de collision */
+            if (!collisionWithNextDirection)
+                this.direction = this.nextDirection;
+        }
         switch (this.direction) {
             case 0 /* Left */:
+                newX -= this.stepPx;
                 angle = 180;
                 break;
-            case 2 /* Up */:
-                angle = 270;
-                break;
             case 1 /* Right */:
+                newX += this.stepPx;
                 angle = 0;
                 break;
+            case 2 /* Up */:
+                newY -= this.stepPx;
+                angle = 270;
+                break;
             case 3 /* Down */:
+                newY += this.stepPx;
                 angle = 90;
                 break;
         }
-        /* -- Dessin du pacman dans le context courant -- */
-        /* Coordonnées */
-        var x = this.coordinates.x;
-        var y = this.coordinates.y;
-        var newX = x;
-        var newY = y;
-        var currentDirection = this.direction;
-        var caseWidth = Case.CASE_WIDTH;
-        /* On peut changer de direction */
-        if (x % caseWidth == 0 && y % caseWidth == 0)
-            currentDirection = this.nextDirection;
-        switch (currentDirection) {
-            case 0 /* Left */:
-            case 1 /* Right */:
-                /* Y OK, on change le X */
-                if (y % caseWidth == 0) {
-                    if (currentDirection == 0 /* Left */)
-                        newX = x - this.stepPx;
-                    else
-                        newX = x + this.stepPx;
-                    /* Vérification de collision */
-                    var caseNumberX = parseInt(x / caseWidth);
-                    var caseNumberY = parseInt(y / caseWidth);
-                    if (currentDirection == 1 /* Right */)
-                        ++caseNumberX;
-                    var collide = this.checkCollision(caseNumberX, caseNumberY);
-                    if (!collide)
-                        this.coordinates.x = newX;
-                    /* Changement de la direction */
-                    if (currentDirection == 0 /* Left */ || currentDirection == 1 /* Right */)
-                        this.direction = currentDirection;
-                }
-                /* Teste si sens inverse */
-                if (this.direction == 0 /* Left */ && this.nextDirection == 1 /* Right */ || this.direction == 1 /* Right */ && this.nextDirection == 0 /* Left */)
-                    this.direction = this.nextDirection;
-                break;
-            case 2 /* Up */:
-            case 3 /* Down */:
-                /* X OK, on change le Y */
-                if (x % caseWidth == 0) {
-                    if (currentDirection == 2 /* Up */)
-                        newY = y - this.stepPx;
-                    else
-                        newY = y + this.stepPx;
-                    /* Vérification de collision */
-                    var caseNumberX = parseInt(x / caseWidth);
-                    var caseNumberY = parseInt(y / caseWidth);
-                    if (currentDirection == 3 /* Down */)
-                        ++caseNumberY;
-                    var collide = this.checkCollision(caseNumberX, caseNumberY);
-                    if (!collide)
-                        this.coordinates.y = newY;
-                    /* Changement de la direction */
-                    if (currentDirection == 2 /* Up */ || currentDirection == 3 /* Down */)
-                        this.direction = currentDirection;
-                }
-                /* Teste si sens inverse */
-                if (this.direction == 2 /* Up */ && this.nextDirection == 3 /* Down */ || this.direction == 3 /* Down */ && this.nextDirection == 2 /* Up */)
-                    this.direction = this.nextDirection;
-                break;
+        /* Pas de collision, changement des coordonnées */
+        if (!collisionWithNextDirection || !collisionWithCurrentDirection) {
+            this.coordinates.x = newX;
+            this.coordinates.y = newY;
         }
         /* Enregistrement du context */
         ctx.save();
@@ -712,6 +678,35 @@ var Pacman = (function () {
         ctx.restore();
         /* Retour de l'instance */
         return this;
+    };
+    /**
+     * Récupère les coordonnées de la case suivante en fonction d'une direction donnée
+     *
+     * @param direction
+     *
+     * @returns {Point}
+     */
+    Pacman.prototype.getNextCaseCoords = function (direction) {
+        /* La case suivante avec la prochaine direction */
+        var nextCaseCoords = {
+            x: this.coordinates.x / Case.CASE_WIDTH,
+            y: this.coordinates.y / Case.CASE_WIDTH
+        };
+        switch (direction) {
+            case 0 /* Left */:
+                nextCaseCoords.x--;
+                break;
+            case 1 /* Right */:
+                nextCaseCoords.x++;
+                break;
+            case 2 /* Up */:
+                nextCaseCoords.y--;
+                break;
+            case 3 /* Down */:
+                nextCaseCoords.y++;
+                break;
+        }
+        return nextCaseCoords;
     };
     return Pacman;
 })();
