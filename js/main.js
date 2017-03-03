@@ -172,8 +172,6 @@ var Jeu = (function () {
         this.pacman = new Pacman();
         this.pacman.setCollideFunction(this.checkCollision.bind(this));
         this.pacman.init();
-        /* TMP - démarrage du jeu */
-        this.pacman.start();
         /* RequestAnimationFrame pour le pacman, les fantomes */
         requestAnimFrame(this.draw.bind(this));
         return this;
@@ -186,16 +184,33 @@ var Jeu = (function () {
     Jeu.prototype.draw = function () {
         /* Si l'interval a été atteint */
         if (+new Date() - this.time > Jeu.INTERVAL) {
-            var pacman = this.pacman;
-            var margin = (Case.CASE_WIDTH - pacman.getSize().w) / 2;
-            /* Suppression puis dessin du pacman */
-            this.canvas.getContext().clearRect(pacman.getX() + margin, pacman.getY() + margin, pacman.getSize().w, pacman.getSize().h);
-            pacman.draw(this.canvas.getContext());
+            /* Animation de pacman */
+            this.animatePacman();
             /* Mise à jour du temps */
             this.time = +new Date();
         }
         /* Animation suivante */
         requestAnimFrame(this.draw.bind(this));
+        return this;
+    };
+    /**
+     * Anime pacman et donne les instructions
+     *
+     * @returns {Jeu}
+     */
+    Jeu.prototype.animatePacman = function () {
+        var pacman = this.pacman;
+        /* Pour centrer dans la case */
+        var margin = (Case.CASE_WIDTH - pacman.getSize().w) / 2;
+        var ctx = this.canvas.getContext();
+        /* Suppression du pacman courant */
+        ctx.clearRect(pacman.getX() + margin, pacman.getY() + margin, pacman.getSize().w, pacman.getSize().h);
+        /* Instruction de modification des coordonées */
+        pacman.move();
+        /* Instruction d'animation */
+        pacman.animate();
+        /* Dessin dans le canvas principal */
+        ctx.drawImage(pacman.getCanvasElem(), pacman.getX() + margin, pacman.getY() + margin);
         return this;
     };
     /**
@@ -498,10 +513,9 @@ var Pacman = (function () {
             y: 11 * Case.CASE_WIDTH
         };
         this.currentStep = 0;
-        this.stepNumber = 6;
-        this.interval = 40;
+        this.stepNumber = 12;
         this.stepPx = 2;
-        this.time = +new Date();
+        this.angle = 0;
     }
     /**
      * @param callback
@@ -529,6 +543,14 @@ var Pacman = (function () {
      */
     Pacman.prototype.getY = function () {
         return this.coordinates.y;
+    };
+    /**
+     * Renvoie le canvas de pacman pour pouvoir être dessiné dans le jeu
+     *
+     * @returns {HTMLCanvasElement}
+     */
+    Pacman.prototype.getCanvasElem = function () {
+        return this.canvas.getElement();
     };
     /**
      * Initialisation
@@ -580,48 +602,27 @@ var Pacman = (function () {
         return this;
     };
     /**
-     * Démarre le requestAnimationFrame
-     *
-     * @returns {Pacman}
-     */
-    Pacman.prototype.start = function () {
-        /* Animation suivante */
-        requestAnimFrame(this.animate.bind(this));
-        return this;
-    };
-    /**
-     * Anime le pacman
+     * Anime le pacman et le dessine dans le canvas (methode draw)
      *
      * @returns {Pacman}
      */
     Pacman.prototype.animate = function () {
-        /* Si l'interval a été atteind */
-        if (+new Date() - this.time > this.interval) {
-            /* On augmente l'étape */
-            this.currentStep++;
-            /* Réinitialisation de l'étape si besoin */
-            if (this.currentStep % this.stepNumber == 0)
-                this.currentStep = 0;
-            /* Mise à jour du temps */
-            this.time = +new Date();
-        }
-        /* Animation suivante */
-        requestAnimFrame(this.animate.bind(this));
+        /* Augmentation de l'étape */
+        this.currentStep++;
+        /* Réinitialisation de l'étape si besoin */
+        if (this.currentStep % this.stepNumber == 0)
+            this.currentStep = 0;
+        /* Dessin dans le canvas */
+        this.draw();
         /* Retour de l'instance */
         return this;
     };
     /**
-     * Dessine le Pacman
+     * Modifie les coordonnées de pacman
      *
      * @returns {Pacman}
      */
-    Pacman.prototype.draw = function (gameCtx) {
-        /* L'angle du dessin */
-        var angle = 0;
-        /* Le context du pacman */
-        var ctx = this.canvas.getContext();
-        /* Taille */
-        var size = this.size;
+    Pacman.prototype.move = function () {
         /* Largeur de la case */
         var caseWidth = Case.CASE_WIDTH;
         /* Pas de collision par défaut */
@@ -650,19 +651,19 @@ var Pacman = (function () {
         switch (this.direction) {
             case 0 /* Left */:
                 newX -= this.stepPx;
-                angle = 180;
+                this.angle = 180;
                 break;
             case 1 /* Right */:
                 newX += this.stepPx;
-                angle = 0;
+                this.angle = 0;
                 break;
             case 2 /* Up */:
                 newY -= this.stepPx;
-                angle = 270;
+                this.angle = 270;
                 break;
             case 3 /* Down */:
                 newY += this.stepPx;
-                angle = 90;
+                this.angle = 90;
                 break;
         }
         /* Pas de collision, changement des coordonnées */
@@ -670,6 +671,21 @@ var Pacman = (function () {
             this.coordinates.x = newX;
             this.coordinates.y = newY;
         }
+        /* Retour de l'instance */
+        return this;
+    };
+    /**
+     * Dessine le Pacman dans le canvas
+     *
+     * @returns {Pacman}
+     */
+    Pacman.prototype.draw = function () {
+        /* Le context du pacman */
+        var ctx = this.canvas.getContext();
+        /* Taille */
+        var size = this.size;
+        /* Largeur de la case */
+        var caseWidth = Case.CASE_WIDTH;
         /* Suppression du context */
         ctx.clearRect(0, 0, size.w, size.h);
         /* Enregistrement du context */
@@ -677,7 +693,7 @@ var Pacman = (function () {
         /* Translation */
         ctx.translate(size.w / 2, size.h / 2);
         /* Rotation */
-        ctx.rotate(angle * Math.PI / 180);
+        ctx.rotate(this.angle * Math.PI / 180);
         /* Translation inverse pour le remettre comme avant */
         ctx.translate(-size.w / 2, -size.h / 2);
         /* Couleur */
@@ -694,8 +710,6 @@ var Pacman = (function () {
         ctx.fill();
         /* La marge */
         var margin = (caseWidth - size.w) / 2;
-        /* Dessin dans le canvas du jeu */
-        gameCtx.drawImage(ctx.canvas, this.getX() + margin, this.getY() + margin);
         /* Restauration du context */
         ctx.restore();
         /* Retour de l'instance */

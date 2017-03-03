@@ -35,19 +35,14 @@ class Pacman
   private stepNumber:number;
 
   /**
-   * L'interval pour requestAnimationFrame
-   */
-  private interval:number;
-
-  /**
    * Le décalage en px lors du mouvement
    */
   private stepPx:number;
 
   /**
-   * Le timestamp courant pour pas faire trop d'animations
+   * L'angle
    */
-  private time:number;
+  private angle:number;
 
   /**
    * Pour détecter une collision (fonction dans Jeu)
@@ -90,6 +85,16 @@ class Pacman
   }
 
   /**
+   * Renvoie le canvas de pacman pour pouvoir être dessiné dans le jeu
+   *
+   * @returns {HTMLCanvasElement}
+   */
+  public getCanvasElem():HTMLCanvasElement
+  {
+    return this.canvas.getElement();
+  }
+
+  /**
    * Le constructeur qui initialise les variables
    *
    * @param gameCanvas
@@ -107,10 +112,9 @@ class Pacman
     };
 
     this.currentStep = 0;
-    this.stepNumber = 6;
-    this.interval = 40;
+    this.stepNumber = 12;
     this.stepPx = 2;
-    this.time = +new Date();
+    this.angle = 0;
   }
 
   /**
@@ -176,62 +180,33 @@ class Pacman
   }
 
   /**
-   * Démarre le requestAnimationFrame
-   *
-   * @returns {Pacman}
-   */
-  public start():Pacman
-  {
-    /* Animation suivante */
-    requestAnimFrame(this.animate.bind(this));
-
-    return this;
-  }
-
-  /**
-   * Anime le pacman
+   * Anime le pacman et le dessine dans le canvas (methode draw)
    *
    * @returns {Pacman}
    */
   public animate():Pacman
   {
-    /* Si l'interval a été atteind */
-    if (+new Date() - this.time > this.interval)
-    {
-      /* On augmente l'étape */
-      this.currentStep++;
+    /* Augmentation de l'étape */
+    this.currentStep++;
 
-      /* Réinitialisation de l'étape si besoin */
-      if (this.currentStep % this.stepNumber == 0)
-        this.currentStep = 0;
+    /* Réinitialisation de l'étape si besoin */
+    if (this.currentStep % this.stepNumber == 0)
+      this.currentStep = 0;
 
-      /* Mise à jour du temps */
-      this.time = +new Date();
-    }
-
-    /* Animation suivante */
-    requestAnimFrame(this.animate.bind(this));
+    /* Dessin dans le canvas */
+    this.draw();
 
     /* Retour de l'instance */
     return this;
   }
 
   /**
-   * Dessine le Pacman
+   * Modifie les coordonnées de pacman
    *
    * @returns {Pacman}
    */
-  public draw(gameCtx:CanvasRenderingContext2D):Pacman
+  public move()
   {
-    /* L'angle du dessin */
-    var angle:number = 0;
-
-    /* Le context du pacman */
-    var ctx:CanvasRenderingContext2D = this.canvas.getContext();
-
-    /* Taille */
-    var size:Size = this.size;
-
     /* Largeur de la case */
     var caseWidth:number = Case.CASE_WIDTH;
 
@@ -275,19 +250,19 @@ class Pacman
     {
       case Directions.Left:
         newX -= this.stepPx;
-        angle = 180;
+        this.angle = 180;
         break;
       case Directions.Right:
         newX += this.stepPx;
-        angle = 0;
+        this.angle = 0;
         break;
       case Directions.Up:
         newY -= this.stepPx;
-        angle = 270;
+        this.angle = 270;
         break;
       case Directions.Down:
         newY += this.stepPx;
-        angle = 90;
+        this.angle = 90;
         break;
     }
 
@@ -297,6 +272,26 @@ class Pacman
       this.coordinates.x = newX;
       this.coordinates.y = newY;
     }
+
+    /* Retour de l'instance */
+    return this;
+  }
+
+  /**
+   * Dessine le Pacman dans le canvas
+   *
+   * @returns {Pacman}
+   */
+  public draw():Pacman
+  {
+    /* Le context du pacman */
+    var ctx:CanvasRenderingContext2D = this.canvas.getContext();
+
+    /* Taille */
+    var size:Size = this.size;
+
+    /* Largeur de la case */
+    var caseWidth:number = Case.CASE_WIDTH;
 
     /* Suppression du context */
     ctx.clearRect(0, 0, size.w, size.h);
@@ -308,7 +303,7 @@ class Pacman
     ctx.translate(size.w / 2, size.h / 2);
 
     /* Rotation */
-    ctx.rotate(angle * Math.PI / 180);
+    ctx.rotate(this.angle * Math.PI / 180);
 
     /* Translation inverse pour le remettre comme avant */
     ctx.translate(-size.w / 2, -size.h / 2);
@@ -330,9 +325,6 @@ class Pacman
 
     /* La marge */
     var margin:number = (caseWidth - size.w) / 2;
-
-    /* Dessin dans le canvas du jeu */
-    gameCtx.drawImage(ctx.canvas, this.getX() + margin, this.getY() + margin);
 
     /* Restauration du context */
     ctx.restore();

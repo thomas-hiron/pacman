@@ -49,8 +49,6 @@ class Jeu
     this.pacman.setCollideFunction(this.checkCollision.bind(this));
     this.pacman.init();
 
-    /* TMP - démarrage du jeu */
-    this.pacman.start();
     /* RequestAnimationFrame pour le pacman, les fantomes */
     requestAnimFrame(this.draw.bind(this));
 
@@ -67,12 +65,8 @@ class Jeu
     /* Si l'interval a été atteint */
     if (+new Date() - this.time > Jeu.INTERVAL)
     {
-      var pacman:Pacman = this.pacman;
-      var margin:number = (Case.CASE_WIDTH - pacman.getSize().w) / 2;
-
-      /* Suppression puis dessin du pacman */
-      this.canvas.getContext().clearRect(pacman.getX() + margin, pacman.getY() + margin, pacman.getSize().w, pacman.getSize().h);
-      pacman.draw(this.canvas.getContext());
+      /* Animation de pacman */
+      this.animatePacman();
 
       /* Mise à jour du temps */
       this.time = +new Date();
@@ -80,6 +74,33 @@ class Jeu
 
     /* Animation suivante */
     requestAnimFrame(this.draw.bind(this));
+
+    return this;
+  }
+
+  /**
+   * Anime pacman et donne les instructions
+   *
+   * @returns {Jeu}
+   */
+  private animatePacman():Jeu
+  {
+    var pacman:Pacman = this.pacman;
+    /* Pour centrer dans la case */
+    var margin:number = (Case.CASE_WIDTH - pacman.getSize().w) / 2;
+    var ctx = this.canvas.getContext();
+
+    /* Suppression du pacman courant */
+    ctx.clearRect(pacman.getX() + margin, pacman.getY() + margin, pacman.getSize().w, pacman.getSize().h);
+
+    /* Instruction de modification des coordonées */
+    pacman.move();
+
+    /* Instruction d'animation */
+    pacman.animate();
+
+    /* Dessin dans le canvas principal */
+    ctx.drawImage(pacman.getCanvasElem(), pacman.getX() + margin, pacman.getY() + margin);
 
     return this;
   }
