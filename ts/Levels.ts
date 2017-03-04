@@ -7,7 +7,7 @@
  */
 class Levels
 {
-  private levels:Array<Array<Array<Case>>>;
+  private levels: Array<Array<Array<Case>>>;
 
   constructor()
   {
@@ -21,12 +21,12 @@ class Levels
    *
    * @returns {Levels}
    */
-  private constructLevel1():Levels
+  private constructLevel1(): Levels
   {
     /* Les blocs avec cases */
-    var cases:Array<Array<Case>> = new Array(20);
+    var cases: Array<Array<Case>> = new Array(20);
 
-    for (var i:number = 0, l:number = cases.length; i < l; ++i)
+    for (var i: number = 0, l: number = cases.length; i < l; ++i)
     {
       cases[i] = new Array(15);
 
@@ -38,7 +38,7 @@ class Levels
     }
 
     /* On rempli toutes les cases murs */
-    var casesCoords:Array<Array<number>> = [
+    var wallsCoordinates: Array<Array<number>> = [
       [0, 7],
       [1, 1], [1, 2], [1, 4], [1, 5], [1, 7], [1, 9], [1, 10], [1, 12], [1, 13],
       [3, 1], [3, 2], [3, 3], [3, 4], [3, 5], [3, 7], [3, 9], [3, 10], [3, 11], [3, 12], [3, 13],
@@ -58,8 +58,25 @@ class Levels
     ];
 
     /* Déclaration de tous les murs */
-    for (i = 0, l = casesCoords.length; i < l; ++i)
-      cases[casesCoords[i][0]][casesCoords[i][1]].isAWall(true);
+    for (i = 0, l = wallsCoordinates.length; i < l; ++i)
+      cases[wallsCoordinates[i][0]][wallsCoordinates[i][1]].isAWall(true);
+
+    /* Sinon on met de la bouffe */
+    for (i = 0, l = cases.length; i < l; ++i)
+    {
+      for (j = 0, k = cases[i].length; j < k; ++j)
+      {
+        /* Pas trouvé, c'est une case, ajout de la nourriture */
+        if (wallsCoordinates[i][j] == void 0)
+          cases[i][j].setFood(new Food());
+      }
+    }
+
+    /* Ajout des grosses bouffes */
+    cases[1][2].setFood(new BigFood());
+    cases[13][2].setFood(new BigFood());
+    cases[2][12].setFood(new BigFood());
+    cases[12][12].setFood(new BigFood());
 
     /* Ajout des cases */
     this.levels.push(cases);
@@ -74,9 +91,9 @@ class Levels
    *
    * @returns {Array<Array<Case>>}
    */
-  public get(currentLevel:number):Array<Array<Case>>
+  public get(currentLevel: number): Array<Array<Case>>
   {
-    var level:Array<Array<Case>> = this.levels[currentLevel - 1] || null;
+    var level: Array<Array<Case>> = this.levels[currentLevel - 1] || null;
 
     return level;
   }

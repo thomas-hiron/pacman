@@ -128,6 +128,32 @@ class Case {
     getCoordinates() {
         return this.coordinates;
     }
+    /**
+     * Ajoute la bouffe
+     *
+     * @param food
+     * @returns {Case}
+     */
+    setFood(food) {
+        this.food = food;
+        return this;
+    }
+    /**
+     * S'il y a de la grosse bouffe
+     *
+     * @returns {boolean}
+     */
+    hasBigFood() {
+        return this.food != null && this.food instanceof BigFood;
+    }
+    /**
+     * S'il y a de la bouffe
+     *
+     * @returns {boolean}
+     */
+    hasFood() {
+        return this.food != null;
+    }
 }
 Case.CASE_WIDTH = 40;
 /**
@@ -140,6 +166,19 @@ var Directions;
     Directions[Directions["Up"] = 2] = "Up";
     Directions[Directions["Down"] = 3] = "Down";
 })(Directions || (Directions = {}));
+/**
+ * Created by mac pro on 04/03/2017.
+ */
+/**
+ * De la bouffe normale
+ */
+class Food {
+}
+/**
+ * De la bouffe qui permet de manger les fantômes
+ */
+class BigFood extends Food {
+}
 /**
  * Created by thiron on 03/07/2015.
  */
@@ -262,7 +301,7 @@ class Levels {
             }
         }
         /* On rempli toutes les cases murs */
-        var casesCoords = [
+        var wallsCoordinates = [
             [0, 7],
             [1, 1], [1, 2], [1, 4], [1, 5], [1, 7], [1, 9], [1, 10], [1, 12], [1, 13],
             [3, 1], [3, 2], [3, 3], [3, 4], [3, 5], [3, 7], [3, 9], [3, 10], [3, 11], [3, 12], [3, 13],
@@ -281,8 +320,21 @@ class Levels {
             [18, 1], [18, 2], [18, 3], [18, 4], [18, 5], [18, 6], [18, 7], [18, 8], [18, 9], [18, 10], [18, 11], [18, 12], [18, 13]
         ];
         /* Déclaration de tous les murs */
-        for (i = 0, l = casesCoords.length; i < l; ++i)
-            cases[casesCoords[i][0]][casesCoords[i][1]].isAWall(true);
+        for (i = 0, l = wallsCoordinates.length; i < l; ++i)
+            cases[wallsCoordinates[i][0]][wallsCoordinates[i][1]].isAWall(true);
+        /* Sinon on met de la bouffe */
+        for (i = 0, l = cases.length; i < l; ++i) {
+            for (j = 0, k = cases[i].length; j < k; ++j) {
+                /* Pas trouvé, c'est une case, ajout de la nourriture */
+                if (wallsCoordinates[i][j] == void 0)
+                    cases[i][j].setFood(new Food());
+            }
+        }
+        /* Ajout des grosses bouffes */
+        cases[1][2].setFood(new BigFood());
+        cases[13][2].setFood(new BigFood());
+        cases[2][12].setFood(new BigFood());
+        cases[12][12].setFood(new BigFood());
         /* Ajout des cases */
         this.levels.push(cases);
         return this;

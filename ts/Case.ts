@@ -6,13 +6,14 @@ class Case
 {
   public static CASE_WIDTH = 40;
 
-  private wall:boolean;
-  private coordinates:Point;
+  private food: Food;
+  private wall: boolean;
+  private coordinates: Point;
 
-  private borderLeft:boolean;
-  private borderRight:boolean;
-  private borderTop:boolean;
-  private borderBottom:boolean;
+  private borderLeft: boolean;
+  private borderRight: boolean;
+  private borderTop: boolean;
+  private borderBottom: boolean;
 
   constructor()
   {
@@ -21,7 +22,7 @@ class Case
     this.coordinates = {
       x: 0,
       y: 0
-    }
+    };
 
     /* Initialisation des bordures */
     this.borderLeft = true;
@@ -35,7 +36,7 @@ class Case
    *
    * @returns {boolean}
    */
-  public isAWall(isAWall:boolean = null):boolean
+  public isAWall(isAWall: boolean = null): boolean
   {
     if (isAWall !== null)
       this.wall = isAWall;
@@ -46,7 +47,7 @@ class Case
   /**
    * S'il y a une bordure à gauche
    */
-  hasBorderLeft(hasBorder:boolean = null):boolean
+  public hasBorderLeft(hasBorder: boolean = null): boolean
   {
     if (hasBorder !== null)
       this.borderLeft = hasBorder;
@@ -57,7 +58,7 @@ class Case
   /**
    * S'il y a une bordure à droite
    */
-  hasBorderRight(hasBorder:boolean = null):boolean
+  public hasBorderRight(hasBorder: boolean = null): boolean
   {
     if (hasBorder !== null)
       this.borderRight = hasBorder;
@@ -68,7 +69,7 @@ class Case
   /**
    * S'il y a une bordure en haut
    */
-  hasBorderTop(hasBorder:boolean = null):boolean
+  public hasBorderTop(hasBorder: boolean = null): boolean
   {
     if (hasBorder !== null)
       this.borderTop = hasBorder;
@@ -79,7 +80,7 @@ class Case
   /**
    * S'il y a une bordure en bas
    */
-  hasBorderBottom(hasBorder:boolean = null):boolean
+  public hasBorderBottom(hasBorder: boolean = null): boolean
   {
     if (hasBorder !== null)
       this.borderBottom = hasBorder;
@@ -93,7 +94,7 @@ class Case
    * @param i
    * @param j
    */
-  setCoordinates(i:number, j:number):void
+  public setCoordinates(i: number, j: number): void
   {
     this.coordinates.x = i;
     this.coordinates.y = j;
@@ -104,8 +105,41 @@ class Case
    *
    * @returns {Point}
    */
-  getCoordinates():Point
+  getCoordinates(): Point
   {
     return this.coordinates;
+  }
+
+  /**
+   * Ajoute la bouffe
+   *
+   * @param food
+   * @returns {Case}
+   */
+  public setFood(food: Food): Case
+  {
+    this.food = food;
+
+    return this;
+  }
+
+  /**
+   * S'il y a de la grosse bouffe
+   *
+   * @returns {boolean}
+   */
+  public hasBigFood(): boolean
+  {
+    return this.food != null && this.food instanceof BigFood;
+  }
+
+  /**
+   * S'il y a de la bouffe
+   *
+   * @returns {boolean}
+   */
+  public hasFood(): boolean
+  {
+    return this.food != null;
   }
 }
