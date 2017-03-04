@@ -74,6 +74,9 @@ class Jeu
     /* Si l'interval a été atteint */
     if (+new Date() - this.time > Jeu.INTERVAL)
     {
+      /* Dessine la case courante si le point a pas été mangé pour pas le couper */
+      this.drawCurrentFood();
+
       /* Animation de pacman */
       this.animatePacman();
 
@@ -115,6 +118,38 @@ class Jeu
   }
 
   /**
+   * Dessine la nourriture si elle a pas été mangée
+   *
+   * @returns {Jeu}
+   */
+  private drawCurrentFood()
+  {
+    /* La case de pacman */
+    var coords: Point = this.pacman.getPreviousCaseCoords();
+    var margin: number = 5;
+
+    /* Récupération de la case courante */
+    var currentCasesLevel: Array<Array<Case>> = this.levelsManager.getCurrentCasesLevel();
+    var currentCase: Case = currentCasesLevel[coords.y][coords.x];
+
+    /* Case ok */
+    if (currentCase != null && currentCase.hasFood())
+    {
+      var canvas: Canvas = new Canvas();
+      canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
+
+      /* Dessin */
+      this.levelsManager.drawFood(canvas, currentCase);
+
+      /* Dessin de la nourriture et suppression de l'ancienne */
+      this.canvas.getContext().clearRect(coords.x * Case.CASE_WIDTH + margin, coords.y * Case.CASE_WIDTH + margin, 30, 30);
+      this.canvas.getContext().drawImage(canvas.getElement(), 0, 0);
+    }
+
+    return this;
+  }
+
+  /**
    * Vérifie qu'il n'y a pas de collision
    *
    * @param x
@@ -136,8 +171,15 @@ class Jeu
    */
   public foodEaten(e: CustomEvent): Jeu
   {
-    /* Les coordonées */
+    /* Les coordonées de la case courante */
     var coords: Point = e.detail;
+
+    /* Récupération de la case courante */
+    var currentCasesLevel: Array<Array<Case>> = this.levelsManager.getCurrentCasesLevel();
+    var currentCase: Case = currentCasesLevel[coords.y][coords.x];
+
+    /* Suppression de la nourriture */
+    currentCase.setFood(null);
 
     return this;
   }

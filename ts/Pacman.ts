@@ -277,13 +277,9 @@ class Pacman
     if (percentInCase == 15)
     {
       /* Les coordonées de la case */
-      var nextCaseCoords: Point = this.getNextCaseCoords(this.direction);
+      var currentCaseCoords: Point = this.getPreviousCaseCoords();
 
-      /* Round */
-      nextCaseCoords.x = Math.abs(Math.round(nextCaseCoords.x));
-      nextCaseCoords.y = Math.abs(Math.round(nextCaseCoords.y));
-
-      var event: Event = new CustomEvent('FoodEaten', {'detail': nextCaseCoords});
+      var event: Event = new CustomEvent('FoodEaten', {'detail': currentCaseCoords});
       window.dispatchEvent(event);
     }
 
@@ -380,5 +376,30 @@ class Pacman
     }
 
     return nextCaseCoords;
+  }
+
+  /**
+   * Récupère les coordonnées de la case courante
+   *
+   * @returns {Point}
+   */
+  public getPreviousCaseCoords()
+  {
+    var moduloX: number = this.coordinates.x % Case.CASE_WIDTH;
+    var moduloY: number = this.coordinates.y % Case.CASE_WIDTH;
+
+    /* Suppression pour avoir la case */
+    var coords: Point = {
+      x: (this.coordinates.x - moduloX) / Case.CASE_WIDTH,
+      y: (this.coordinates.y - moduloY) / Case.CASE_WIDTH
+    };
+
+    /* Suivant la direction, c'est pas forcément la bonne case */
+    if (this.direction == Directions.Left)
+      coords.x++;
+    else if (this.direction == Directions.Up)
+      coords.y++;
+
+    return coords;
   }
 }

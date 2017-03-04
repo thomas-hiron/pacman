@@ -155,6 +155,14 @@ class Case {
     hasFood() {
         return this.food != null;
     }
+    /**
+     * Getter
+     *
+     * @returns {Food}
+     */
+    getFood() {
+        return this.food;
+    }
 }
 Case.CASE_WIDTH = 40;
 /**
@@ -234,6 +242,8 @@ class Jeu {
     draw() {
         /* Si l'interval a été atteint */
         if (+new Date() - this.time > Jeu.INTERVAL) {
+            /* Dessine la case courante si le point a pas été mangé pour pas le couper */
+            this.drawCurrentFood();
             /* Animation de pacman */
             this.animatePacman();
             /* Mise à jour du temps */
@@ -264,6 +274,30 @@ class Jeu {
         return this;
     }
     /**
+     * Dessine la nourriture si elle a pas été mangée
+     *
+     * @returns {Jeu}
+     */
+    drawCurrentFood() {
+        /* La case de pacman */
+        var coords = this.pacman.getPreviousCaseCoords();
+        var margin = 5;
+        /* Récupération de la case courante */
+        var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
+        var currentCase = currentCasesLevel[coords.y][coords.x];
+        /* Case ok */
+        if (currentCase != null && currentCase.hasFood()) {
+            var canvas = new Canvas();
+            canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
+            /* Dessin */
+            this.levelsManager.drawFood(canvas, currentCase);
+            /* Dessin de la nourriture et suppression de l'ancienne */
+            this.canvas.getContext().clearRect(coords.x * Case.CASE_WIDTH + margin, coords.y * Case.CASE_WIDTH + margin, 30, 30);
+            this.canvas.getContext().drawImage(canvas.getElement(), 0, 0);
+        }
+        return this;
+    }
+    /**
      * Vérifie qu'il n'y a pas de collision
      *
      * @param x
@@ -281,8 +315,13 @@ class Jeu {
      * @returns {Jeu}
      */
     foodEaten(e) {
-        /* Les coordonées */
+        /* Les coordonées de la case courante */
         var coords = e.detail;
+        /* Récupération de la case courante */
+        var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
+        var currentCase = currentCasesLevel[coords.y][coords.x];
+        /* Suppression de la nourriture */
+        currentCase.setFood(null);
         return this;
     }
 }
@@ -404,7 +443,7 @@ class LevelsManager {
                 /* Dessine la case courante et la nourriture */
                 this.drawCase(canvas, currentCase);
                 if (currentCase.hasFood())
-                    this.drawFood(canvas, currentCase, currentCase.hasBigFood());
+                    this.drawFood(canvas, currentCase);
             }
         }
         return this;
@@ -457,19 +496,18 @@ class LevelsManager {
      *
      * @param canvas
      * @param currentCase
-     * @param bigFood
      *
      * @returns {LevelsManager}
      */
-    drawFood(canvas, currentCase, bigFood) {
+    drawFood(canvas, currentCase) {
         var context = canvas.getContext();
         var coordinates = currentCase.getCoordinates();
-        var radius = bigFood ? 7 : 3;
+        var radius = currentCase.getFood() instanceof BigFood ? 6 : 3;
         var margin = Case.CASE_WIDTH / 2;
         context.beginPath();
         context.arc(coordinates.x * Case.CASE_WIDTH + margin, coordinates.y * Case.CASE_WIDTH + margin, radius, 0, 2 * Math.PI, false);
         context.fillStyle = 'white';
-        context.strokeStyle = '';
+        context.strokeStyle = 'white';
         context.lineWidth = 0;
         context.fill();
         context.closePath();
@@ -694,11 +732,8 @@ class Pacman {
         /* Suppression du point */
         if (percentInCase == 15) {
             /* Les coordonées de la case */
-            var nextCaseCoords = this.getNextCaseCoords(this.direction);
-            /* Round */
-            nextCaseCoords.x = Math.abs(Math.round(nextCaseCoords.x));
-            nextCaseCoords.y = Math.abs(Math.round(nextCaseCoords.y));
-            var event = new CustomEvent('FoodEaten', { 'detail': nextCaseCoords });
+            var currentCaseCoords = this.getPreviousCaseCoords();
+            var event = new CustomEvent('FoodEaten', { 'detail': currentCaseCoords });
             window.dispatchEvent(event);
         }
         /* Retour de l'instance */
@@ -774,5 +809,25 @@ class Pacman {
                 break;
         }
         return nextCaseCoords;
+    }
+    /**
+     * Récupère les coordonnées de la case courante
+     *
+     * @returns {Point}
+     */
+    getPreviousCaseCoords() {
+        var moduloX = this.coordinates.x % Case.CASE_WIDTH;
+        var moduloY = this.coordinates.y % Case.CASE_WIDTH;
+        /* Suppression pour avoir la case */
+        var coords = {
+            x: (this.coordinates.x - moduloX) / Case.CASE_WIDTH,
+            y: (this.coordinates.y - moduloY) / Case.CASE_WIDTH
+        };
+        /* Suivant la direction, c'est pas forcément la bonne case */
+        if (this.direction == Directions.Left)
+            coords.x++;
+        else if (this.direction == Directions.Up)
+            coords.y++;
+        return coords;
     }
 }

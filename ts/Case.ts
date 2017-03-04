@@ -143,4 +143,14 @@ class Case
   {
     return this.food != null;
   }
+
+  /**
+   * Getter
+   *
+   * @returns {Food}
+   */
+  public getFood()
+  {
+    return this.food;
+  }
 }
