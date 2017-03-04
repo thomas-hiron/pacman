@@ -224,6 +224,8 @@ class Jeu {
         this.levelsManager.draw(canvasLevel);
         /* Dessin du niveau */
         this.canvas.getContext().drawImage(canvasLevel.getElement(), 0, Jeu.TOP_HEIGHT);
+        /* Le score */
+        this.score = new Score();
         /* Dessin du haut */
         this.drawTop();
         /* Pacman */
@@ -248,6 +250,8 @@ class Jeu {
             this.drawCurrentFood();
             /* Animation de pacman */
             this.animatePacman();
+            /* Mise à jour du score */
+            this.drawScore();
             /* Mise à jour du temps */
             this.time = +new Date();
         }
@@ -329,13 +333,27 @@ class Jeu {
         context.fillStyle = 'white';
         context.font = "16px Arial";
         /* Affichage du score */
-        context.fillText("Score : 0", 10, Jeu.TOP_HEIGHT / 2 + 5);
+        context.fillText(this.score.toString(), 10, Jeu.TOP_HEIGHT / 2 + 5);
         /* Affichage du titre */
         context.textAlign = 'center';
         context.fillText("Pacman", this.canvas.getElement().width / 2, Jeu.TOP_HEIGHT / 2 + 5);
         /* Affichage du niveau */
         context.textAlign = 'right';
         context.fillText("Niveau 1", this.canvas.getElement().width - 10, Jeu.TOP_HEIGHT / 2 + 5);
+        return this;
+    }
+    /**
+     * Affichage le score
+     *
+     * @returns {Jeu}
+     */
+    drawScore() {
+        var context = this.canvas.getContext();
+        /* Suppression */
+        context.clearRect(0, 0, 200, Jeu.TOP_HEIGHT - 5);
+        /* Rajout */
+        context.textAlign = 'left';
+        context.fillText(this.score.toString(), 10, Jeu.TOP_HEIGHT / 2 + 5);
         return this;
     }
     /**
@@ -873,5 +891,22 @@ class Pacman {
         else if (this.direction == Directions.Up)
             coords.y++;
         return coords;
+    }
+}
+/**
+ * Created by mac pro on 05/03/2017.
+ */
+/**
+ * Gère le score
+ */
+class Score {
+    constructor() {
+        this.score = 0;
+    }
+    /**
+     * @returns {string}
+     */
+    toString() {
+        return 'Score : ' + this.score;
     }
 }
