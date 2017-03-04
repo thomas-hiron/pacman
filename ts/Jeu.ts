@@ -262,6 +262,9 @@ class Jeu
     var currentCasesLevel: Array<Array<Case>> = this.levelsManager.getCurrentCasesLevel();
     var currentCase: Case = currentCasesLevel[coords.y][coords.x];
 
+    /* Augmentation du score */
+    this.score.update(currentCase);
+
     /* Suppression de la nourriture */
     currentCase.setFood(null);
 

@@ -379,6 +379,8 @@ class Jeu {
         /* Récupération de la case courante */
         var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
         var currentCase = currentCasesLevel[coords.y][coords.x];
+        /* Augmentation du score */
+        this.score.update(currentCase);
         /* Suppression de la nourriture */
         currentCase.setFood(null);
         return this;
@@ -909,4 +911,21 @@ class Score {
     toString() {
         return 'Score : ' + this.score;
     }
+    /**
+     * Augmente le score en fonction de la case
+     *
+     * @param currentCase
+     *
+     * @returns {Score}
+     */
+    update(currentCase) {
+        if (currentCase.hasBigFood())
+            this.score += Score.BIG_FOOD;
+        else if (currentCase.hasFood())
+            this.score += Score.FOOD;
+        return this;
+    }
 }
+/* Constantes de score */
+Score.FOOD = 10;
+Score.BIG_FOOD = 50;
