@@ -55,6 +55,9 @@ class Jeu
     this.pacman.setCollideFunction(this.checkCollision.bind(this));
     this.pacman.init();
 
+    /* Listener pour la nourriture mangée */
+    window.addEventListener('FoodEaten', this.foodEaten.bind(this), false);
+
     /* RequestAnimationFrame pour le pacman, les fantomes */
     requestAnimFrame(this.draw.bind(this));
 
@@ -124,5 +127,18 @@ class Jeu
     var currentCasesLevel: Array<Array<Case>> = this.levelsManager.getCurrentCasesLevel();
 
     return currentCasesLevel[y] == void 0 || currentCasesLevel[y][x] === void 0 || currentCasesLevel[y][x].isAWall();
+  }
+
+  /**
+   * Mange la nourriture
+   *
+   * @returns {Jeu}
+   */
+  public foodEaten(e: CustomEvent): Jeu
+  {
+    /* Les coordonées */
+    var coords: Point = e.detail;
+
+    return this;
   }
 }

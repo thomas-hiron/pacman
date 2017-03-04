@@ -220,6 +220,8 @@ class Jeu {
         this.pacman = new Pacman();
         this.pacman.setCollideFunction(this.checkCollision.bind(this));
         this.pacman.init();
+        /* Listener pour la nourriture mangée */
+        window.addEventListener('FoodEaten', this.foodEaten.bind(this), false);
         /* RequestAnimationFrame pour le pacman, les fantomes */
         requestAnimFrame(this.draw.bind(this));
         return this;
@@ -272,6 +274,16 @@ class Jeu {
     checkCollision(x, y) {
         var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
         return currentCasesLevel[y] == void 0 || currentCasesLevel[y][x] === void 0 || currentCasesLevel[y][x].isAWall();
+    }
+    /**
+     * Mange la nourriture
+     *
+     * @returns {Jeu}
+     */
+    foodEaten(e) {
+        /* Les coordonées */
+        var coords = e.detail;
+        return this;
     }
 }
 Jeu.INTERVAL = 10;
@@ -650,21 +662,26 @@ class Pacman {
                 this.direction == Directions.Down && this.nextDirection == Directions.Up)
                 this.direction = this.nextDirection;
         }
-        /* En fonction de la direction, modification des coords et de l'angle */
+        /* En fonction de la direction, modification des coords et de l'angle, si 15% dans la case, on supprime la bouffe */
+        var percentInCase;
         switch (this.direction) {
             case Directions.Left:
+                percentInCase = 100 - this.coordinates.x % caseWidth * 100 / caseWidth;
                 newX -= this.stepPx;
                 this.angle = 180;
                 break;
             case Directions.Right:
+                percentInCase = this.coordinates.x % caseWidth * 100 / caseWidth;
                 newX += this.stepPx;
                 this.angle = 0;
                 break;
             case Directions.Up:
+                percentInCase = 100 - this.coordinates.y % caseWidth * 100 / caseWidth;
                 newY -= this.stepPx;
                 this.angle = 270;
                 break;
             case Directions.Down:
+                percentInCase = this.coordinates.y % caseWidth * 100 / caseWidth;
                 newY += this.stepPx;
                 this.angle = 90;
                 break;
@@ -673,6 +690,16 @@ class Pacman {
         if (!collisionWithNextDirection || !collisionWithCurrentDirection) {
             this.coordinates.x = newX;
             this.coordinates.y = newY;
+        }
+        /* Suppression du point */
+        if (percentInCase == 15) {
+            /* Les coordonées de la case */
+            var nextCaseCoords = this.getNextCaseCoords(this.direction);
+            /* Round */
+            nextCaseCoords.x = Math.abs(Math.round(nextCaseCoords.x));
+            nextCaseCoords.y = Math.abs(Math.round(nextCaseCoords.y));
+            var event = new CustomEvent('FoodEaten', { 'detail': nextCaseCoords });
+            window.dispatchEvent(event);
         }
         /* Retour de l'instance */
         return this;

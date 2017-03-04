@@ -10,51 +10,51 @@ class Pacman
   /**
    * Le canvas pour pacman
    */
-  private canvas:Canvas;
+  private canvas: Canvas;
 
   /**
    * La taille de pacman
    */
-  private size:Size;
+  private size: Size;
 
   /**
    * Les coordonnées de départ
    */
-  private coordinates:Point;
+  private coordinates: Point;
 
   /**
    * La direction courante et la suivante
    */
-  private direction:number;
-  private nextDirection:number;
+  private direction: number;
+  private nextDirection: number;
 
   /**
    * L'étape courante pour le dessin et le nombre d'animations
    */
-  private currentStep:number;
-  private stepNumber:number;
+  private currentStep: number;
+  private stepNumber: number;
 
   /**
    * Le décalage en px lors du mouvement
    */
-  private stepPx:number;
+  private stepPx: number;
 
   /**
    * L'angle
    */
-  private angle:number;
+  private angle: number;
 
   /**
    * Pour détecter une collision (fonction dans Jeu)
    */
-  private checkCollision:any;
+  private checkCollision: any;
 
   /**
    * @param callback
    *
    * @returns {Pacman}
    */
-  public setCollideFunction(callback:any)
+  public setCollideFunction(callback: any)
   {
     this.checkCollision = callback;
     return this;
@@ -63,7 +63,7 @@ class Pacman
   /**
    * @returns {Size}
    */
-  public getSize():Size
+  public getSize(): Size
   {
     return this.size;
   }
@@ -71,7 +71,7 @@ class Pacman
   /**
    * @returns {number}
    */
-  public getX():number
+  public getX(): number
   {
     return this.coordinates.x;
   }
@@ -79,7 +79,7 @@ class Pacman
   /**
    * @returns {number}
    */
-  public getY():number
+  public getY(): number
   {
     return this.coordinates.y;
   }
@@ -89,7 +89,7 @@ class Pacman
    *
    * @returns {HTMLCanvasElement}
    */
-  public getCanvasElem():HTMLCanvasElement
+  public getCanvasElem(): HTMLCanvasElement
   {
     return this.canvas.getElement();
   }
@@ -120,7 +120,7 @@ class Pacman
    *
    * @returns {Pacman}
    */
-  public init():Pacman
+  public init(): Pacman
   {
     /* Création du canvas */
     this.canvas = new Canvas();
@@ -146,12 +146,12 @@ class Pacman
    *
    * @returns {Pacman}
    */
-  public rotate(e:KeyboardEvent):Pacman
+  public rotate(e: KeyboardEvent): Pacman
   {
     e.preventDefault();
 
     /* Le code de la flèche touchée */
-    var code:number = e.keyCode;
+    var code: number = e.keyCode;
 
     /* Selon la flèche, on change le direction */
     switch (code)
@@ -179,7 +179,7 @@ class Pacman
    *
    * @returns {Pacman}
    */
-  public animate():Pacman
+  public animate(): Pacman
   {
     /* Augmentation de l'étape */
     this.currentStep++;
@@ -203,22 +203,22 @@ class Pacman
   public move()
   {
     /* Largeur de la case */
-    var caseWidth:number = Case.CASE_WIDTH;
+    var caseWidth: number = Case.CASE_WIDTH;
 
     /* Pas de collision par défaut */
-    var collisionWithNextDirection:boolean = false;
-    var collisionWithCurrentDirection:boolean = false;
+    var collisionWithNextDirection: boolean = false;
+    var collisionWithCurrentDirection: boolean = false;
 
     /* Les nouvelles coordonnées */
-    var newX:number = this.coordinates.x;
-    var newY:number = this.coordinates.y;
+    var newX: number = this.coordinates.x;
+    var newY: number = this.coordinates.y;
 
     /* Si dans une case, on change de direction, si possible */
     if (this.coordinates.x % caseWidth == 0 && this.coordinates.y % caseWidth == 0)
     {
       /* Les cases suivantes en fonction de la direction courante et suivante */
-      var nextCaseCoordsWithNextDirection:Point = this.getNextCaseCoords(this.nextDirection);
-      var nextCaseCoordsWithCurrentDirection:Point = this.getNextCaseCoords(this.direction);
+      var nextCaseCoordsWithNextDirection: Point = this.getNextCaseCoords(this.nextDirection);
+      var nextCaseCoordsWithCurrentDirection: Point = this.getNextCaseCoords(this.direction);
 
       /* Vérification que pas de collision */
       collisionWithNextDirection = this.checkCollision(nextCaseCoordsWithNextDirection.x, nextCaseCoordsWithNextDirection.y);
@@ -240,22 +240,27 @@ class Pacman
         this.direction = this.nextDirection
     }
 
-    /* En fonction de la direction, modification des coords et de l'angle */
+    /* En fonction de la direction, modification des coords et de l'angle, si 15% dans la case, on supprime la bouffe */
+    var percentInCase: number;
     switch (this.direction)
     {
       case Directions.Left:
+        percentInCase = 100 - this.coordinates.x % caseWidth * 100 / caseWidth;
         newX -= this.stepPx;
         this.angle = 180;
         break;
       case Directions.Right:
+        percentInCase = this.coordinates.x % caseWidth * 100 / caseWidth;
         newX += this.stepPx;
         this.angle = 0;
         break;
       case Directions.Up:
+        percentInCase = 100 - this.coordinates.y % caseWidth * 100 / caseWidth;
         newY -= this.stepPx;
         this.angle = 270;
         break;
       case Directions.Down:
+        percentInCase = this.coordinates.y % caseWidth * 100 / caseWidth;
         newY += this.stepPx;
         this.angle = 90;
         break;
@@ -268,6 +273,20 @@ class Pacman
       this.coordinates.y = newY;
     }
 
+    /* Suppression du point */
+    if (percentInCase == 15)
+    {
+      /* Les coordonées de la case */
+      var nextCaseCoords: Point = this.getNextCaseCoords(this.direction);
+
+      /* Round */
+      nextCaseCoords.x = Math.abs(Math.round(nextCaseCoords.x));
+      nextCaseCoords.y = Math.abs(Math.round(nextCaseCoords.y));
+
+      var event: Event = new CustomEvent('FoodEaten', {'detail': nextCaseCoords});
+      window.dispatchEvent(event);
+    }
+
     /* Retour de l'instance */
     return this;
   }
@@ -277,16 +296,16 @@ class Pacman
    *
    * @returns {Pacman}
    */
-  public draw():Pacman
+  public draw(): Pacman
   {
     /* Le context du pacman */
-    var ctx:CanvasRenderingContext2D = this.canvas.getContext();
+    var ctx: CanvasRenderingContext2D = this.canvas.getContext();
 
     /* Taille */
-    var size:Size = this.size;
+    var size: Size = this.size;
 
     /* Largeur de la case */
-    var caseWidth:number = Case.CASE_WIDTH;
+    var caseWidth: number = Case.CASE_WIDTH;
 
     /* Suppression du context */
     ctx.clearRect(0, 0, size.w, size.h);
@@ -307,8 +326,8 @@ class Pacman
     ctx.fillStyle = "#FFFF00";
 
     /* Calcul pour le dessin */
-    var inclinaison:number = this.currentStep * 0.25 / (this.stepNumber - 1);
-    var inclinaison2:number = 1 - inclinaison;
+    var inclinaison: number = this.currentStep * 0.25 / (this.stepNumber - 1);
+    var inclinaison2: number = 1 - inclinaison;
 
     /* Dessin */
     ctx.beginPath();
@@ -319,7 +338,7 @@ class Pacman
     ctx.fill();
 
     /* La marge */
-    var margin:number = (caseWidth - size.w) / 2;
+    var margin: number = (caseWidth - size.w) / 2;
 
     /* Restauration du context */
     ctx.restore();
@@ -335,10 +354,10 @@ class Pacman
    *
    * @returns {Point}
    */
-  private getNextCaseCoords(direction:number):Point
+  private getNextCaseCoords(direction: number): Point
   {
     /* La case suivante avec la prochaine direction */
-    var nextCaseCoords:Point = {
+    var nextCaseCoords: Point = {
       x: this.coordinates.x / Case.CASE_WIDTH,
       y: this.coordinates.y / Case.CASE_WIDTH
     };
