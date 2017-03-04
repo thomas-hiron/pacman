@@ -11,8 +11,12 @@ class Canvas
    * Le constructeur
    * @param canvas
    */
-  constructor(canvas:Element)
+  constructor(canvas:Element = null)
   {
+    /* Init si null */
+    if(canvas == null)
+      canvas = document.createElement('CANVAS');
+
     this.element = <HTMLCanvasElement>canvas;
   }
 
@@ -47,7 +51,7 @@ class Canvas
   }
 
   /**
-   * Getter de l'élément
+   * Getter de l'Ã©lÃ©ment
    *
    * @returns {HTMLCanvasElement}
    */

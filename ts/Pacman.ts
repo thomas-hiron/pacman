@@ -96,8 +96,6 @@ class Pacman
 
   /**
    * Le constructeur qui initialise les variables
-   *
-   * @param gameCanvas
    */
   public constructor()
   {
@@ -125,7 +123,7 @@ class Pacman
   public init():Pacman
   {
     /* Création du canvas */
-    this.canvas = new Canvas(document.createElement('CANVAS'));
+    this.canvas = new Canvas();
     this.canvas.init();
 
     /* Initialisation de la taille du canvas */
