@@ -224,6 +224,8 @@ class Jeu {
         this.levelsManager.draw(canvasLevel);
         /* Dessin du niveau */
         this.canvas.getContext().drawImage(canvasLevel.getElement(), 0, Jeu.TOP_HEIGHT);
+        /* Dessin du haut */
+        this.drawTop();
         /* Pacman */
         this.pacman = new Pacman();
         this.pacman.setCollideFunction(this.checkCollision.bind(this));
@@ -295,6 +297,45 @@ class Jeu {
             this.canvas.getContext().clearRect(coords.x * Case.CASE_WIDTH + margin, coords.y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
             this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
         }
+        return this;
+    }
+    /**
+     * Dessine le haut
+     *
+     * @returns {Jeu}
+     */
+    drawTop() {
+        var context = this.canvas.getContext();
+        context.beginPath();
+        context.strokeStyle = "#012EB6";
+        context.lineWidth = 4;
+        /* Toute la bordure */
+        context.moveTo(0, Jeu.TOP_HEIGHT);
+        context.lineTo(this.canvas.getElement().width, Jeu.TOP_HEIGHT);
+        context.lineTo(this.canvas.getElement().width, this.canvas.getElement().height);
+        context.lineTo(0, this.canvas.getElement().height);
+        context.lineTo(0, Jeu.TOP_HEIGHT);
+        /* Bordure */
+        context.stroke();
+        /* Pour faire la bordure double */
+        context.globalCompositeOperation = 'destination-out';
+        context.lineWidth = 2;
+        context.stroke();
+        /* Le contexte par défaut */
+        context.globalCompositeOperation = 'source-over';
+        /* Fermeture du path */
+        context.closePath();
+        /* Propriété des fonts */
+        context.fillStyle = 'white';
+        context.font = "16px Arial";
+        /* Affichage du score */
+        context.fillText("Score : 0", 10, Jeu.TOP_HEIGHT / 2 + 5);
+        /* Affichage du titre */
+        context.textAlign = 'center';
+        context.fillText("Pacman", this.canvas.getElement().width / 2, Jeu.TOP_HEIGHT / 2 + 5);
+        /* Affichage du niveau */
+        context.textAlign = 'right';
+        context.fillText("Niveau 1", this.canvas.getElement().width - 10, Jeu.TOP_HEIGHT / 2 + 5);
         return this;
     }
     /**

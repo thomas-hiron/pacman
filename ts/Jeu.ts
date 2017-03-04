@@ -53,6 +53,9 @@ class Jeu
     /* Dessin du niveau */
     this.canvas.getContext().drawImage(canvasLevel.getElement(), 0, Jeu.TOP_HEIGHT);
 
+    /* Dessin du haut */
+    this.drawTop();
+
     /* Pacman */
     this.pacman = new Pacman();
     this.pacman.setCollideFunction(this.checkCollision.bind(this));
@@ -72,7 +75,7 @@ class Jeu
    *
    * @returns {Jeu}
    */
-  public draw(): Jeu
+  private draw(): Jeu
   {
     /* Si l'interval a été atteint */
     if (+new Date() - this.time > Jeu.INTERVAL)
@@ -125,7 +128,7 @@ class Jeu
    *
    * @returns {Jeu}
    */
-  private drawCurrentFood()
+  private drawCurrentFood(): Jeu
   {
     /* La case de pacman */
     var coords: Point = this.pacman.getPreviousCaseCoords();
@@ -153,6 +156,58 @@ class Jeu
   }
 
   /**
+   * Dessine le haut
+   *
+   * @returns {Jeu}
+   */
+  private drawTop(): Jeu
+  {
+    var context: CanvasRenderingContext2D = this.canvas.getContext();
+
+    context.beginPath();
+    context.strokeStyle = "#012EB6";
+    context.lineWidth = 4;
+
+    /* Toute la bordure */
+    context.moveTo(0, Jeu.TOP_HEIGHT);
+    context.lineTo(this.canvas.getElement().width, Jeu.TOP_HEIGHT);
+    context.lineTo(this.canvas.getElement().width, this.canvas.getElement().height);
+    context.lineTo(0, this.canvas.getElement().height);
+    context.lineTo(0, Jeu.TOP_HEIGHT);
+
+    /* Bordure */
+    context.stroke();
+
+    /* Pour faire la bordure double */
+    context.globalCompositeOperation = 'destination-out';
+    context.lineWidth = 2;
+    context.stroke();
+
+    /* Le contexte par défaut */
+    context.globalCompositeOperation = 'source-over';
+
+    /* Fermeture du path */
+    context.closePath();
+
+    /* Propriété des fonts */
+    context.fillStyle = 'white';
+    context.font = "16px Arial";
+
+    /* Affichage du score */
+    context.fillText("Score : 0", 10, Jeu.TOP_HEIGHT / 2 + 5);
+
+    /* Affichage du titre */
+    context.textAlign = 'center';
+    context.fillText("Pacman", this.canvas.getElement().width / 2, Jeu.TOP_HEIGHT / 2 + 5);
+
+    /* Affichage du niveau */
+    context.textAlign = 'right';
+    context.fillText("Niveau 1", this.canvas.getElement().width - 10, Jeu.TOP_HEIGHT / 2 + 5);
+
+    return this;
+  }
+
+  /**
    * Vérifie qu'il n'y a pas de collision
    *
    * @param x
@@ -160,7 +215,7 @@ class Jeu
    *
    * @returns {boolean}
    */
-  public checkCollision(x: number, y: number): boolean
+  private checkCollision(x: number, y: number): boolean
   {
     var currentCasesLevel: Array<Array<Case>> = this.levelsManager.getCurrentCasesLevel();
 
@@ -172,7 +227,7 @@ class Jeu
    *
    * @returns {Jeu}
    */
-  public foodEaten(e: CustomEvent): Jeu
+  private foodEaten(e: CustomEvent): Jeu
   {
     /* Les coordonées de la case courante */
     var coords: Point = e.detail;
