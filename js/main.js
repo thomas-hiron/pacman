@@ -794,9 +794,9 @@ class Pacman {
             this.coordinates.y = newY;
         }
         /* Suppression du point */
-        if (percentInCase == 15) {
+        if (percentInCase == 75) {
             /* Les coordonées de la case */
-            var currentCaseCoords = this.getPreviousCaseCoords();
+            var currentCaseCoords = this.getCurrentCaseCoords();
             var event = new CustomEvent('FoodEaten', { 'detail': currentCaseCoords });
             window.dispatchEvent(event);
         }
@@ -879,7 +879,7 @@ class Pacman {
      *
      * @returns {Point}
      */
-    getPreviousCaseCoords() {
+    getCurrentCaseCoords() {
         var moduloX = this.coordinates.x % Case.CASE_WIDTH;
         var moduloY = this.coordinates.y % Case.CASE_WIDTH;
         /* Suppression pour avoir la case */
@@ -888,10 +888,34 @@ class Pacman {
             y: (this.coordinates.y - moduloY) / Case.CASE_WIDTH
         };
         /* Suivant la direction, c'est pas forcément la bonne case */
-        if (this.direction == Directions.Left)
+        if (this.direction == Directions.Right)
             coords.x++;
-        else if (this.direction == Directions.Up)
+        else if (this.direction == Directions.Down)
             coords.y++;
+        return coords;
+    }
+    /**
+     * Récupère les coordonnées de la case précédente (celle derrière pacmanà
+     *
+     * @returns {Point}
+     */
+    getPreviousCaseCoords() {
+        var coords = this.getCurrentCaseCoords();
+        /* Suivant la direction, c'est pas forcément la bonne case */
+        switch (this.direction) {
+            case Directions.Left:
+                coords.x++;
+                break;
+            case Directions.Right:
+                coords.x--;
+                break;
+            case Directions.Up:
+                coords.y++;
+                break;
+            case Directions.Down:
+                coords.y--;
+                break;
+        }
         return coords;
     }
 }
