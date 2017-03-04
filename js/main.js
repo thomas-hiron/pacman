@@ -58,6 +58,7 @@ class Canvas {
 class Case {
     constructor() {
         this.wall = false;
+        this.food = null;
         this.coordinates = {
             x: 0,
             y: 0
@@ -325,15 +326,15 @@ class Levels {
         /* Sinon on met de la bouffe */
         for (i = 0, l = cases.length; i < l; ++i) {
             for (j = 0, k = cases[i].length; j < k; ++j) {
-                /* Pas trouvé, c'est une case, ajout de la nourriture */
-                if (wallsCoordinates[i][j] == void 0)
+                /* Ajout de la nourriture */
+                if (!cases[i][j].isAWall())
                     cases[i][j].setFood(new Food());
             }
         }
-        /* Ajout des grosses bouffes */
-        cases[1][2].setFood(new BigFood());
-        cases[13][2].setFood(new BigFood());
-        cases[2][12].setFood(new BigFood());
+        /* Ajout des grosses bouffes, y d'abord */
+        cases[2][1].setFood(new BigFood());
+        cases[2][13].setFood(new BigFood());
+        cases[12][2].setFood(new BigFood());
         cases[12][12].setFood(new BigFood());
         /* Ajout des cases */
         this.levels.push(cases);
@@ -388,8 +389,10 @@ class LevelsManager {
                 currentCase.hasBorderRight(rightCase != null && currentCase.isAWall() && !rightCase.isAWall());
                 currentCase.hasBorderTop(upCase != null && currentCase.isAWall() && !upCase.isAWall());
                 currentCase.hasBorderBottom(downCase != null && currentCase.isAWall() && !downCase.isAWall());
-                /* Dessine la case courante */
+                /* Dessine la case courante et la nourriture */
                 this.drawCase(canvas, currentCase);
+                if (currentCase.hasFood())
+                    this.drawFood(canvas, currentCase, currentCase.hasBigFood());
             }
         }
         return this;
@@ -402,6 +405,7 @@ class LevelsManager {
      */
     drawCase(canvas, currentCase) {
         var context = canvas.getContext();
+        context.beginPath();
         context.strokeStyle = "#012EB6";
         context.lineWidth = 4;
         var coordinates = currentCase.getCoordinates();
@@ -433,6 +437,29 @@ class LevelsManager {
         /* Le contexte par défaut */
         context.globalCompositeOperation = 'source-over';
         /* Fermeture du path */
+        context.closePath();
+        return this;
+    }
+    /**
+     * Dessine la bouffe
+     *
+     * @param canvas
+     * @param currentCase
+     * @param bigFood
+     *
+     * @returns {LevelsManager}
+     */
+    drawFood(canvas, currentCase, bigFood) {
+        var context = canvas.getContext();
+        var coordinates = currentCase.getCoordinates();
+        var radius = bigFood ? 7 : 3;
+        var margin = Case.CASE_WIDTH / 2;
+        context.beginPath();
+        context.arc(coordinates.x * Case.CASE_WIDTH + margin, coordinates.y * Case.CASE_WIDTH + margin, radius, 0, 2 * Math.PI, false);
+        context.fillStyle = 'white';
+        context.strokeStyle = '';
+        context.lineWidth = 0;
+        context.fill();
         context.closePath();
         return this;
     }

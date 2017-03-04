@@ -7,8 +7,8 @@
  */
 class LevelsManager
 {
-  private currentLevel:number = 1;
-  private levels:Levels;
+  private currentLevel: number = 1;
+  private levels: Levels;
 
   constructor()
   {
@@ -20,29 +20,29 @@ class LevelsManager
    *
    * @param canvas
    */
-  public draw(canvas:Canvas):LevelsManager
+  public draw(canvas: Canvas): LevelsManager
   {
-    var currentLevel:Array<Array<Case>> = this.levels.get(this.currentLevel);
+    var currentLevel: Array<Array<Case>> = this.levels.get(this.currentLevel);
 
     /* Prévention de bug */
     if (currentLevel == null)
       return this;
 
     /* Parcourt de chaque ligne */
-    for (var i:number = 0, l:number = currentLevel.length; i < l; ++i)
+    for (var i: number = 0, l: number = currentLevel.length; i < l; ++i)
     {
-      var row:Array<Case> = currentLevel[i];
+      var row: Array<Case> = currentLevel[i];
 
       /* Parcourt de chaque case */
-      for (var j:number = 0, k:number = row.length; j < k; ++j)
+      for (var j: number = 0, k: number = row.length; j < k; ++j)
       {
-        var currentCase:Case = row[j];
+        var currentCase: Case = row[j];
 
         /* Détermination des bordures à supprimer */
-        var leftCase:Case = row[j - 1] || null;
-        var rightCase:Case = row[j + 1] || null;
-        var upCase:Case = currentLevel[i - 1] != null ? currentLevel[i - 1][j] : null;
-        var downCase:Case = currentLevel[i + 1] != null ? currentLevel[i + 1][j] : null;
+        var leftCase: Case = row[j - 1] || null;
+        var rightCase: Case = row[j + 1] || null;
+        var upCase: Case = currentLevel[i - 1] != null ? currentLevel[i - 1][j] : null;
+        var downCase: Case = currentLevel[i + 1] != null ? currentLevel[i + 1][j] : null;
 
         /* Suppression des bordures */
         currentCase.hasBorderLeft(leftCase != null && currentCase.isAWall() && !leftCase.isAWall());
@@ -50,8 +50,10 @@ class LevelsManager
         currentCase.hasBorderTop(upCase != null && currentCase.isAWall() && !upCase.isAWall());
         currentCase.hasBorderBottom(downCase != null && currentCase.isAWall() && !downCase.isAWall());
 
-        /* Dessine la case courante */
+        /* Dessine la case courante et la nourriture */
         this.drawCase(canvas, currentCase);
+        if (currentCase.hasFood())
+          this.drawFood(canvas, currentCase, currentCase.hasBigFood());
       }
     }
 
@@ -64,14 +66,15 @@ class LevelsManager
    * @param canvas
    * @param currentCase
    */
-  private drawCase(canvas:Canvas, currentCase:Case):LevelsManager
+  private drawCase(canvas: Canvas, currentCase: Case): LevelsManager
   {
-    var context:CanvasRenderingContext2D = canvas.getContext();
+    var context: CanvasRenderingContext2D = canvas.getContext();
 
+    context.beginPath();
     context.strokeStyle = "#012EB6";
     context.lineWidth = 4;
 
-    var coordinates:Point = currentCase.getCoordinates();
+    var coordinates: Point = currentCase.getCoordinates();
 
     if (currentCase.hasBorderLeft())
     {
@@ -118,11 +121,39 @@ class LevelsManager
   }
 
   /**
+   * Dessine la bouffe
+   *
+   * @param canvas
+   * @param currentCase
+   * @param bigFood
+   *
+   * @returns {LevelsManager}
+   */
+  public drawFood(canvas: Canvas, currentCase: Case, bigFood: boolean): LevelsManager
+  {
+    var context: CanvasRenderingContext2D = canvas.getContext();
+    var coordinates: Point = currentCase.getCoordinates();
+
+    var radius: number = bigFood ? 7 : 3;
+    var margin: number = Case.CASE_WIDTH / 2;
+
+    context.beginPath();
+    context.arc(coordinates.x * Case.CASE_WIDTH + margin, coordinates.y * Case.CASE_WIDTH + margin, radius, 0, 2 * Math.PI, false);
+    context.fillStyle = 'white';
+    context.strokeStyle = '';
+    context.lineWidth = 0;
+    context.fill();
+    context.closePath();
+
+    return this;
+  }
+
+  /**
    * Récupère toutes les cases du niveau courant
    *
    * @returns {Array<Array<Case>>}
    */
-  public getCurrentCasesLevel():Array<Array<Case>>
+  public getCurrentCasesLevel(): Array<Array<Case>>
   {
     return this.levels.get(this.currentLevel);
   }

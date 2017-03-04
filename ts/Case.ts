@@ -18,6 +18,7 @@ class Case
   constructor()
   {
     this.wall = false;
+    this.food = null;
 
     this.coordinates = {
       x: 0,

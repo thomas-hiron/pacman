@@ -66,16 +66,16 @@ class Levels
     {
       for (j = 0, k = cases[i].length; j < k; ++j)
       {
-        /* Pas trouvé, c'est une case, ajout de la nourriture */
-        if (wallsCoordinates[i][j] == void 0)
+        /* Ajout de la nourriture */
+        if (!cases[i][j].isAWall())
           cases[i][j].setFood(new Food());
       }
     }
 
-    /* Ajout des grosses bouffes */
-    cases[1][2].setFood(new BigFood());
-    cases[13][2].setFood(new BigFood());
-    cases[2][12].setFood(new BigFood());
+    /* Ajout des grosses bouffes, y d'abord */
+    cases[2][1].setFood(new BigFood());
+    cases[2][13].setFood(new BigFood());
+    cases[12][2].setFood(new BigFood());
     cases[12][12].setFood(new BigFood());
 
     /* Ajout des cases */
