@@ -223,7 +223,7 @@ class Jeu {
         this.levelsManager = new LevelsManager();
         this.levelsManager.draw(canvasLevel);
         /* Dessin du niveau */
-        this.canvas.getContext().drawImage(canvasLevel.getElement(), 0, 0);
+        this.canvas.getContext().drawImage(canvasLevel.getElement(), 0, Jeu.TOP_HEIGHT);
         /* Pacman */
         this.pacman = new Pacman();
         this.pacman.setCollideFunction(this.checkCollision.bind(this));
@@ -264,13 +264,13 @@ class Jeu {
         var margin = (Case.CASE_WIDTH - pacman.getSize().w) / 2;
         var ctx = this.canvas.getContext();
         /* Suppression du pacman courant */
-        ctx.clearRect(pacman.getX() + margin, pacman.getY() + margin, pacman.getSize().w, pacman.getSize().h);
+        ctx.clearRect(pacman.getX() + margin, pacman.getY() + margin + Jeu.TOP_HEIGHT, pacman.getSize().w, pacman.getSize().h);
         /* Instruction de modification des coordonées */
         pacman.move();
         /* Instruction d'animation */
         pacman.animate();
         /* Dessin dans le canvas principal */
-        ctx.drawImage(pacman.getCanvasElem(), pacman.getX() + margin, pacman.getY() + margin);
+        ctx.drawImage(pacman.getCanvasElem(), pacman.getX() + margin, pacman.getY() + margin + Jeu.TOP_HEIGHT);
         return this;
     }
     /**
@@ -292,8 +292,8 @@ class Jeu {
             /* Dessin */
             this.levelsManager.drawFood(canvas, currentCase);
             /* Dessin de la nourriture et suppression de l'ancienne */
-            this.canvas.getContext().clearRect(coords.x * Case.CASE_WIDTH + margin, coords.y * Case.CASE_WIDTH + margin, 30, 30);
-            this.canvas.getContext().drawImage(canvas.getElement(), 0, 0);
+            this.canvas.getContext().clearRect(coords.x * Case.CASE_WIDTH + margin, coords.y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
+            this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
         }
         return this;
     }
@@ -325,7 +325,10 @@ class Jeu {
         return this;
     }
 }
+/* Interval du request animation frame */
 Jeu.INTERVAL = 10;
+/* Hauteur du panneau supérieur */
+Jeu.TOP_HEIGHT = 40;
 /**
  * Created by thiron on 03/07/2015.
  */

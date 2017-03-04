@@ -7,7 +7,10 @@
  */
 class Jeu
 {
+  /* Interval du request animation frame */
   private static INTERVAL: number = 10;
+  /* Hauteur du panneau supérieur */
+  private static TOP_HEIGHT: number = 40;
 
   private canvas: Canvas;
   private pacman: Pacman;
@@ -48,7 +51,7 @@ class Jeu
     this.levelsManager.draw(canvasLevel);
 
     /* Dessin du niveau */
-    this.canvas.getContext().drawImage(canvasLevel.getElement(), 0, 0);
+    this.canvas.getContext().drawImage(canvasLevel.getElement(), 0, Jeu.TOP_HEIGHT);
 
     /* Pacman */
     this.pacman = new Pacman();
@@ -103,7 +106,7 @@ class Jeu
     var ctx = this.canvas.getContext();
 
     /* Suppression du pacman courant */
-    ctx.clearRect(pacman.getX() + margin, pacman.getY() + margin, pacman.getSize().w, pacman.getSize().h);
+    ctx.clearRect(pacman.getX() + margin, pacman.getY() + margin + Jeu.TOP_HEIGHT, pacman.getSize().w, pacman.getSize().h);
 
     /* Instruction de modification des coordonées */
     pacman.move();
@@ -112,7 +115,7 @@ class Jeu
     pacman.animate();
 
     /* Dessin dans le canvas principal */
-    ctx.drawImage(pacman.getCanvasElem(), pacman.getX() + margin, pacman.getY() + margin);
+    ctx.drawImage(pacman.getCanvasElem(), pacman.getX() + margin, pacman.getY() + margin + Jeu.TOP_HEIGHT);
 
     return this;
   }
@@ -142,8 +145,8 @@ class Jeu
       this.levelsManager.drawFood(canvas, currentCase);
 
       /* Dessin de la nourriture et suppression de l'ancienne */
-      this.canvas.getContext().clearRect(coords.x * Case.CASE_WIDTH + margin, coords.y * Case.CASE_WIDTH + margin, 30, 30);
-      this.canvas.getContext().drawImage(canvas.getElement(), 0, 0);
+      this.canvas.getContext().clearRect(coords.x * Case.CASE_WIDTH + margin, coords.y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
+      this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
     }
 
     return this;
