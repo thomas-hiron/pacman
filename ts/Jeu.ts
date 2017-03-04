@@ -7,12 +7,12 @@
  */
 class Jeu
 {
-  private static INTERVAL:number = 10;
+  private static INTERVAL: number = 10;
 
-  private canvas:Canvas;
-  private pacman:Pacman;
-  private time:number;
-  private levelsManager:LevelsManager;
+  private canvas: Canvas;
+  private pacman: Pacman;
+  private time: number;
+  private levelsManager: LevelsManager;
 
   public constructor()
   {
@@ -22,13 +22,12 @@ class Jeu
   /**
    * Initialise le jeu
    */
-  public init():Jeu
+  public init(): Jeu
   {
     try
     {
       /* Initialisation du canvas */
       this.canvas = new Canvas(document.querySelector("canvas"));
-      this.canvas.init();
     }
     catch (e)
     {
@@ -40,9 +39,16 @@ class Jeu
       return this;
     }
 
+    /* Le canvas pour dessiner les niveau */
+    var canvasLevel: Canvas = new Canvas();
+    canvasLevel.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
+
     /* Les niveaux */
     this.levelsManager = new LevelsManager();
-    this.levelsManager.draw(this.canvas);
+    this.levelsManager.draw(canvasLevel);
+
+    /* Dessin du niveau */
+    this.canvas.getContext().drawImage(canvasLevel.getElement(), 0, 0);
 
     /* Pacman */
     this.pacman = new Pacman();
@@ -60,7 +66,7 @@ class Jeu
    *
    * @returns {Jeu}
    */
-  public draw():Jeu
+  public draw(): Jeu
   {
     /* Si l'interval a été atteint */
     if (+new Date() - this.time > Jeu.INTERVAL)
@@ -83,11 +89,11 @@ class Jeu
    *
    * @returns {Jeu}
    */
-  private animatePacman():Jeu
+  private animatePacman(): Jeu
   {
-    var pacman:Pacman = this.pacman;
+    var pacman: Pacman = this.pacman;
     /* Pour centrer dans la case */
-    var margin:number = (Case.CASE_WIDTH - pacman.getSize().w) / 2;
+    var margin: number = (Case.CASE_WIDTH - pacman.getSize().w) / 2;
     var ctx = this.canvas.getContext();
 
     /* Suppression du pacman courant */
@@ -113,9 +119,9 @@ class Jeu
    *
    * @returns {boolean}
    */
-  public checkCollision(x:number, y:number):boolean
+  public checkCollision(x: number, y: number): boolean
   {
-    var currentCasesLevel:Array<Array<Case>> = this.levelsManager.getCurrentCasesLevel();
+    var currentCasesLevel: Array<Array<Case>> = this.levelsManager.getCurrentCasesLevel();
 
     return currentCasesLevel[y] == void 0 || currentCasesLevel[y][x] === void 0 || currentCasesLevel[y][x].isAWall();
   }

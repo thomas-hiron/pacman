@@ -61,6 +61,7 @@ class LevelsManager
   /**
    * Dessine la case courante
    *
+   * @param canvas
    * @param currentCase
    */
   private drawCase(canvas:Canvas, currentCase:Case):LevelsManager

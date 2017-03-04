@@ -11,11 +11,6 @@ class Canvas {
         if (canvas == null)
             canvas = document.createElement('CANVAS');
         this.element = canvas;
-    }
-    /**
-     * Initialisation
-     */
-    init() {
         /* Erreur */
         if (!this.element || !this.element.getContext)
             throw new Error("Le canvas n'est pas pris en charge par votre navigateur");
@@ -42,6 +37,19 @@ class Canvas {
      */
     getElement() {
         return this.element;
+    }
+    /**
+     * Initialise la taille
+     *
+     * @param width
+     * @param height
+     *
+     * @returns {Canvas}
+     */
+    setSize(width, height) {
+        this.element.width = width;
+        this.element.height = height;
+        return this;
     }
 }
 /**
@@ -152,7 +160,6 @@ class Jeu {
         try {
             /* Initialisation du canvas */
             this.canvas = new Canvas(document.querySelector("canvas"));
-            this.canvas.init();
         }
         catch (e) {
             /* Une erreur s'est produite, alert puis redirection */
@@ -161,9 +168,14 @@ class Jeu {
             /* Retour de l'instance pour ne pas continuer le temps de la redirection */
             return this;
         }
+        /* Le canvas pour dessiner les niveau */
+        var canvasLevel = new Canvas();
+        canvasLevel.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
         /* Les niveaux */
         this.levelsManager = new LevelsManager();
-        this.levelsManager.draw(this.canvas);
+        this.levelsManager.draw(canvasLevel);
+        /* Dessin du niveau */
+        this.canvas.getContext().drawImage(canvasLevel.getElement(), 0, 0);
         /* Pacman */
         this.pacman = new Pacman();
         this.pacman.setCollideFunction(this.checkCollision.bind(this));
@@ -333,6 +345,7 @@ class LevelsManager {
     /**
      * Dessine la case courante
      *
+     * @param canvas
      * @param currentCase
      */
     drawCase(canvas, currentCase) {
@@ -469,11 +482,8 @@ class Pacman {
     init() {
         /* Création du canvas */
         this.canvas = new Canvas();
-        this.canvas.init();
         /* Initialisation de la taille du canvas */
-        var canvas = this.canvas.getElement();
-        canvas.width = this.size.w;
-        canvas.height = this.size.h;
+        this.canvas.setSize(this.size.w, this.size.h);
         /* Initialisation de la direction */
         this.direction = Directions.Right;
         this.nextDirection = this.direction;

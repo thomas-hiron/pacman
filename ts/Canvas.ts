@@ -4,36 +4,30 @@
 
 class Canvas
 {
-  private element:HTMLCanvasElement;
-  private context:CanvasRenderingContext2D;
+  private element: HTMLCanvasElement;
+  private context: CanvasRenderingContext2D;
 
   /**
    * Le constructeur
    * @param canvas
    */
-  constructor(canvas:Element = null)
+  constructor(canvas: Element = null)
   {
     /* Init si null */
-    if(canvas == null)
+    if (canvas == null)
       canvas = document.createElement('CANVAS');
 
     this.element = <HTMLCanvasElement>canvas;
-  }
 
-  /**
-   * Initialisation
-   */
-  public init():Canvas
-  {
     /* Erreur */
-    if(!this.element || !this.element.getContext)
+    if (!this.element || !this.element.getContext)
       throw new Error("Le canvas n'est pas pris en charge par votre navigateur");
 
     /* Initialisation du context */
     this.context = this.element.getContext("2d");
 
     /* Erreur */
-    if(!this.context)
+    if (!this.context)
       throw new Error("Le canvas n'est pas pris en charge par votre navigateur");
 
     /* Retour de l'instance */
@@ -45,7 +39,7 @@ class Canvas
    *
    * @returns {CanvasRenderingContext2D}
    */
-  public getContext():CanvasRenderingContext2D
+  public getContext(): CanvasRenderingContext2D
   {
     return this.context;
   }
@@ -55,8 +49,24 @@ class Canvas
    *
    * @returns {HTMLCanvasElement}
    */
-  public getElement():HTMLCanvasElement
+  public getElement(): HTMLCanvasElement
   {
     return this.element;
+  }
+
+  /**
+   * Initialise la taille
+   *
+   * @param width
+   * @param height
+   *
+   * @returns {Canvas}
+   */
+  setSize(width: number, height: number)
+  {
+    this.element.width = width;
+    this.element.height = height;
+
+    return this;
   }
 }

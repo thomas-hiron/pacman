@@ -124,12 +124,9 @@ class Pacman
   {
     /* Création du canvas */
     this.canvas = new Canvas();
-    this.canvas.init();
 
     /* Initialisation de la taille du canvas */
-    var canvas:HTMLCanvasElement = this.canvas.getElement();
-    canvas.width = this.size.w;
-    canvas.height = this.size.h;
+    this.canvas.setSize(this.size.w, this.size.h);
 
     /* Initialisation de la direction */
     this.direction = Directions.Right;
