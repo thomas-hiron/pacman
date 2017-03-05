@@ -6,7 +6,7 @@ class Case
 {
   public static CASE_WIDTH = 40;
 
-  private food: Food;
+  private pacDot: PacDot;
   private wall: boolean;
   private coordinates: Point;
 
@@ -18,7 +18,7 @@ class Case
   constructor()
   {
     this.wall = false;
-    this.food = null;
+    this.pacDot = null;
 
     this.coordinates = {
       x: 0,
@@ -112,45 +112,45 @@ class Case
   }
 
   /**
-   * Ajoute la bouffe
+   * Ajoute le point
    *
-   * @param food
+   * @param pacDot
    * @returns {Case}
    */
-  public setFood(food: Food): Case
+  public setPacDot(pacDot: PacDot): Case
   {
-    this.food = food;
+    this.pacDot = pacDot;
 
     return this;
   }
 
   /**
-   * S'il y a de la grosse bouffe
+   * S'il y a un power pellet
    *
    * @returns {boolean}
    */
-  public hasBigFood(): boolean
+  public hasPowerPellet(): boolean
   {
-    return this.food != null && this.food instanceof BigFood;
+    return this.pacDot != null && this.pacDot instanceof PowerPellet;
   }
 
   /**
-   * S'il y a de la bouffe
+   * S'il y a un pacdot
    *
    * @returns {boolean}
    */
-  public hasFood(): boolean
+  public hasPacDot(): boolean
   {
-    return this.food != null;
+    return this.pacDot != null;
   }
 
   /**
    * Getter
    *
-   * @returns {Food}
+   * @returns {PacDot}
    */
-  public getFood()
+  public getPacDot()
   {
-    return this.food;
+    return this.pacDot;
   }
 }

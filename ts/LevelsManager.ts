@@ -9,15 +9,15 @@ class LevelsManager
 {
   private currentLevel: number = 1;
   private levels: Levels;
-  private currentLevelFoodNumber: number;
+  private currentLevelPacDotNumber: number;
 
   constructor()
   {
     this.levels = new Levels();
-    this.currentLevelFoodNumber = 0;
+    this.currentLevelPacDotNumber = 0;
 
     /* Listener food eaten */
-    window.addEventListener('FoodEaten', this.foodEaten.bind(this), false);
+    window.addEventListener('PacDotEaten', this.pacDotEaten.bind(this), false);
   }
 
   /**
@@ -29,8 +29,8 @@ class LevelsManager
   {
     var currentLevel: Array<Array<Case>> = this.levels.get(this.currentLevel);
 
-    /* Réinitialisation du nombre de nourriture */
-    this.currentLevelFoodNumber = 0;
+    /* Réinitialisation du nombre de points */
+    this.currentLevelPacDotNumber = 0;
 
     /* Prévention de bug */
     if (currentLevel == null)
@@ -58,14 +58,14 @@ class LevelsManager
         currentCase.hasBorderTop(upCase != null && currentCase.isAWall() && !upCase.isAWall());
         currentCase.hasBorderBottom(downCase != null && currentCase.isAWall() && !downCase.isAWall());
 
-        /* Dessine la case courante et la nourriture */
+        /* Dessine la case courante et le point */
         this.drawCase(canvas, currentCase);
-        if (currentCase.hasFood())
+        if (currentCase.hasPacDot())
         {
-          this.drawFood(canvas, currentCase);
+          this.drawPacDot(canvas, currentCase);
 
-          /* Increntation du nombre de nourriture */
-          this.currentLevelFoodNumber++;
+          /* Incrémentation du nombre de points */
+          this.currentLevelPacDotNumber++;
         }
       }
     }
@@ -134,21 +134,21 @@ class LevelsManager
   }
 
   /**
-   * Dessine la bouffe
+   * Dessine le point
    *
    * @param canvas
    * @param currentCase
    *
    * @returns {LevelsManager}
    */
-  public drawFood(canvas: Canvas, currentCase: Case): LevelsManager
+  public drawPacDot(canvas: Canvas, currentCase: Case): LevelsManager
   {
-    if (currentCase.hasFood())
+    if (currentCase.hasPacDot())
     {
       var context: CanvasRenderingContext2D = canvas.getContext();
       var coordinates: Point = currentCase.getCoordinates();
 
-      var radius: number = currentCase.getFood() instanceof BigFood ? 6 : 3;
+      var radius: number = currentCase.getPacDot() instanceof PowerPellet ? 6 : 3;
       var margin: number = Case.CASE_WIDTH / 2;
 
       context.beginPath();
@@ -180,7 +180,7 @@ class LevelsManager
    *
    * @returns {LevelsManager}
    */
-  private foodEaten(e: CustomEvent): LevelsManager
+  private pacDotEaten(e: CustomEvent): LevelsManager
   {
     /* Les coordonées de la case courante */
     var coords: Point = e.detail;
@@ -189,12 +189,12 @@ class LevelsManager
     var currentCasesLevel: Array<Array<Case>> = this.getCurrentCasesLevel();
     var currentCase: Case = currentCasesLevel[coords.y][coords.x];
 
-    /* Décrémentation s'il y a de la nourriture */
-    if (currentCase.hasFood())
-      this.currentLevelFoodNumber--;
+    /* Décrémentation s'il y a un point */
+    if (currentCase.hasPacDot())
+      this.currentLevelPacDotNumber--;
 
     /* Niveau terminé */
-    if (this.currentLevelFoodNumber <= 0)
+    if (this.currentLevelPacDotNumber <= 0)
     {
       var event: Event = new CustomEvent('LevelFinished');
       window.dispatchEvent(event);
@@ -208,21 +208,21 @@ class LevelsManager
    *
    * @returns {Array<Case>}
    */
-  public getBigFood()
+  public getPowerPellet()
   {
     var cases: Array<Array<Case>> = this.getCurrentCasesLevel();
-    var casesWithBigFood: Array<Case> = [];
+    var casesWithPowerPellet: Array<Case> = [];
 
     for (var i: number = 0, l: number = cases.length; i < l; ++i)
     {
       /* Parcourt de chaque case */
       for (var j: number = 0, k: number = cases[i].length; j < k; ++j)
       {
-        if (cases[i][j].hasBigFood())
-          casesWithBigFood.push(cases[i][j]);
+        if (cases[i][j].hasPowerPellet())
+          casesWithPowerPellet.push(cases[i][j]);
       }
     }
 
-    return casesWithBigFood;
+    return casesWithPowerPellet;
   }
 }

@@ -17,7 +17,7 @@ class Jeu
   private time: number;
   private levelsManager: LevelsManager;
   private score: Score;
-  private bigFoodCases: Array<Case>;
+  private powerPelletCases: Array<Case>;
 
   public constructor()
   {
@@ -66,8 +66,8 @@ class Jeu
     this.pacman.setCollideFunction(this.checkCollision.bind(this));
     this.pacman.init();
 
-    /* Listener pour la nourriture mangée */
-    window.addEventListener('FoodEaten', this.foodEaten.bind(this), false);
+    /* Listener pour un point mangée */
+    window.addEventListener('PacDotEaten', this.pacDotEaten.bind(this), false);
 
     /* Listener pour niveau terminé */
     window.addEventListener('LevelFinished', this.levelFinished.bind(this), false);
@@ -86,8 +86,8 @@ class Jeu
   private start(): Jeu
   {
 
-    /* Récupération de toutes les grosses bouffe pour les faire clignoter */
-    this.bigFoodCases = this.levelsManager.getBigFood();
+    /* Récupération de toutes les power pellet pour les faire clignoter */
+    this.powerPelletCases = this.levelsManager.getPowerPellet();
 
     /* RequestAnimationFrame pour le pacman, les fantomes */
     requestAnimFrame(this.draw.bind(this));
@@ -106,10 +106,10 @@ class Jeu
     if (+new Date() - this.time > Jeu.INTERVAL)
     {
       /* Dessine la case courante si le point a pas été mangé pour pas le couper */
-      this.drawCurrentFood();
+      this.drawCurrentPacDot();
 
       /* Clignotement des points */
-      this.flashBigFood();
+      this.flashPowerPellet();
 
       /* Animation de pacman */
       this.animatePacman();
@@ -158,11 +158,11 @@ class Jeu
   }
 
   /**
-   * Dessine la nourriture si elle a pas été mangée
+   * Dessine un point si il a pas été mangé
    *
    * @returns {Jeu}
    */
-  private drawCurrentFood(): Jeu
+  private drawCurrentPacDot(): Jeu
   {
     /* La case de pacman */
     var coords: Point = this.pacman.getPreviousCaseCoords();
@@ -173,15 +173,15 @@ class Jeu
     var currentCase: Case = currentCasesLevel[coords.y][coords.x];
 
     /* Case ok */
-    if (currentCase != null && currentCase.hasFood())
+    if (currentCase != null && currentCase.hasPacDot())
     {
       var canvas: Canvas = new Canvas();
       canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
 
       /* Dessin */
-      this.levelsManager.drawFood(canvas, currentCase);
+      this.levelsManager.drawPacDot(canvas, currentCase);
 
-      /* Dessin de la nourriture et suppression de l'ancienne */
+      /* Dessin du point et suppression de l'ancien */
       this.canvas.getContext().clearRect(coords.x * Case.CASE_WIDTH + margin, coords.y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
       this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
     }
@@ -289,18 +289,18 @@ class Jeu
    *
    * @returns {Jeu}
    */
-  private flashBigFood(): Jeu
+  private flashPowerPellet(): Jeu
   {
     var date: Date = new Date();
     var context: CanvasRenderingContext2D = this.canvas.getContext();
     var margin: number = 10;
 
     /* Suppression dans les deux cas */
-    for (var i = 0, l = this.bigFoodCases.length; i < l; ++i)
+    for (var i = 0, l = this.powerPelletCases.length; i < l; ++i)
     {
       context.clearRect(
-        this.bigFoodCases[i].getCoordinates().x * Case.CASE_WIDTH + margin,
-        this.bigFoodCases[i].getCoordinates().y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT,
+        this.powerPelletCases[i].getCoordinates().x * Case.CASE_WIDTH + margin,
+        this.powerPelletCases[i].getCoordinates().y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT,
         Case.CASE_WIDTH / 2,
         Case.CASE_WIDTH / 2
       );
@@ -313,10 +313,10 @@ class Jeu
       canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
 
       /* Dessin */
-      for (var i = 0, l = this.bigFoodCases.length; i < l; ++i)
-        this.levelsManager.drawFood(canvas, this.bigFoodCases[i]);
+      for (var i = 0, l = this.powerPelletCases.length; i < l; ++i)
+        this.levelsManager.drawPacDot(canvas, this.powerPelletCases[i]);
 
-      /* Dessin de la nourriture  */
+      /* Dessin du point  */
       this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
     }
 
@@ -339,11 +339,11 @@ class Jeu
   }
 
   /**
-   * Mange la nourriture
+   * Mange le point
    *
    * @returns {Jeu}
    */
-  private foodEaten(e: CustomEvent): Jeu
+  private pacDotEaten(e: CustomEvent): Jeu
   {
     /* Les coordonées de la case courante */
     var coords: Point = e.detail;
@@ -355,8 +355,8 @@ class Jeu
     /* Augmentation du score */
     this.score.update(currentCase);
 
-    /* Suppression de la nourriture */
-    currentCase.setFood(null);
+    /* Suppression du point */
+    currentCase.setPacDot(null);
 
     return this;
   }

@@ -58,7 +58,7 @@ class Canvas {
 class Case {
     constructor() {
         this.wall = false;
-        this.food = null;
+        this.pacDot = null;
         this.coordinates = {
             x: 0,
             y: 0
@@ -130,38 +130,38 @@ class Case {
         return this.coordinates;
     }
     /**
-     * Ajoute la bouffe
+     * Ajoute le point
      *
-     * @param food
+     * @param pacDot
      * @returns {Case}
      */
-    setFood(food) {
-        this.food = food;
+    setPacDot(pacDot) {
+        this.pacDot = pacDot;
         return this;
     }
     /**
-     * S'il y a de la grosse bouffe
+     * S'il y a un power pellet
      *
      * @returns {boolean}
      */
-    hasBigFood() {
-        return this.food != null && this.food instanceof BigFood;
+    hasPowerPellet() {
+        return this.pacDot != null && this.pacDot instanceof PowerPellet;
     }
     /**
-     * S'il y a de la bouffe
+     * S'il y a un pacdot
      *
      * @returns {boolean}
      */
-    hasFood() {
-        return this.food != null;
+    hasPacDot() {
+        return this.pacDot != null;
     }
     /**
      * Getter
      *
-     * @returns {Food}
+     * @returns {PacDot}
      */
-    getFood() {
-        return this.food;
+    getPacDot() {
+        return this.pacDot;
     }
 }
 Case.CASE_WIDTH = 40;
@@ -175,19 +175,6 @@ var Directions;
     Directions[Directions["Up"] = 2] = "Up";
     Directions[Directions["Down"] = 3] = "Down";
 })(Directions || (Directions = {}));
-/**
- * Created by mac pro on 04/03/2017.
- */
-/**
- * De la bouffe normale
- */
-class Food {
-}
-/**
- * De la bouffe qui permet de manger les fantômes
- */
-class BigFood extends Food {
-}
 /**
  * Created by thiron on 03/07/2015.
  */
@@ -232,8 +219,8 @@ class Jeu {
         this.pacman = new Pacman();
         this.pacman.setCollideFunction(this.checkCollision.bind(this));
         this.pacman.init();
-        /* Listener pour la nourriture mangée */
-        window.addEventListener('FoodEaten', this.foodEaten.bind(this), false);
+        /* Listener pour un point mangée */
+        window.addEventListener('PacDotEaten', this.pacDotEaten.bind(this), false);
         /* Listener pour niveau terminé */
         window.addEventListener('LevelFinished', this.levelFinished.bind(this), false);
         /* Démarrage du jeu */
@@ -246,8 +233,8 @@ class Jeu {
      * @returns {Jeu}
      */
     start() {
-        /* Récupération de toutes les grosses bouffe pour les faire clignoter */
-        this.bigFoodCases = this.levelsManager.getBigFood();
+        /* Récupération de toutes les power pellet pour les faire clignoter */
+        this.powerPelletCases = this.levelsManager.getPowerPellet();
         /* RequestAnimationFrame pour le pacman, les fantomes */
         requestAnimFrame(this.draw.bind(this));
         return this;
@@ -261,9 +248,9 @@ class Jeu {
         /* Si l'interval a été atteint */
         if (+new Date() - this.time > Jeu.INTERVAL) {
             /* Dessine la case courante si le point a pas été mangé pour pas le couper */
-            this.drawCurrentFood();
+            this.drawCurrentPacDot();
             /* Clignotement des points */
-            this.flashBigFood();
+            this.flashPowerPellet();
             /* Animation de pacman */
             this.animatePacman();
             /* Mise à jour du score */
@@ -298,11 +285,11 @@ class Jeu {
         return this;
     }
     /**
-     * Dessine la nourriture si elle a pas été mangée
+     * Dessine un point si il a pas été mangé
      *
      * @returns {Jeu}
      */
-    drawCurrentFood() {
+    drawCurrentPacDot() {
         /* La case de pacman */
         var coords = this.pacman.getPreviousCaseCoords();
         var margin = 5;
@@ -310,12 +297,12 @@ class Jeu {
         var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
         var currentCase = currentCasesLevel[coords.y][coords.x];
         /* Case ok */
-        if (currentCase != null && currentCase.hasFood()) {
+        if (currentCase != null && currentCase.hasPacDot()) {
             var canvas = new Canvas();
             canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
             /* Dessin */
-            this.levelsManager.drawFood(canvas, currentCase);
-            /* Dessin de la nourriture et suppression de l'ancienne */
+            this.levelsManager.drawPacDot(canvas, currentCase);
+            /* Dessin du point et suppression de l'ancien */
             this.canvas.getContext().clearRect(coords.x * Case.CASE_WIDTH + margin, coords.y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
             this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
         }
@@ -398,22 +385,22 @@ class Jeu {
      *
      * @returns {Jeu}
      */
-    flashBigFood() {
+    flashPowerPellet() {
         var date = new Date();
         var context = this.canvas.getContext();
         var margin = 10;
         /* Suppression dans les deux cas */
-        for (var i = 0, l = this.bigFoodCases.length; i < l; ++i) {
-            context.clearRect(this.bigFoodCases[i].getCoordinates().x * Case.CASE_WIDTH + margin, this.bigFoodCases[i].getCoordinates().y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, Case.CASE_WIDTH / 2, Case.CASE_WIDTH / 2);
+        for (var i = 0, l = this.powerPelletCases.length; i < l; ++i) {
+            context.clearRect(this.powerPelletCases[i].getCoordinates().x * Case.CASE_WIDTH + margin, this.powerPelletCases[i].getCoordinates().y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, Case.CASE_WIDTH / 2, Case.CASE_WIDTH / 2);
         }
         /* Redessin */
         if (date.getMilliseconds() >= 500) {
             var canvas = new Canvas();
             canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
             /* Dessin */
-            for (var i = 0, l = this.bigFoodCases.length; i < l; ++i)
-                this.levelsManager.drawFood(canvas, this.bigFoodCases[i]);
-            /* Dessin de la nourriture  */
+            for (var i = 0, l = this.powerPelletCases.length; i < l; ++i)
+                this.levelsManager.drawPacDot(canvas, this.powerPelletCases[i]);
+            /* Dessin du point  */
             this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
         }
         return this;
@@ -431,11 +418,11 @@ class Jeu {
         return currentCasesLevel[y] == void 0 || currentCasesLevel[y][x] === void 0 || currentCasesLevel[y][x].isAWall();
     }
     /**
-     * Mange la nourriture
+     * Mange le point
      *
      * @returns {Jeu}
      */
-    foodEaten(e) {
+    pacDotEaten(e) {
         /* Les coordonées de la case courante */
         var coords = e.detail;
         /* Récupération de la case courante */
@@ -443,8 +430,8 @@ class Jeu {
         var currentCase = currentCasesLevel[coords.y][coords.x];
         /* Augmentation du score */
         this.score.update(currentCase);
-        /* Suppression de la nourriture */
-        currentCase.setFood(null);
+        /* Suppression du point */
+        currentCase.setPacDot(null);
         return this;
     }
     /**
@@ -520,21 +507,21 @@ class Levels {
         /* Déclaration de tous les murs */
         for (i = 0, l = wallsCoordinates.length; i < l; ++i)
             cases[wallsCoordinates[i][0]][wallsCoordinates[i][1]].isAWall(true);
-        /* Sinon on met de la bouffe */
+        /* Sinon on met un point */
         for (i = 0, l = cases.length; i < l; ++i) {
             for (j = 0, k = cases[i].length; j < k; ++j) {
-                /* Ajout de la nourriture */
+                /* Ajout du point */
                 if (!cases[i][j].isAWall())
-                    cases[i][j].setFood(new Food());
+                    cases[i][j].setPacDot(new PacDot());
             }
         }
-        /* Ajout des grosses bouffes, y d'abord */
-        cases[2][1].setFood(new BigFood());
-        cases[2][13].setFood(new BigFood());
-        cases[12][2].setFood(new BigFood());
-        cases[12][12].setFood(new BigFood());
+        /* Ajout des power pellet, y d'abord */
+        cases[2][1].setPacDot(new PowerPellet());
+        cases[2][13].setPacDot(new PowerPellet());
+        cases[12][2].setPacDot(new PowerPellet());
+        cases[12][12].setPacDot(new PowerPellet());
         /* Suppression de la case où y'a pacman */
-        cases[11][7].setFood(null);
+        cases[11][7].setPacDot(null);
         /* Ajout des cases */
         this.levels.push(cases);
         return this;
@@ -561,9 +548,9 @@ class LevelsManager {
     constructor() {
         this.currentLevel = 1;
         this.levels = new Levels();
-        this.currentLevelFoodNumber = 0;
+        this.currentLevelPacDotNumber = 0;
         /* Listener food eaten */
-        window.addEventListener('FoodEaten', this.foodEaten.bind(this), false);
+        window.addEventListener('PacDotEaten', this.pacDotEaten.bind(this), false);
     }
     /**
      * Dessine le niveau dans le canvas
@@ -572,8 +559,8 @@ class LevelsManager {
      */
     draw(canvas) {
         var currentLevel = this.levels.get(this.currentLevel);
-        /* Réinitialisation du nombre de nourriture */
-        this.currentLevelFoodNumber = 0;
+        /* Réinitialisation du nombre de points */
+        this.currentLevelPacDotNumber = 0;
         /* Prévention de bug */
         if (currentLevel == null)
             return this;
@@ -593,12 +580,12 @@ class LevelsManager {
                 currentCase.hasBorderRight(rightCase != null && currentCase.isAWall() && !rightCase.isAWall());
                 currentCase.hasBorderTop(upCase != null && currentCase.isAWall() && !upCase.isAWall());
                 currentCase.hasBorderBottom(downCase != null && currentCase.isAWall() && !downCase.isAWall());
-                /* Dessine la case courante et la nourriture */
+                /* Dessine la case courante et le point */
                 this.drawCase(canvas, currentCase);
-                if (currentCase.hasFood()) {
-                    this.drawFood(canvas, currentCase);
-                    /* Increntation du nombre de nourriture */
-                    this.currentLevelFoodNumber++;
+                if (currentCase.hasPacDot()) {
+                    this.drawPacDot(canvas, currentCase);
+                    /* Incrémentation du nombre de points */
+                    this.currentLevelPacDotNumber++;
                 }
             }
         }
@@ -648,18 +635,18 @@ class LevelsManager {
         return this;
     }
     /**
-     * Dessine la bouffe
+     * Dessine le point
      *
      * @param canvas
      * @param currentCase
      *
      * @returns {LevelsManager}
      */
-    drawFood(canvas, currentCase) {
-        if (currentCase.hasFood()) {
+    drawPacDot(canvas, currentCase) {
+        if (currentCase.hasPacDot()) {
             var context = canvas.getContext();
             var coordinates = currentCase.getCoordinates();
-            var radius = currentCase.getFood() instanceof BigFood ? 6 : 3;
+            var radius = currentCase.getPacDot() instanceof PowerPellet ? 6 : 3;
             var margin = Case.CASE_WIDTH / 2;
             context.beginPath();
             context.arc(coordinates.x * Case.CASE_WIDTH + margin, coordinates.y * Case.CASE_WIDTH + margin, radius, 0, 2 * Math.PI, false);
@@ -686,17 +673,17 @@ class LevelsManager {
      *
      * @returns {LevelsManager}
      */
-    foodEaten(e) {
+    pacDotEaten(e) {
         /* Les coordonées de la case courante */
         var coords = e.detail;
         /* Récupération de la case courante */
         var currentCasesLevel = this.getCurrentCasesLevel();
         var currentCase = currentCasesLevel[coords.y][coords.x];
-        /* Décrémentation s'il y a de la nourriture */
-        if (currentCase.hasFood())
-            this.currentLevelFoodNumber--;
+        /* Décrémentation s'il y a un point */
+        if (currentCase.hasPacDot())
+            this.currentLevelPacDotNumber--;
         /* Niveau terminé */
-        if (this.currentLevelFoodNumber <= 0) {
+        if (this.currentLevelPacDotNumber <= 0) {
             var event = new CustomEvent('LevelFinished');
             window.dispatchEvent(event);
         }
@@ -707,17 +694,17 @@ class LevelsManager {
      *
      * @returns {Array<Case>}
      */
-    getBigFood() {
+    getPowerPellet() {
         var cases = this.getCurrentCasesLevel();
-        var casesWithBigFood = [];
+        var casesWithPowerPellet = [];
         for (var i = 0, l = cases.length; i < l; ++i) {
             /* Parcourt de chaque case */
             for (var j = 0, k = cases[i].length; j < k; ++j) {
-                if (cases[i][j].hasBigFood())
-                    casesWithBigFood.push(cases[i][j]);
+                if (cases[i][j].hasPowerPellet())
+                    casesWithPowerPellet.push(cases[i][j]);
             }
         }
-        return casesWithBigFood;
+        return casesWithPowerPellet;
     }
 }
 /**
@@ -742,6 +729,19 @@ var requestAnimFrame = (function () {
             window.setTimeout(callback, 1000 / 60, new Date().getTime());
         };
 })();
+/**
+ * Created by mac pro on 04/03/2017.
+ */
+/**
+ * De la bouffe normale
+ */
+class PacDot {
+}
+/**
+ * De la bouffe qui permet de manger les fantômes
+ */
+class PowerPellet extends PacDot {
+}
 /**
  * Created by thiron on 01/03/2017.
  */
@@ -898,7 +898,7 @@ class Pacman {
                 this.direction == Directions.Down && this.nextDirection == Directions.Up)
                 this.direction = this.nextDirection;
         }
-        /* En fonction de la direction, modification des coords et de l'angle, si 15% dans la case, on supprime la bouffe */
+        /* En fonction de la direction, modification des coords et de l'angle, si 15% dans la case, on supprime le point */
         var percentInCase;
         switch (this.direction) {
             case Directions.Left:
@@ -931,7 +931,7 @@ class Pacman {
         if (percentInCase == 75) {
             /* Les coordonées de la case */
             var currentCaseCoords = this.getCurrentCaseCoords();
-            var event = new CustomEvent('FoodEaten', { 'detail': currentCaseCoords });
+            var event = new CustomEvent('PacDotEaten', { 'detail': currentCaseCoords });
             window.dispatchEvent(event);
         }
         /* Retour de l'instance */
@@ -1077,13 +1077,13 @@ class Score {
      * @returns {Score}
      */
     update(currentCase) {
-        if (currentCase.hasBigFood())
-            this.score += Score.BIG_FOOD;
-        else if (currentCase.hasFood())
-            this.score += Score.FOOD;
+        if (currentCase.hasPowerPellet())
+            this.score += Score.POWER_PELLET;
+        else if (currentCase.hasPacDot())
+            this.score += Score.PAC_DOT;
         return this;
     }
 }
 /* Constantes de score */
-Score.FOOD = 10;
-Score.BIG_FOOD = 50;
+Score.PAC_DOT = 10;
+Score.POWER_PELLET = 50;

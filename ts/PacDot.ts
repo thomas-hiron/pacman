@@ -5,7 +5,7 @@
 /**
  * De la bouffe normale
  */
-class Food
+class PacDot
 {
 
 }
@@ -13,7 +13,7 @@ class Food
 /**
  * De la bouffe qui permet de manger les fantômes
  */
-class BigFood extends Food
+class PowerPellet extends PacDot
 {
 
 }

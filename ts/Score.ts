@@ -10,8 +10,8 @@ class Score
   private score: number = 0;
 
   /* Constantes de score */
-  private static FOOD = 10;
-  private static BIG_FOOD = 50;
+  private static PAC_DOT = 10;
+  private static POWER_PELLET = 50;
 
   /**
    * @returns {string}
@@ -30,10 +30,10 @@ class Score
    */
   public update(currentCase: Case)
   {
-    if (currentCase.hasBigFood())
-      this.score += Score.BIG_FOOD;
-    else if (currentCase.hasFood())
-      this.score += Score.FOOD;
+    if (currentCase.hasPowerPellet())
+      this.score += Score.POWER_PELLET;
+    else if (currentCase.hasPacDot())
+      this.score += Score.PAC_DOT;
 
     return this;
   }

@@ -73,25 +73,25 @@ class Levels
     for (i = 0, l = wallsCoordinates.length; i < l; ++i)
       cases[wallsCoordinates[i][0]][wallsCoordinates[i][1]].isAWall(true);
 
-    /* Sinon on met de la bouffe */
+    /* Sinon on met un point */
     for (i = 0, l = cases.length; i < l; ++i)
     {
       for (j = 0, k = cases[i].length; j < k; ++j)
       {
-        /* Ajout de la nourriture */
+        /* Ajout du point */
         if (!cases[i][j].isAWall())
-          cases[i][j].setFood(new Food());
+          cases[i][j].setPacDot(new PacDot());
       }
     }
 
-    /* Ajout des grosses bouffes, y d'abord */
-    cases[2][1].setFood(new BigFood());
-    cases[2][13].setFood(new BigFood());
-    cases[12][2].setFood(new BigFood());
-    cases[12][12].setFood(new BigFood());
+    /* Ajout des power pellet, y d'abord */
+    cases[2][1].setPacDot(new PowerPellet());
+    cases[2][13].setPacDot(new PowerPellet());
+    cases[12][2].setPacDot(new PowerPellet());
+    cases[12][12].setPacDot(new PowerPellet());
 
     /* Suppression de la case où y'a pacman */
-    cases[11][7].setFood(null);
+    cases[11][7].setPacDot(null);
 
     /* Ajout des cases */
     this.levels.push(cases);

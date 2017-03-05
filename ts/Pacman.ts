@@ -240,7 +240,7 @@ class Pacman
         this.direction = this.nextDirection
     }
 
-    /* En fonction de la direction, modification des coords et de l'angle, si 15% dans la case, on supprime la bouffe */
+    /* En fonction de la direction, modification des coords et de l'angle, si 15% dans la case, on supprime le point */
     var percentInCase: number;
     switch (this.direction)
     {
@@ -279,7 +279,7 @@ class Pacman
       /* Les coordonées de la case */
       var currentCaseCoords: Point = this.getCurrentCaseCoords();
 
-      var event: Event = new CustomEvent('FoodEaten', {'detail': currentCaseCoords});
+      var event: Event = new CustomEvent('PacDotEaten', {'detail': currentCaseCoords});
       window.dispatchEvent(event);
     }
 
