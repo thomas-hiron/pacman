@@ -90,6 +90,9 @@ class Jeu
     /* Listener pour un nouveau fruit */
     window.addEventListener('NewFruit', this.onNewFruit.bind(this), false);
 
+    /* Listener pour un fruit supprimé (pas mangé) */
+    window.addEventListener('RemoveFruit', this.onRemoveFruit.bind(this), false);
+
     return this;
   }
 
@@ -400,9 +403,25 @@ class Jeu
    *
    * @returns {Jeu}
    */
-  private onNewFruit(e:CustomEvent): Jeu
+  private onNewFruit(e: CustomEvent): Jeu
   {
-    var fruit:Fruit = e.detail;
+    var fruit: Fruit = e.detail;
+
+    // TODO : Ajouter le fruit dans le jeu
+
+    return this;
+  }
+
+  /**
+   * Quand un fruit a été supprimé parce que pas mangé
+   *
+   * @param e
+   *
+   * @returns {Jeu}
+   */
+  private onRemoveFruit(): Jeu
+  {
+    // TODO : Supprimer le fruit du jeu
 
     return this;
   }

@@ -9,8 +9,12 @@ class FruitsManager
 {
   /* Chaque fois qu'un fruit apparait */
   private static APPEARANCE_INTEVERVAL = 1000;
+  private static APPEARANCE_DURATION = 1000;
 
+  /* Démarrage du conteur d'ajout de fruit */
   private startTime: number;
+  /* Démarrage du conteur de suppression de fruit */
+  private addTime: number;
 
   /**
    * Démarrage
@@ -19,6 +23,7 @@ class FruitsManager
   public start(): FruitsManager
   {
     this.startTime = +new Date();
+    this.addTime = null;
 
     return this;
   }
@@ -33,6 +38,8 @@ class FruitsManager
     /* Un nouveau fruit au bout de 30 secondes */
     if (this.startTime != null && +new Date() - this.startTime > FruitsManager.APPEARANCE_INTEVERVAL)
       this.newFruit();
+    else if (this.addTime != null && +new Date() - this.addTime > FruitsManager.APPEARANCE_DURATION)
+      this.removeFruit();
 
     return this;
   }
@@ -46,6 +53,9 @@ class FruitsManager
   {
     /* Suppression du startTime */
     this.startTime = null;
+
+    /* Ajout du addTime */
+    this.addTime = +new Date();
 
     /* Les proba de chaque fruit, en se basant à 1 seule chance pour la clé */
     var keyProbability: number = 1;
@@ -81,6 +91,23 @@ class FruitsManager
 
     /* Dispatch event pour que le jeu l'ajoute */
     var event: CustomEvent = new CustomEvent('NewFruit', {'detail': fruit});
+    window.dispatchEvent(event);
+
+    return this;
+  }
+
+  /**
+   * Supprime un fruit
+   *
+   * @returns {FruitsManager}
+   */
+  private removeFruit(): FruitsManager
+  {
+    /* Démarrage */
+    this.start();
+
+    /* Dispatch event */
+    var event: CustomEvent = new CustomEvent('RemoveFruit');
     window.dispatchEvent(event);
 
     return this;

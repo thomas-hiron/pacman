@@ -253,6 +253,7 @@ class FruitsManager {
      */
     start() {
         this.startTime = +new Date();
+        this.addTime = null;
         return this;
     }
     /**
@@ -264,6 +265,8 @@ class FruitsManager {
         /* Un nouveau fruit au bout de 30 secondes */
         if (this.startTime != null && +new Date() - this.startTime > FruitsManager.APPEARANCE_INTEVERVAL)
             this.newFruit();
+        else if (this.addTime != null && +new Date() - this.addTime > FruitsManager.APPEARANCE_DURATION)
+            this.removeFruit();
         return this;
     }
     /**
@@ -274,6 +277,8 @@ class FruitsManager {
     newFruit() {
         /* Suppression du startTime */
         this.startTime = null;
+        /* Ajout du addTime */
+        this.addTime = +new Date();
         /* Les proba de chaque fruit, en se basant à 1 seule chance pour la clé */
         var keyProbability = 1;
         var bellProbability = keyProbability + Key.SCORE_VALUE / Bell.SCORE_VALUE;
@@ -308,9 +313,23 @@ class FruitsManager {
         window.dispatchEvent(event);
         return this;
     }
+    /**
+     * Supprime un fruit
+     *
+     * @returns {FruitsManager}
+     */
+    removeFruit() {
+        /* Démarrage */
+        this.start();
+        /* Dispatch event */
+        var event = new CustomEvent('RemoveFruit');
+        window.dispatchEvent(event);
+        return this;
+    }
 }
 /* Chaque fois qu'un fruit apparait */
 FruitsManager.APPEARANCE_INTEVERVAL = 1000;
+FruitsManager.APPEARANCE_DURATION = 1000;
 /**
  * Created by thiron on 03/07/2015.
  */
@@ -370,6 +389,8 @@ class Jeu {
         window.addEventListener('LevelFinished', this.onLevelFinished.bind(this), false);
         /* Listener pour un nouveau fruit */
         window.addEventListener('NewFruit', this.onNewFruit.bind(this), false);
+        /* Listener pour un fruit supprimé (pas mangé) */
+        window.addEventListener('RemoveFruit', this.onRemoveFruit.bind(this), false);
         return this;
     }
     /**
@@ -601,6 +622,18 @@ class Jeu {
      */
     onNewFruit(e) {
         var fruit = e.detail;
+        // TODO : Ajouter le fruit dans le jeu
+        return this;
+    }
+    /**
+     * Quand un fruit a été supprimé parce que pas mangé
+     *
+     * @param e
+     *
+     * @returns {Jeu}
+     */
+    onRemoveFruit() {
+        // TODO : Supprimer le fruit du jeu
         return this;
     }
 }
