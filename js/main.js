@@ -352,7 +352,7 @@ class FruitsManager {
     }
 }
 /* Chaque fois qu'un fruit apparait */
-FruitsManager.APPEARANCE_INTEVERVAL = 1000;
+FruitsManager.APPEARANCE_INTEVERVAL = 30000;
 FruitsManager.APPEARANCE_DURATION = 10000;
 /**
  * Created by thiron on 03/07/2015.
