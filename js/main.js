@@ -262,6 +262,8 @@ class Jeu {
         if (+new Date() - this.time > Jeu.INTERVAL) {
             /* Dessine la case courante si le point a pas été mangé pour pas le couper */
             this.drawCurrentFood();
+            /* Clignotement des points */
+            this.flashBigFood();
             /* Animation de pacman */
             this.animatePacman();
             /* Mise à jour du score */
@@ -389,6 +391,31 @@ class Jeu {
         context.lineWidth = 1;
         context.stroke();
         context.closePath();
+        return this;
+    }
+    /**
+     * Fait clignoter les gros points
+     *
+     * @returns {Jeu}
+     */
+    flashBigFood() {
+        var date = new Date();
+        var context = this.canvas.getContext();
+        var margin = 10;
+        /* Suppression dans les deux cas */
+        for (var i = 0, l = this.bigFoodCases.length; i < l; ++i) {
+            context.clearRect(this.bigFoodCases[i].getCoordinates().x * Case.CASE_WIDTH + margin, this.bigFoodCases[i].getCoordinates().y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, Case.CASE_WIDTH / 2, Case.CASE_WIDTH / 2);
+        }
+        /* Redessin */
+        if (date.getMilliseconds() >= 500) {
+            var canvas = new Canvas();
+            canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
+            /* Dessin */
+            for (var i = 0, l = this.bigFoodCases.length; i < l; ++i)
+                this.levelsManager.drawFood(canvas, this.bigFoodCases[i]);
+            /* Dessin de la nourriture  */
+            this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
+        }
         return this;
     }
     /**
@@ -629,17 +656,19 @@ class LevelsManager {
      * @returns {LevelsManager}
      */
     drawFood(canvas, currentCase) {
-        var context = canvas.getContext();
-        var coordinates = currentCase.getCoordinates();
-        var radius = currentCase.getFood() instanceof BigFood ? 6 : 3;
-        var margin = Case.CASE_WIDTH / 2;
-        context.beginPath();
-        context.arc(coordinates.x * Case.CASE_WIDTH + margin, coordinates.y * Case.CASE_WIDTH + margin, radius, 0, 2 * Math.PI, false);
-        context.fillStyle = 'white';
-        context.strokeStyle = 'white';
-        context.lineWidth = 0;
-        context.fill();
-        context.closePath();
+        if (currentCase.hasFood()) {
+            var context = canvas.getContext();
+            var coordinates = currentCase.getCoordinates();
+            var radius = currentCase.getFood() instanceof BigFood ? 6 : 3;
+            var margin = Case.CASE_WIDTH / 2;
+            context.beginPath();
+            context.arc(coordinates.x * Case.CASE_WIDTH + margin, coordinates.y * Case.CASE_WIDTH + margin, radius, 0, 2 * Math.PI, false);
+            context.fillStyle = 'white';
+            context.strokeStyle = 'white';
+            context.lineWidth = 0;
+            context.fill();
+            context.closePath();
+        }
         return this;
     }
     /**

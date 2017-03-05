@@ -143,19 +143,22 @@ class LevelsManager
    */
   public drawFood(canvas: Canvas, currentCase: Case): LevelsManager
   {
-    var context: CanvasRenderingContext2D = canvas.getContext();
-    var coordinates: Point = currentCase.getCoordinates();
+    if (currentCase.hasFood())
+    {
+      var context: CanvasRenderingContext2D = canvas.getContext();
+      var coordinates: Point = currentCase.getCoordinates();
 
-    var radius: number = currentCase.getFood() instanceof BigFood ? 6 : 3;
-    var margin: number = Case.CASE_WIDTH / 2;
+      var radius: number = currentCase.getFood() instanceof BigFood ? 6 : 3;
+      var margin: number = Case.CASE_WIDTH / 2;
 
-    context.beginPath();
-    context.arc(coordinates.x * Case.CASE_WIDTH + margin, coordinates.y * Case.CASE_WIDTH + margin, radius, 0, 2 * Math.PI, false);
-    context.fillStyle = 'white';
-    context.strokeStyle = 'white';
-    context.lineWidth = 0;
-    context.fill();
-    context.closePath();
+      context.beginPath();
+      context.arc(coordinates.x * Case.CASE_WIDTH + margin, coordinates.y * Case.CASE_WIDTH + margin, radius, 0, 2 * Math.PI, false);
+      context.fillStyle = 'white';
+      context.strokeStyle = 'white';
+      context.lineWidth = 0;
+      context.fill();
+      context.closePath();
+    }
 
     return this;
   }

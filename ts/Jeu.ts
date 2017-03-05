@@ -108,6 +108,9 @@ class Jeu
       /* Dessine la case courante si le point a pas été mangé pour pas le couper */
       this.drawCurrentFood();
 
+      /* Clignotement des points */
+      this.flashBigFood();
+
       /* Animation de pacman */
       this.animatePacman();
 
@@ -262,7 +265,7 @@ class Jeu
    *
    * @returns {Jeu}
    */
-  public drawEscapeDoor(): Jeu
+  private drawEscapeDoor(): Jeu
   {
     var context: CanvasRenderingContext2D = this.canvas.getContext();
 
@@ -277,6 +280,45 @@ class Jeu
     context.lineWidth = 1;
     context.stroke();
     context.closePath();
+
+    return this;
+  }
+
+  /**
+   * Fait clignoter les gros points
+   *
+   * @returns {Jeu}
+   */
+  private flashBigFood(): Jeu
+  {
+    var date: Date = new Date();
+    var context: CanvasRenderingContext2D = this.canvas.getContext();
+    var margin: number = 10;
+
+    /* Suppression dans les deux cas */
+    for (var i = 0, l = this.bigFoodCases.length; i < l; ++i)
+    {
+      context.clearRect(
+        this.bigFoodCases[i].getCoordinates().x * Case.CASE_WIDTH + margin,
+        this.bigFoodCases[i].getCoordinates().y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT,
+        Case.CASE_WIDTH / 2,
+        Case.CASE_WIDTH / 2
+      );
+    }
+
+    /* Redessin */
+    if (date.getMilliseconds() >= 500)
+    {
+      var canvas: Canvas = new Canvas();
+      canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
+
+      /* Dessin */
+      for (var i = 0, l = this.bigFoodCases.length; i < l; ++i)
+        this.levelsManager.drawFood(canvas, this.bigFoodCases[i]);
+
+      /* Dessin de la nourriture  */
+      this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
+    }
 
     return this;
   }
