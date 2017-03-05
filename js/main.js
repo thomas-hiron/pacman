@@ -492,13 +492,18 @@ class Jeu {
         var currentCase = currentCasesLevel[coords.y][coords.x];
         /* Case ok */
         if (currentCase != null && currentCase.hasPacDot()) {
-            var canvas = new Canvas();
-            canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
-            /* Dessin */
-            this.levelsManager.drawPacDot(canvas, currentCase);
-            /* Dessin du point et suppression de l'ancien */
-            this.canvas.getContext().clearRect(coords.x * Case.CASE_WIDTH + margin, coords.y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
-            this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
+            /* Si c'est un fruit, c'est Jeu qui redessine */
+            if (currentCase.getPacDot() instanceof Fruit)
+                this.onNewFruit(null);
+            else {
+                var canvas = new Canvas();
+                canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
+                /* Dessin */
+                this.levelsManager.drawPacDot(canvas, currentCase);
+                /* Dessin du point et suppression de l'ancien */
+                this.canvas.getContext().clearRect(coords.x * Case.CASE_WIDTH + margin, coords.y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
+                this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
+            }
         }
         return this;
     }
@@ -648,13 +653,16 @@ class Jeu {
      * @returns {Jeu}
      */
     onNewFruit(e) {
-        var fruit = e.detail;
+        /* Nettoyage de la case au cas où */
+        this.onRemoveFruit(false);
+        /* Récupération de la case du milieu */
+        var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
+        var middleCase = currentCasesLevel[11][7];
+        var fruit = e === null ? middleCase.getPacDot() : e.detail;
         var fruitWidth = Fruit.WIDTH;
         var margin = (Case.CASE_WIDTH - fruitWidth) / 2;
         var index = 0;
-        /* Récupération de la case du milieu et ajout du fruit */
-        var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
-        var middleCase = currentCasesLevel[11][7];
+        /* Ajout du fruit */
         middleCase.setPacDot(fruit);
         if (fruit instanceof Strawberry)
             index = 1;
@@ -689,15 +697,17 @@ class Jeu {
      *
      * @returns {Jeu}
      */
-    onRemoveFruit() {
+    onRemoveFruit(removeFromCase = true) {
         var fruitWidth = Fruit.WIDTH;
         var margin = (Case.CASE_WIDTH - fruitWidth) / 2;
         /* Suppression dans le canvas */
         this.canvas.getContext().clearRect(7 * Case.CASE_WIDTH + margin, 11 * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, fruitWidth, fruitWidth);
         /* Récupération de la case du milieu et suppression du fruit */
-        var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
-        var middleCase = currentCasesLevel[11][7];
-        middleCase.setPacDot(null);
+        if (removeFromCase !== false) {
+            var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
+            var middleCase = currentCasesLevel[11][7];
+            middleCase.setPacDot(null);
+        }
         return this;
     }
 }

@@ -198,15 +198,21 @@ class Jeu
     /* Case ok */
     if (currentCase != null && currentCase.hasPacDot())
     {
-      var canvas: Canvas = new Canvas();
-      canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
+      /* Si c'est un fruit, c'est Jeu qui redessine */
+      if (currentCase.getPacDot() instanceof Fruit)
+        this.onNewFruit(null);
+      else
+      {
+        var canvas: Canvas = new Canvas();
+        canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
 
-      /* Dessin */
-      this.levelsManager.drawPacDot(canvas, currentCase);
+        /* Dessin */
+        this.levelsManager.drawPacDot(canvas, currentCase);
 
-      /* Dessin du point et suppression de l'ancien */
-      this.canvas.getContext().clearRect(coords.x * Case.CASE_WIDTH + margin, coords.y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
-      this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
+        /* Dessin du point et suppression de l'ancien */
+        this.canvas.getContext().clearRect(coords.x * Case.CASE_WIDTH + margin, coords.y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
+        this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
+      }
     }
 
     return this;
@@ -379,7 +385,7 @@ class Jeu
     this.score.update(currentCase);
 
     /* Si c'est un fruit, on recommence le compteur */
-    if(currentCase.getPacDot() instanceof Fruit)
+    if (currentCase.getPacDot() instanceof Fruit)
       this.fruitsManager.start();
 
     /* Suppression du point */
@@ -409,14 +415,19 @@ class Jeu
    */
   private onNewFruit(e: CustomEvent): Jeu
   {
-    var fruit: Fruit = e.detail;
+    /* Nettoyage de la case au cas où */
+    this.onRemoveFruit(false);
+
+    /* Récupération de la case du milieu */
+    var currentCasesLevel: Array<Array<Case>> = this.levelsManager.getCurrentCasesLevel();
+    var middleCase: Case = currentCasesLevel[11][7];
+
+    var fruit: Fruit = e === null ? middleCase.getPacDot() : e.detail;
     var fruitWidth: number = Fruit.WIDTH;
     var margin: number = (Case.CASE_WIDTH - fruitWidth) / 2;
     var index: number = 0;
 
-    /* Récupération de la case du milieu et ajout du fruit */
-    var currentCasesLevel: Array<Array<Case>> = this.levelsManager.getCurrentCasesLevel();
-    var middleCase: Case = currentCasesLevel[11][7];
+    /* Ajout du fruit */
     middleCase.setPacDot(fruit);
 
     if (fruit instanceof Strawberry)
@@ -456,7 +467,7 @@ class Jeu
    *
    * @returns {Jeu}
    */
-  private onRemoveFruit(): Jeu
+  private onRemoveFruit(removeFromCase: boolean = true): Jeu
   {
     var fruitWidth: number = Fruit.WIDTH;
     var margin: number = (Case.CASE_WIDTH - fruitWidth) / 2;
@@ -465,9 +476,12 @@ class Jeu
     this.canvas.getContext().clearRect(7 * Case.CASE_WIDTH + margin, 11 * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, fruitWidth, fruitWidth);
 
     /* Récupération de la case du milieu et suppression du fruit */
-    var currentCasesLevel: Array<Array<Case>> = this.levelsManager.getCurrentCasesLevel();
-    var middleCase: Case = currentCasesLevel[11][7];
-    middleCase.setPacDot(null);
+    if (removeFromCase !== false)
+    {
+      var currentCasesLevel: Array<Array<Case>> = this.levelsManager.getCurrentCasesLevel();
+      var middleCase: Case = currentCasesLevel[11][7];
+      middleCase.setPacDot(null);
+    }
 
     return this;
   }
