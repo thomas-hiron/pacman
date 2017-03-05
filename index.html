@@ -1,53 +1,59 @@
 <!doctype html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8">
-    <title>Pacman</title>
-    <script type="text/javascript" src="js/main.js"></script>
-  </head>
+    <head>
+        <meta charset="UTF-8">
+        <title>Pacman</title>
+        <script type="text/javascript" src="js/main.js"></script>
 
-  <body>
-    <style type="text/css">
-      body {
-        background-color: #c6c6c6;
-        text-align: center;
-        padding-top: 30px;
-      }
+        <style type="text/css">
+            body {
+                background-color: #c6c6c6;
+                text-align: center;
+                padding-top: 30px;
+            }
 
-      body > div {
-        position: relative;
-      }
+            body > div {
+                position: relative;
+            }
 
-      canvas {
-        background-color: black;
-        border-radius: 5px;
-        -webkit-border-radius: 5px;
-        padding: 2px;
-      }
+            canvas {
+                background-color: black;
+                border-radius: 5px;
+                -webkit-border-radius: 5px;
+                padding: 2px;
+            }
 
-      .hide {
-        display: none;
-      }
+            .hide {
+                display: none;
+            }
 
-      .jouer {
-        position: relative;
-        top: 460px;
-        font-size: 30px;
-        color: #ffffff;
-        width: 70px;
-        margin: auto;
-        font-family: Arial;
-      }
+            .jouer {
+                position: relative;
+                top: 460px;
+                font-size: 30px;
+                color: #ffffff;
+                width: 70px;
+                margin: auto;
+                font-family: Arial;
+            }
 
-      .jouer:hover {
-        cursor: pointer;
-      }
-    </style>
-    <div>
-      <!--<p style="visibility:visible;" class="jouer">Jouer</p>-->
-      <canvas width="600" height="840">
-        Ce jeu n'est pas compatible sur votre navigateur.
-      </canvas>
-    </div>
-  </body>
+            .jouer:hover {
+                cursor: pointer;
+            }
+
+            img {
+                display: none;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div>
+            <!--<p style="visibility:visible;" class="jouer">Jouer</p>-->
+            <canvas width="600" height="840">
+                Ce jeu n'est pas compatible sur votre navigateur.
+            </canvas>
+            <img src="sprite.png" alt="Fruits">
+        </div>
+    </body>
 </html>
