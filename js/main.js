@@ -178,6 +178,71 @@ var Directions;
 /**
  * Created by mac pro on 05/03/2017.
  */
+class Fruit {
+    getScoreValue() {
+        return this.scoreValue;
+    }
+}
+/* Les fruits */
+class Cherry extends Fruit {
+    constructor(...args) {
+        super(...args);
+        this.scoreValue = Cherry.SCORE_VALUE;
+    }
+}
+Cherry.SCORE_VALUE = 100;
+class Strawberry extends Fruit {
+    constructor(...args) {
+        super(...args);
+        this.scoreValue = Strawberry.SCORE_VALUE;
+    }
+}
+Strawberry.SCORE_VALUE = 300;
+class Orange extends Fruit {
+    constructor(...args) {
+        super(...args);
+        this.scoreValue = Orange.SCORE_VALUE;
+    }
+}
+Orange.SCORE_VALUE = 500;
+class Apple extends Fruit {
+    constructor(...args) {
+        super(...args);
+        this.scoreValue = Apple.SCORE_VALUE;
+    }
+}
+Apple.SCORE_VALUE = 700;
+class Melon extends Fruit {
+    constructor(...args) {
+        super(...args);
+        this.scoreValue = Melon.SCORE_VALUE;
+    }
+}
+Melon.SCORE_VALUE = 1000;
+class Galaxian extends Fruit {
+    constructor(...args) {
+        super(...args);
+        this.scoreValue = Galaxian.SCORE_VALUE;
+    }
+}
+Galaxian.SCORE_VALUE = 2000;
+class Bell extends Fruit {
+    constructor(...args) {
+        super(...args);
+        this.scoreValue = Bell.SCORE_VALUE;
+    }
+}
+Bell.SCORE_VALUE = 3000;
+class Key extends Fruit {
+    constructor(...args) {
+        super(...args);
+        this.scoreValue = Key.SCORE_VALUE;
+    }
+}
+Key.SCORE_VALUE = 5000;
+/**
+ * Created by mac pro on 05/03/2017.
+ */
 /**
  * Gère tous les fruits
  */
@@ -209,7 +274,35 @@ class FruitsManager {
     newFruit() {
         /* Suppression du startTime */
         this.startTime = null;
-        // TODO : ajouter un fruit au hasard
+        /* Les proba de chaque fruit, en se basant à 1 seule chance pour la clé */
+        var keyProbability = 1;
+        var bellProbability = keyProbability + Key.SCORE_VALUE / Bell.SCORE_VALUE;
+        var galaxianProbability = bellProbability + Key.SCORE_VALUE / Galaxian.SCORE_VALUE;
+        var melonProbability = galaxianProbability + Key.SCORE_VALUE / Melon.SCORE_VALUE;
+        var appleProbability = melonProbability + Key.SCORE_VALUE / Apple.SCORE_VALUE;
+        var orangeProbability = appleProbability + Key.SCORE_VALUE / Orange.SCORE_VALUE;
+        var strawberryProbability = orangeProbability + Key.SCORE_VALUE / Strawberry.SCORE_VALUE;
+        var cherryProbability = strawberryProbability + Key.SCORE_VALUE / Cherry.SCORE_VALUE;
+        /* Récupération dans l'interval trouvé */
+        var random = Math.round(Math.random() * (cherryProbability - keyProbability) + keyProbability);
+        var fruit;
+        /* Instanciation du bon fruit */
+        if (random <= keyProbability)
+            fruit = new Key();
+        else if (random <= bellProbability)
+            fruit = new Bell();
+        else if (random <= galaxianProbability)
+            fruit = new Galaxian();
+        else if (random <= melonProbability)
+            fruit = new Melon();
+        else if (random <= appleProbability)
+            fruit = new Apple();
+        else if (random <= orangeProbability)
+            fruit = new Orange();
+        else if (random <= strawberryProbability)
+            fruit = new Strawberry();
+        else
+            fruit = new Cherry();
         return this;
     }
 }
@@ -1133,12 +1226,3 @@ class Score {
 /* Constantes de score */
 Score.PAC_DOT = 10;
 Score.POWER_PELLET = 50;
-/* Les fruits */
-Score.CHERRY = 100;
-Score.STRAWBERRY = 300;
-Score.ORANGE = 500;
-Score.APPLE = 700;
-Score.MELON = 1000;
-Score.GALAXIAN = 2000;
-Score.BELL = 3000;
-Score.KEY = 5000;

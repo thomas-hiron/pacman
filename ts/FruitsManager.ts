@@ -47,7 +47,37 @@ class FruitsManager
     /* Suppression du startTime */
     this.startTime = null;
 
-    // TODO : ajouter un fruit au hasard
+    /* Les proba de chaque fruit, en se basant à 1 seule chance pour la clé */
+    var keyProbability: number = 1;
+    var bellProbability: number = keyProbability + Key.SCORE_VALUE / Bell.SCORE_VALUE;
+    var galaxianProbability: number = bellProbability + Key.SCORE_VALUE / Galaxian.SCORE_VALUE;
+    var melonProbability: number = galaxianProbability + Key.SCORE_VALUE / Melon.SCORE_VALUE;
+    var appleProbability: number = melonProbability + Key.SCORE_VALUE / Apple.SCORE_VALUE;
+    var orangeProbability: number = appleProbability + Key.SCORE_VALUE / Orange.SCORE_VALUE;
+    var strawberryProbability: number = orangeProbability + Key.SCORE_VALUE / Strawberry.SCORE_VALUE;
+    var cherryProbability: number = strawberryProbability + Key.SCORE_VALUE / Cherry.SCORE_VALUE;
+
+    /* Récupération dans l'interval trouvé */
+    var random: number = Math.round(Math.random() * (cherryProbability - keyProbability) + keyProbability);
+    var fruit: Fruit;
+
+    /* Instanciation du bon fruit */
+    if (random <= keyProbability)
+      fruit = new Key();
+    else if (random <= bellProbability)
+      fruit = new Bell();
+    else if (random <= galaxianProbability)
+      fruit = new Galaxian();
+    else if (random <= melonProbability)
+      fruit = new Melon();
+    else if (random <= appleProbability)
+      fruit = new Apple();
+    else if (random <= orangeProbability)
+      fruit = new Orange();
+    else if (random <= strawberryProbability)
+      fruit = new Strawberry();
+    else
+      fruit = new Cherry();
 
     return this;
   }
