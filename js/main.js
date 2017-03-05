@@ -252,6 +252,8 @@ class Jeu {
             this.animatePacman();
             /* Mise à jour du score */
             this.drawScore();
+            /* Dessin de la porte de sortie des fantomes */
+            this.drawEscapeDoor();
             /* Mise à jour du temps */
             this.time = +new Date();
         }
@@ -354,6 +356,25 @@ class Jeu {
         /* Rajout */
         context.textAlign = 'left';
         context.fillText(this.score.toString(), 10, Jeu.TOP_HEIGHT / 2 + 5);
+        return this;
+    }
+    /**
+     * Dessine la porte de sortie des fantomes
+     *
+     * @returns {Jeu}
+     */
+    drawEscapeDoor() {
+        var context = this.canvas.getContext();
+        /* Suppression */
+        context.clearRect(7 * Case.CASE_WIDTH, 10 * Case.CASE_WIDTH - 5, Case.CASE_WIDTH, Case.CASE_WIDTH);
+        /* Dessin de la ligne */
+        context.beginPath();
+        context.moveTo(7 * Case.CASE_WIDTH, 10 * Case.CASE_WIDTH);
+        context.lineTo(8 * Case.CASE_WIDTH, 10 * Case.CASE_WIDTH);
+        context.strokeStyle = 'white';
+        context.lineWidth = 1;
+        context.stroke();
+        context.closePath();
         return this;
     }
     /**
