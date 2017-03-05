@@ -4,6 +4,7 @@
 
 abstract class Fruit
 {
+  public static WIDTH = 20;
   protected scoreValue: number;
 
   public getScoreValue(): number

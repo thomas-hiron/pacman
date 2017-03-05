@@ -406,7 +406,7 @@ class Jeu
   private onNewFruit(e: CustomEvent): Jeu
   {
     var fruit: Fruit = e.detail;
-    var fruitWidth: number = 20;
+    var fruitWidth: number = Fruit.WIDTH;
     var margin: number = (Case.CASE_WIDTH - fruitWidth) / 2;
     var index: number = 0;
 
@@ -440,13 +440,15 @@ class Jeu
   /**
    * Quand un fruit a été supprimé parce que pas mangé
    *
-   * @param e
-   *
    * @returns {Jeu}
    */
   private onRemoveFruit(): Jeu
   {
-    // TODO : Supprimer le fruit du jeu
+    var fruitWidth: number = Fruit.WIDTH;
+    var margin: number = (Case.CASE_WIDTH - fruitWidth) / 2;
+
+    /* Suppression dans le canvas */
+    this.canvas.getContext().clearRect(7 * Case.CASE_WIDTH + margin, 11 * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, fruitWidth, fruitWidth);
 
     return this;
   }

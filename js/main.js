@@ -183,6 +183,7 @@ class Fruit {
         return this.scoreValue;
     }
 }
+Fruit.WIDTH = 20;
 /* Les fruits */
 class Cherry extends Fruit {
     constructor(...args) {
@@ -329,7 +330,7 @@ class FruitsManager {
 }
 /* Chaque fois qu'un fruit apparait */
 FruitsManager.APPEARANCE_INTEVERVAL = 1000;
-FruitsManager.APPEARANCE_DURATION = 10000;
+FruitsManager.APPEARANCE_DURATION = 1000;
 /**
  * Created by thiron on 03/07/2015.
  */
@@ -622,7 +623,7 @@ class Jeu {
      */
     onNewFruit(e) {
         var fruit = e.detail;
-        var fruitWidth = 20;
+        var fruitWidth = Fruit.WIDTH;
         var margin = (Case.CASE_WIDTH - fruitWidth) / 2;
         var index = 0;
         if (fruit instanceof Strawberry)
@@ -646,12 +647,13 @@ class Jeu {
     /**
      * Quand un fruit a été supprimé parce que pas mangé
      *
-     * @param e
-     *
      * @returns {Jeu}
      */
     onRemoveFruit() {
-        // TODO : Supprimer le fruit du jeu
+        var fruitWidth = Fruit.WIDTH;
+        var margin = (Case.CASE_WIDTH - fruitWidth) / 2;
+        /* Suppression dans le canvas */
+        this.canvas.getContext().clearRect(7 * Case.CASE_WIDTH + margin, 11 * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, fruitWidth, fruitWidth);
         return this;
     }
 }
