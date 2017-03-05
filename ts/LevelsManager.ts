@@ -191,12 +191,35 @@ class LevelsManager
       this.currentLevelFoodNumber--;
 
     /* Niveau terminé */
-    if(this.currentLevelFoodNumber <= 0)
+    if (this.currentLevelFoodNumber <= 0)
     {
       var event: Event = new CustomEvent('LevelFinished');
       window.dispatchEvent(event);
     }
 
     return this;
+  }
+
+  /**
+   * Récupère les gros points
+   *
+   * @returns {Array<Case>}
+   */
+  public getBigFood()
+  {
+    var cases: Array<Array<Case>> = this.getCurrentCasesLevel();
+    var casesWithBigFood: Array<Case> = [];
+
+    for (var i: number = 0, l: number = cases.length; i < l; ++i)
+    {
+      /* Parcourt de chaque case */
+      for (var j: number = 0, k: number = cases[i].length; j < k; ++j)
+      {
+        if (cases[i][j].hasBigFood())
+          casesWithBigFood.push(cases[i][j]);
+      }
+    }
+
+    return casesWithBigFood;
   }
 }

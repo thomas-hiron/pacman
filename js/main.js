@@ -224,6 +224,8 @@ class Jeu {
         this.levelsManager.draw(canvasLevel);
         /* Dessin du niveau */
         this.canvas.getContext().drawImage(canvasLevel.getElement(), 0, Jeu.TOP_HEIGHT);
+        /* Récupération de toutes les grosses bouffe pour les faire clignoter */
+        this.bigFoodCases = this.levelsManager.getBigFood();
         /* Le score */
         this.score = new Score();
         /* Dessin du haut */
@@ -654,13 +656,29 @@ class LevelsManager {
         /* Décrémentation s'il y a de la nourriture */
         if (currentCase.hasFood())
             this.currentLevelFoodNumber--;
-        console.log(this.currentLevelFoodNumber);
         /* Niveau terminé */
         if (this.currentLevelFoodNumber <= 0) {
             var event = new CustomEvent('LevelFinished');
             window.dispatchEvent(event);
         }
         return this;
+    }
+    /**
+     * Récupère les gros points
+     *
+     * @returns {Array<Case>}
+     */
+    getBigFood() {
+        var cases = this.getCurrentCasesLevel();
+        var casesWithBigFood = [];
+        for (var i = 0, l = cases.length; i < l; ++i) {
+            /* Parcourt de chaque case */
+            for (var j = 0, k = cases[i].length; j < k; ++j) {
+                if (cases[i][j].hasBigFood())
+                    casesWithBigFood.push(cases[i][j]);
+            }
+        }
+        return casesWithBigFood;
     }
 }
 /**

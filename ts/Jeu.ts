@@ -17,6 +17,7 @@ class Jeu
   private time: number;
   private levelsManager: LevelsManager;
   private score: Score;
+  private bigFoodCases: Array<Case>;
 
   public constructor()
   {
@@ -53,6 +54,9 @@ class Jeu
 
     /* Dessin du niveau */
     this.canvas.getContext().drawImage(canvasLevel.getElement(), 0, Jeu.TOP_HEIGHT);
+
+    /* Récupération de toutes les grosses bouffe pour les faire clignoter */
+    this.bigFoodCases = this.levelsManager.getBigFood();
 
     /* Le score */
     this.score = new Score();
