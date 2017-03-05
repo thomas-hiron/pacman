@@ -30,10 +30,8 @@ class Score
    */
   public update(currentCase: Case)
   {
-    if (currentCase.hasPowerPellet())
-      this.score += Score.POWER_PELLET;
-    else if (currentCase.hasPacDot())
-      this.score += Score.PAC_DOT;
+    if (currentCase.getPacDot() instanceof PacDot)
+      this.score += currentCase.getPacDot().getScoreValue();
 
     return this;
   }

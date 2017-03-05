@@ -1,16 +1,10 @@
 /**
  * Created by mac pro on 05/03/2017.
  */
-
-abstract class Fruit
+///<reference path='PacDot.ts' />
+abstract class Fruit extends PacDot
 {
   public static WIDTH = 20;
-  protected scoreValue: number;
-
-  public getScoreValue(): number
-  {
-    return this.scoreValue;
-  }
 }
 
 /* Les fruits */

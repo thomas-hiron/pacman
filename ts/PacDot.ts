@@ -7,7 +7,13 @@
  */
 class PacDot
 {
+  public static SCORE_VALUE = 10;
+  protected scoreValue: number = PacDot.SCORE_VALUE;
 
+  public getScoreValue(): number
+  {
+    return this.scoreValue;
+  }
 }
 
 /**
@@ -15,5 +21,6 @@ class PacDot
  */
 class PowerPellet extends PacDot
 {
-
+  public static SCORE_VALUE = 50;
+  protected scoreValue:number = PowerPellet.SCORE_VALUE;
 }

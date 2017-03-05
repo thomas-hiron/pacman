@@ -410,6 +410,11 @@ class Jeu
     var margin: number = (Case.CASE_WIDTH - fruitWidth) / 2;
     var index: number = 0;
 
+    /* Récupération de la case du milieu et ajout du fruit */
+    var currentCasesLevel: Array<Array<Case>> = this.levelsManager.getCurrentCasesLevel();
+    var middleCase: Case = currentCasesLevel[11][7];
+    middleCase.setPacDot(fruit);
+
     if (fruit instanceof Strawberry)
       index = 1;
     else if (fruit instanceof Orange)
@@ -427,11 +432,16 @@ class Jeu
 
     var img: HTMLImageElement = <HTMLImageElement>document.querySelector('img');
     this.canvas.getContext().drawImage(
-      img, /* L'image */
-      index * fruitWidth, 0, /* Où commencer le clip de l'image, dépend donc du fruit */
-      fruitWidth, fruitWidth, /* La taille du fruit */
-      7 * Case.CASE_WIDTH + margin, 11 * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, /* La position dans le canvas */
-      fruitWidth, fruitWidth /*  La taille du fruit */
+      /* L'image */
+      img,
+      /* Où commencer le clip de l'image, dépend donc du fruit */
+      index * fruitWidth, 0,
+      /* La taille du fruit */
+      fruitWidth, fruitWidth,
+      /* La position dans le canvas */
+      middleCase.getCoordinates().x * Case.CASE_WIDTH + margin, middleCase.getCoordinates().y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT,
+      /*  La taille du fruit */
+      fruitWidth, fruitWidth
     );
 
     return this;
@@ -449,6 +459,11 @@ class Jeu
 
     /* Suppression dans le canvas */
     this.canvas.getContext().clearRect(7 * Case.CASE_WIDTH + margin, 11 * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, fruitWidth, fruitWidth);
+
+    /* Récupération de la case du milieu et suppression du fruit */
+    var currentCasesLevel: Array<Array<Case>> = this.levelsManager.getCurrentCasesLevel();
+    var middleCase: Case = currentCasesLevel[11][7];
+    middleCase.setPacDot(null);
 
     return this;
   }

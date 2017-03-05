@@ -176,12 +176,35 @@ var Directions;
     Directions[Directions["Down"] = 3] = "Down";
 })(Directions || (Directions = {}));
 /**
- * Created by mac pro on 05/03/2017.
+ * Created by mac pro on 04/03/2017.
  */
-class Fruit {
+/**
+ * De la bouffe normale
+ */
+class PacDot {
+    constructor() {
+        this.scoreValue = PacDot.SCORE_VALUE;
+    }
     getScoreValue() {
         return this.scoreValue;
     }
+}
+PacDot.SCORE_VALUE = 10;
+/**
+ * De la bouffe qui permet de manger les fantômes
+ */
+class PowerPellet extends PacDot {
+    constructor(...args) {
+        super(...args);
+        this.scoreValue = PowerPellet.SCORE_VALUE;
+    }
+}
+PowerPellet.SCORE_VALUE = 50;
+/**
+ * Created by mac pro on 05/03/2017.
+ */
+///<reference path='PacDot.ts' />
+class Fruit extends PacDot {
 }
 Fruit.WIDTH = 20;
 /* Les fruits */
@@ -626,6 +649,10 @@ class Jeu {
         var fruitWidth = Fruit.WIDTH;
         var margin = (Case.CASE_WIDTH - fruitWidth) / 2;
         var index = 0;
+        /* Récupération de la case du milieu et ajout du fruit */
+        var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
+        var middleCase = currentCasesLevel[11][7];
+        middleCase.setPacDot(fruit);
         if (fruit instanceof Strawberry)
             index = 1;
         else if (fruit instanceof Orange)
@@ -641,7 +668,17 @@ class Jeu {
         else if (fruit instanceof Key)
             index = 7;
         var img = document.querySelector('img');
-        this.canvas.getContext().drawImage(img, /* L'image */ index * fruitWidth, 0, /* Où commencer le clip de l'image, dépend donc du fruit */ fruitWidth, fruitWidth, /* La taille du fruit */ 7 * Case.CASE_WIDTH + margin, 11 * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, /* La position dans le canvas */ fruitWidth, fruitWidth /*  La taille du fruit */);
+        this.canvas.getContext().drawImage(
+        /* L'image */
+        img, 
+        /* Où commencer le clip de l'image, dépend donc du fruit */
+        index * fruitWidth, 0, 
+        /* La taille du fruit */
+        fruitWidth, fruitWidth, 
+        /* La position dans le canvas */
+        middleCase.getCoordinates().x * Case.CASE_WIDTH + margin, middleCase.getCoordinates().y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, 
+        /*  La taille du fruit */
+        fruitWidth, fruitWidth);
         return this;
     }
     /**
@@ -654,6 +691,10 @@ class Jeu {
         var margin = (Case.CASE_WIDTH - fruitWidth) / 2;
         /* Suppression dans le canvas */
         this.canvas.getContext().clearRect(7 * Case.CASE_WIDTH + margin, 11 * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, fruitWidth, fruitWidth);
+        /* Récupération de la case du milieu et suppression du fruit */
+        var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
+        var middleCase = currentCasesLevel[11][7];
+        middleCase.setPacDot(null);
         return this;
     }
 }
@@ -942,19 +983,6 @@ var requestAnimFrame = (function () {
             window.setTimeout(callback, 1000 / 60, new Date().getTime());
         };
 })();
-/**
- * Created by mac pro on 04/03/2017.
- */
-/**
- * De la bouffe normale
- */
-class PacDot {
-}
-/**
- * De la bouffe qui permet de manger les fantômes
- */
-class PowerPellet extends PacDot {
-}
 /**
  * Created by thiron on 01/03/2017.
  */
@@ -1290,10 +1318,8 @@ class Score {
      * @returns {Score}
      */
     update(currentCase) {
-        if (currentCase.hasPowerPellet())
-            this.score += Score.POWER_PELLET;
-        else if (currentCase.hasPacDot())
-            this.score += Score.PAC_DOT;
+        if (currentCase.getPacDot() instanceof PacDot)
+            this.score += currentCase.getPacDot().getScoreValue();
         return this;
     }
 }
