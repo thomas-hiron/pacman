@@ -234,6 +234,8 @@ class Jeu {
         this.pacman.init();
         /* Listener pour la nourriture mangée */
         window.addEventListener('FoodEaten', this.foodEaten.bind(this), false);
+        /* Listener pour niveau terminé */
+        window.addEventListener('LevelFinished', this.levelFinished.bind(this), false);
         /* RequestAnimationFrame pour le pacman, les fantomes */
         requestAnimFrame(this.draw.bind(this));
         return this;
@@ -406,6 +408,15 @@ class Jeu {
         currentCase.setFood(null);
         return this;
     }
+    /**
+     * Niveau terminé !
+     *
+     * @returns {Jeu}
+     */
+    levelFinished() {
+        console.log('Todo : Niveau terminé');
+        return this;
+    }
 }
 /* Interval du request animation frame */
 Jeu.INTERVAL = 10;
@@ -511,6 +522,9 @@ class LevelsManager {
     constructor() {
         this.currentLevel = 1;
         this.levels = new Levels();
+        this.currentLevelFoodNumber = 0;
+        /* Listener food eaten */
+        window.addEventListener('FoodEaten', this.foodEaten.bind(this), false);
     }
     /**
      * Dessine le niveau dans le canvas
@@ -519,6 +533,8 @@ class LevelsManager {
      */
     draw(canvas) {
         var currentLevel = this.levels.get(this.currentLevel);
+        /* Réinitialisation du nombre de nourriture */
+        this.currentLevelFoodNumber = 0;
         /* Prévention de bug */
         if (currentLevel == null)
             return this;
@@ -540,8 +556,11 @@ class LevelsManager {
                 currentCase.hasBorderBottom(downCase != null && currentCase.isAWall() && !downCase.isAWall());
                 /* Dessine la case courante et la nourriture */
                 this.drawCase(canvas, currentCase);
-                if (currentCase.hasFood())
+                if (currentCase.hasFood()) {
                     this.drawFood(canvas, currentCase);
+                    /* Increntation du nombre de nourriture */
+                    this.currentLevelFoodNumber++;
+                }
             }
         }
         return this;
@@ -618,6 +637,30 @@ class LevelsManager {
      */
     getCurrentCasesLevel() {
         return this.levels.get(this.currentLevel);
+    }
+    /**
+     * Lorsqu'un case a été mangée
+     *
+     * @param e
+     *
+     * @returns {LevelsManager}
+     */
+    foodEaten(e) {
+        /* Les coordonées de la case courante */
+        var coords = e.detail;
+        /* Récupération de la case courante */
+        var currentCasesLevel = this.getCurrentCasesLevel();
+        var currentCase = currentCasesLevel[coords.y][coords.x];
+        /* Décrémentation s'il y a de la nourriture */
+        if (currentCase.hasFood())
+            this.currentLevelFoodNumber--;
+        console.log(this.currentLevelFoodNumber);
+        /* Niveau terminé */
+        if (this.currentLevelFoodNumber <= 0) {
+            var event = new CustomEvent('LevelFinished');
+            window.dispatchEvent(event);
+        }
+        return this;
     }
 }
 /**

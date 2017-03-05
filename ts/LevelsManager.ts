@@ -9,10 +9,15 @@ class LevelsManager
 {
   private currentLevel: number = 1;
   private levels: Levels;
+  private currentLevelFoodNumber: number;
 
   constructor()
   {
     this.levels = new Levels();
+    this.currentLevelFoodNumber = 0;
+
+    /* Listener food eaten */
+    window.addEventListener('FoodEaten', this.foodEaten.bind(this), false);
   }
 
   /**
@@ -23,6 +28,9 @@ class LevelsManager
   public draw(canvas: Canvas): LevelsManager
   {
     var currentLevel: Array<Array<Case>> = this.levels.get(this.currentLevel);
+
+    /* Réinitialisation du nombre de nourriture */
+    this.currentLevelFoodNumber = 0;
 
     /* Prévention de bug */
     if (currentLevel == null)
@@ -53,7 +61,12 @@ class LevelsManager
         /* Dessine la case courante et la nourriture */
         this.drawCase(canvas, currentCase);
         if (currentCase.hasFood())
+        {
           this.drawFood(canvas, currentCase);
+
+          /* Increntation du nombre de nourriture */
+          this.currentLevelFoodNumber++;
+        }
       }
     }
 
@@ -155,5 +168,35 @@ class LevelsManager
   public getCurrentCasesLevel(): Array<Array<Case>>
   {
     return this.levels.get(this.currentLevel);
+  }
+
+  /**
+   * Lorsqu'un case a été mangée
+   *
+   * @param e
+   *
+   * @returns {LevelsManager}
+   */
+  private foodEaten(e: CustomEvent): LevelsManager
+  {
+    /* Les coordonées de la case courante */
+    var coords: Point = e.detail;
+
+    /* Récupération de la case courante */
+    var currentCasesLevel: Array<Array<Case>> = this.getCurrentCasesLevel();
+    var currentCase: Case = currentCasesLevel[coords.y][coords.x];
+
+    /* Décrémentation s'il y a de la nourriture */
+    if (currentCase.hasFood())
+      this.currentLevelFoodNumber--;
+
+    /* Niveau terminé */
+    if(this.currentLevelFoodNumber <= 0)
+    {
+      var event: Event = new CustomEvent('LevelFinished');
+      window.dispatchEvent(event);
+    }
+
+    return this;
   }
 }

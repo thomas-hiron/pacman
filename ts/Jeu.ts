@@ -68,6 +68,9 @@ class Jeu
     /* Listener pour la nourriture mangée */
     window.addEventListener('FoodEaten', this.foodEaten.bind(this), false);
 
+    /* Listener pour niveau terminé */
+    window.addEventListener('LevelFinished', this.levelFinished.bind(this), false);
+
     /* RequestAnimationFrame pour le pacman, les fantomes */
     requestAnimFrame(this.draw.bind(this));
 
@@ -243,7 +246,7 @@ class Jeu
    */
   public drawEscapeDoor(): Jeu
   {
-    var context:CanvasRenderingContext2D = this.canvas.getContext();
+    var context: CanvasRenderingContext2D = this.canvas.getContext();
 
     /* Suppression */
     context.clearRect(7 * Case.CASE_WIDTH, 10 * Case.CASE_WIDTH - 5, Case.CASE_WIDTH, Case.CASE_WIDTH);
@@ -294,6 +297,18 @@ class Jeu
 
     /* Suppression de la nourriture */
     currentCase.setFood(null);
+
+    return this;
+  }
+
+  /**
+   * Niveau terminé !
+   *
+   * @returns {Jeu}
+   */
+  private levelFinished(): Jeu
+  {
+    console.log('Todo : Niveau terminé');
 
     return this;
   }
