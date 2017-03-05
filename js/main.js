@@ -451,6 +451,8 @@ class Levels {
         cases[2][13].setFood(new BigFood());
         cases[12][2].setFood(new BigFood());
         cases[12][12].setFood(new BigFood());
+        /* Suppression de la case où y'a pacman */
+        cases[11][7].setFood(null);
         /* Ajout des cases */
         this.levels.push(cases);
         return this;
@@ -895,7 +897,7 @@ class Pacman {
         return coords;
     }
     /**
-     * Récupère les coordonnées de la case précédente (celle derrière pacmanà
+     * Récupère les coordonnées de la case précédente (celle derrière pacman)
      *
      * @returns {Point}
      */

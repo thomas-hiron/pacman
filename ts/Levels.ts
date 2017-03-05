@@ -78,6 +78,9 @@ class Levels
     cases[12][2].setFood(new BigFood());
     cases[12][12].setFood(new BigFood());
 
+    /* Suppression de la case où y'a pacman */
+    cases[11][7].setFood(null);
+
     /* Ajout des cases */
     this.levels.push(cases);
 
