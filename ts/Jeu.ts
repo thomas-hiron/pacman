@@ -378,6 +378,10 @@ class Jeu
     /* Augmentation du score */
     this.score.update(currentCase);
 
+    /* Si c'est un fruit, on recommence le compteur */
+    if(currentCase.getPacDot() instanceof Fruit)
+      this.fruitsManager.start();
+
     /* Suppression du point */
     currentCase.setPacDot(null);
 

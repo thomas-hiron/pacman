@@ -353,7 +353,7 @@ class FruitsManager {
 }
 /* Chaque fois qu'un fruit apparait */
 FruitsManager.APPEARANCE_INTEVERVAL = 1000;
-FruitsManager.APPEARANCE_DURATION = 1000;
+FruitsManager.APPEARANCE_DURATION = 10000;
 /**
  * Created by thiron on 03/07/2015.
  */
@@ -624,6 +624,9 @@ class Jeu {
         var currentCase = currentCasesLevel[coords.y][coords.x];
         /* Augmentation du score */
         this.score.update(currentCase);
+        /* Si c'est un fruit, on recommence le compteur */
+        if (currentCase.getPacDot() instanceof Fruit)
+            this.fruitsManager.start();
         /* Suppression du point */
         currentCase.setPacDot(null);
         return this;
