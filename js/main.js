@@ -176,6 +176,46 @@ var Directions;
     Directions[Directions["Down"] = 3] = "Down";
 })(Directions || (Directions = {}));
 /**
+ * Created by mac pro on 05/03/2017.
+ */
+/**
+ * Gère tous les fruits
+ */
+class FruitsManager {
+    /**
+     * Démarrage
+     * @returns {FruitsManager}
+     */
+    start() {
+        this.startTime = +new Date();
+        return this;
+    }
+    /**
+     * Appelé à chaque nouvelle frame du jeu
+     *
+     * @returns {FruitsManager}
+     */
+    onRequestAnimFrame() {
+        /* Un nouveau fruit au bout de 30 secondes */
+        if (this.startTime != null && +new Date() - this.startTime > FruitsManager.APPEARANCE_INTEVERVAL)
+            this.newFruit();
+        return this;
+    }
+    /**
+     * Ajoute un fruit
+     *
+     * @returns {FruitsManager}
+     */
+    newFruit() {
+        /* Suppression du startTime */
+        this.startTime = null;
+        // TODO : ajouter un fruit au hasard
+        return this;
+    }
+}
+/* Chaque fois qu'un fruit apparait */
+FruitsManager.APPEARANCE_INTEVERVAL = 1000;
+/**
  * Created by thiron on 03/07/2015.
  */
 /**
@@ -211,6 +251,8 @@ class Jeu {
         this.levelsManager.draw(canvasLevel);
         /* Dessin du niveau */
         this.canvas.getContext().drawImage(canvasLevel.getElement(), 0, Jeu.TOP_HEIGHT);
+        /* Le manager des fruits */
+        this.fruitsManager = new FruitsManager();
         /* Le score */
         this.score = new Score();
         /* Dessin du haut */
@@ -235,6 +277,8 @@ class Jeu {
     start() {
         /* Récupération de toutes les power pellet pour les faire clignoter */
         this.powerPelletCases = this.levelsManager.getPowerPellet();
+        /* Date de début pour le fruit manager */
+        this.fruitsManager.start();
         /* RequestAnimationFrame pour le pacman, les fantomes */
         requestAnimFrame(this.draw.bind(this));
         return this;
@@ -257,6 +301,8 @@ class Jeu {
             this.drawScore();
             /* Dessin de la porte de sortie des fantomes */
             this.drawEscapeDoor();
+            /* Notification de la nouvelle frame au fruitsManager */
+            this.fruitsManager.onRequestAnimFrame();
             /* Mise à jour du temps */
             this.time = +new Date();
         }

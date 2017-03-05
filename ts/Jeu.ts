@@ -16,6 +16,7 @@ class Jeu
   private pacman: Pacman;
   private time: number;
   private levelsManager: LevelsManager;
+  private fruitsManager: FruitsManager;
   private score: Score;
   private powerPelletCases: Array<Case>;
 
@@ -55,6 +56,9 @@ class Jeu
     /* Dessin du niveau */
     this.canvas.getContext().drawImage(canvasLevel.getElement(), 0, Jeu.TOP_HEIGHT);
 
+    /* Le manager des fruits */
+    this.fruitsManager = new FruitsManager();
+
     /* Le score */
     this.score = new Score();
 
@@ -85,9 +89,11 @@ class Jeu
    */
   private start(): Jeu
   {
-
     /* Récupération de toutes les power pellet pour les faire clignoter */
     this.powerPelletCases = this.levelsManager.getPowerPellet();
+
+    /* Date de début pour le fruit manager */
+    this.fruitsManager.start();
 
     /* RequestAnimationFrame pour le pacman, les fantomes */
     requestAnimFrame(this.draw.bind(this));
@@ -119,6 +125,9 @@ class Jeu
 
       /* Dessin de la porte de sortie des fantomes */
       this.drawEscapeDoor();
+
+      /* Notification de la nouvelle frame au fruitsManager */
+      this.fruitsManager.onRequestAnimFrame();
 
       /* Mise à jour du temps */
       this.time = +new Date();
