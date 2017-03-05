@@ -8,7 +8,7 @@
 class FruitsManager
 {
   /* Chaque fois qu'un fruit apparait */
-  private static APPEARANCE_INTEVERVAL = 30000;
+  private static APPEARANCE_INTEVERVAL = 1000;
   private static APPEARANCE_DURATION = 10000;
 
   /* Démarrage du conteur d'ajout de fruit */

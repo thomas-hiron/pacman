@@ -406,8 +406,33 @@ class Jeu
   private onNewFruit(e: CustomEvent): Jeu
   {
     var fruit: Fruit = e.detail;
+    var fruitWidth: number = 20;
+    var margin: number = (Case.CASE_WIDTH - fruitWidth) / 2;
+    var index: number = 0;
 
-    // TODO : Ajouter le fruit dans le jeu
+    if (fruit instanceof Strawberry)
+      index = 1;
+    else if (fruit instanceof Orange)
+      index = 2;
+    else if (fruit instanceof Apple)
+      index = 3;
+    else if (fruit instanceof Melon)
+      index = 4;
+    else if (fruit instanceof Galaxian)
+      index = 5;
+    else if (fruit instanceof Bell)
+      index = 6;
+    else if (fruit instanceof Key)
+      index = 7;
+
+    var img: HTMLImageElement = <HTMLImageElement>document.querySelector('img');
+    this.canvas.getContext().drawImage(
+      img, /* L'image */
+      index * fruitWidth, 0, /* Où commencer le clip de l'image, dépend donc du fruit */
+      fruitWidth, fruitWidth, /* La taille du fruit */
+      7 * Case.CASE_WIDTH + margin, 11 * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, /* La position dans le canvas */
+      fruitWidth, fruitWidth /*  La taille du fruit */
+    );
 
     return this;
   }

@@ -328,7 +328,7 @@ class FruitsManager {
     }
 }
 /* Chaque fois qu'un fruit apparait */
-FruitsManager.APPEARANCE_INTEVERVAL = 30000;
+FruitsManager.APPEARANCE_INTEVERVAL = 1000;
 FruitsManager.APPEARANCE_DURATION = 10000;
 /**
  * Created by thiron on 03/07/2015.
@@ -622,7 +622,25 @@ class Jeu {
      */
     onNewFruit(e) {
         var fruit = e.detail;
-        // TODO : Ajouter le fruit dans le jeu
+        var fruitWidth = 20;
+        var margin = (Case.CASE_WIDTH - fruitWidth) / 2;
+        var index = 0;
+        if (fruit instanceof Strawberry)
+            index = 1;
+        else if (fruit instanceof Orange)
+            index = 2;
+        else if (fruit instanceof Apple)
+            index = 3;
+        else if (fruit instanceof Melon)
+            index = 4;
+        else if (fruit instanceof Galaxian)
+            index = 5;
+        else if (fruit instanceof Bell)
+            index = 6;
+        else if (fruit instanceof Key)
+            index = 7;
+        var img = document.querySelector('img');
+        this.canvas.getContext().drawImage(img, /* L'image */ index * fruitWidth, 0, /* Où commencer le clip de l'image, dépend donc du fruit */ fruitWidth, fruitWidth, /* La taille du fruit */ 7 * Case.CASE_WIDTH + margin, 11 * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, /* La position dans le canvas */ fruitWidth, fruitWidth /*  La taille du fruit */);
         return this;
     }
     /**
