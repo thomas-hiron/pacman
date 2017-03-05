@@ -55,9 +55,6 @@ class Jeu
     /* Dessin du niveau */
     this.canvas.getContext().drawImage(canvasLevel.getElement(), 0, Jeu.TOP_HEIGHT);
 
-    /* Récupération de toutes les grosses bouffe pour les faire clignoter */
-    this.bigFoodCases = this.levelsManager.getBigFood();
-
     /* Le score */
     this.score = new Score();
 
@@ -74,6 +71,23 @@ class Jeu
 
     /* Listener pour niveau terminé */
     window.addEventListener('LevelFinished', this.levelFinished.bind(this), false);
+
+    /* Démarrage du jeu */
+    this.start();
+
+    return this;
+  }
+
+  /**
+   * Démarre le jeu, appelé à chaque nouveau niveau
+   *
+   * @returns {Jeu}
+   */
+  private start(): Jeu
+  {
+
+    /* Récupération de toutes les grosses bouffe pour les faire clignoter */
+    this.bigFoodCases = this.levelsManager.getBigFood();
 
     /* RequestAnimationFrame pour le pacman, les fantomes */
     requestAnimFrame(this.draw.bind(this));
