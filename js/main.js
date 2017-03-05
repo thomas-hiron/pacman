@@ -435,6 +435,17 @@ class Levels {
             [17, 7],
             [18, 1], [18, 2], [18, 3], [18, 4], [18, 5], [18, 6], [18, 7], [18, 8], [18, 9], [18, 10], [18, 11], [18, 12], [18, 13]
         ];
+        /* Le conteneur des fantomes */
+        wallsCoordinates.push([9, 5]);
+        wallsCoordinates.push([9, 6]);
+        wallsCoordinates.push([9, 7]);
+        wallsCoordinates.push([9, 8]);
+        wallsCoordinates.push([9, 9]);
+        wallsCoordinates.push([10, 5]);
+        wallsCoordinates.push([10, 6]);
+        wallsCoordinates.push([10, 7]);
+        wallsCoordinates.push([10, 8]);
+        wallsCoordinates.push([10, 9]);
         /* Déclaration de tous les murs */
         for (i = 0, l = wallsCoordinates.length; i < l; ++i)
             cases[wallsCoordinates[i][0]][wallsCoordinates[i][1]].isAWall(true);
