@@ -303,6 +303,9 @@ class FruitsManager {
             fruit = new Strawberry();
         else
             fruit = new Cherry();
+        /* Dispatch event pour que le jeu l'ajoute */
+        var event = new CustomEvent('NewFruit', { 'detail': fruit });
+        window.dispatchEvent(event);
         return this;
     }
 }
@@ -354,12 +357,19 @@ class Jeu {
         this.pacman = new Pacman();
         this.pacman.setCollideFunction(this.checkCollision.bind(this));
         this.pacman.init();
-        /* Listener pour un point mangée */
-        window.addEventListener('PacDotEaten', this.pacDotEaten.bind(this), false);
-        /* Listener pour niveau terminé */
-        window.addEventListener('LevelFinished', this.levelFinished.bind(this), false);
+        /* Ajout des listeners */
+        this.addListeners();
         /* Démarrage du jeu */
         this.start();
+        return this;
+    }
+    addListeners() {
+        /* Listener pour un point mangée */
+        window.addEventListener('PacDotEaten', this.onPacDotEaten.bind(this), false);
+        /* Listener pour niveau terminé */
+        window.addEventListener('LevelFinished', this.onLevelFinished.bind(this), false);
+        /* Listener pour un nouveau fruit */
+        window.addEventListener('NewFruit', this.onNewFruit.bind(this), false);
         return this;
     }
     /**
@@ -561,7 +571,7 @@ class Jeu {
      *
      * @returns {Jeu}
      */
-    pacDotEaten(e) {
+    onPacDotEaten(e) {
         /* Les coordonées de la case courante */
         var coords = e.detail;
         /* Récupération de la case courante */
@@ -578,8 +588,19 @@ class Jeu {
      *
      * @returns {Jeu}
      */
-    levelFinished() {
+    onLevelFinished() {
         console.log('Todo : Niveau terminé');
+        return this;
+    }
+    /**
+     * Quand un fruit a été rajouté
+     *
+     * @param e
+     *
+     * @returns {Jeu}
+     */
+    onNewFruit(e) {
+        var fruit = e.detail;
         return this;
     }
 }

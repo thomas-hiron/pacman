@@ -79,6 +79,10 @@ class FruitsManager
     else
       fruit = new Cherry();
 
+    /* Dispatch event pour que le jeu l'ajoute */
+    var event: CustomEvent = new CustomEvent('NewFruit', {'detail': fruit});
+    window.dispatchEvent(event);
+
     return this;
   }
 }

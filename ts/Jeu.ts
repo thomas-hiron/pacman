@@ -70,14 +70,25 @@ class Jeu
     this.pacman.setCollideFunction(this.checkCollision.bind(this));
     this.pacman.init();
 
-    /* Listener pour un point mangée */
-    window.addEventListener('PacDotEaten', this.pacDotEaten.bind(this), false);
-
-    /* Listener pour niveau terminé */
-    window.addEventListener('LevelFinished', this.levelFinished.bind(this), false);
+    /* Ajout des listeners */
+    this.addListeners();
 
     /* Démarrage du jeu */
     this.start();
+
+    return this;
+  }
+
+  private addListeners(): Jeu
+  {
+    /* Listener pour un point mangée */
+    window.addEventListener('PacDotEaten', this.onPacDotEaten.bind(this), false);
+
+    /* Listener pour niveau terminé */
+    window.addEventListener('LevelFinished', this.onLevelFinished.bind(this), false);
+
+    /* Listener pour un nouveau fruit */
+    window.addEventListener('NewFruit', this.onNewFruit.bind(this), false);
 
     return this;
   }
@@ -352,7 +363,7 @@ class Jeu
    *
    * @returns {Jeu}
    */
-  private pacDotEaten(e: CustomEvent): Jeu
+  private onPacDotEaten(e: CustomEvent): Jeu
   {
     /* Les coordonées de la case courante */
     var coords: Point = e.detail;
@@ -375,9 +386,23 @@ class Jeu
    *
    * @returns {Jeu}
    */
-  private levelFinished(): Jeu
+  private onLevelFinished(): Jeu
   {
     console.log('Todo : Niveau terminé');
+
+    return this;
+  }
+
+  /**
+   * Quand un fruit a été rajouté
+   *
+   * @param e
+   *
+   * @returns {Jeu}
+   */
+  private onNewFruit(e:CustomEvent): Jeu
+  {
+    var fruit:Fruit = e.detail;
 
     return this;
   }
