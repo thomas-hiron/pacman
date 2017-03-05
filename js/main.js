@@ -1087,3 +1087,12 @@ class Score {
 /* Constantes de score */
 Score.PAC_DOT = 10;
 Score.POWER_PELLET = 50;
+/* Les fruits */
+Score.CHERRY = 100;
+Score.STRAWBERRY = 300;
+Score.ORANGE = 500;
+Score.APPLE = 700;
+Score.MELON = 1000;
+Score.GALAXIAN = 2000;
+Score.BELL = 3000;
+Score.KEY = 5000;

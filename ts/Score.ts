@@ -13,6 +13,16 @@ class Score
   private static PAC_DOT = 10;
   private static POWER_PELLET = 50;
 
+  /* Les fruits */
+  private static CHERRY = 100;
+  private static STRAWBERRY = 300;
+  private static ORANGE = 500;
+  private static APPLE = 700;
+  private static MELON = 1000;
+  private static GALAXIAN = 2000;
+  private static BELL = 3000;
+  private static KEY = 5000;
+
   /**
    * @returns {string}
    */
