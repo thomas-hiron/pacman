@@ -5,16 +5,17 @@
 /**
  * Gère et dessine les niveaux
  */
-class LevelsManager
+class LevelManager
 {
-  private currentLevel: number = 1;
-  private levels: Levels;
-  private currentLevelPacDotNumber: number;
+  private level: Level;
+
+  /* Nombre de points */
+  private pacDotNumber: number;
 
   constructor()
   {
-    this.levels = new Levels();
-    this.currentLevelPacDotNumber = 0;
+    this.level = new Level();
+    this.pacDotNumber = 0;
 
     /* Listener food eaten */
     window.addEventListener('PacDotEaten', this.pacDotEaten.bind(this), false);
@@ -25,21 +26,17 @@ class LevelsManager
    *
    * @param canvas
    */
-  public draw(canvas: Canvas): LevelsManager
+  public draw(canvas: Canvas): LevelManager
   {
-    var currentLevel: Array<Array<Case>> = this.levels.get(this.currentLevel);
+    var cases: Array<Array<Case>> = this.getCases();
 
     /* Réinitialisation du nombre de points */
-    this.currentLevelPacDotNumber = 0;
-
-    /* Prévention de bug */
-    if (currentLevel == null)
-      return this;
+    this.pacDotNumber = 0;
 
     /* Parcourt de chaque ligne */
-    for (var i: number = 0, l: number = currentLevel.length; i < l; ++i)
+    for (var i: number = 0, l: number = cases.length; i < l; ++i)
     {
-      var row: Array<Case> = currentLevel[i];
+      var row: Array<Case> = cases[i];
 
       /* Parcourt de chaque case */
       for (var j: number = 0, k: number = row.length; j < k; ++j)
@@ -49,8 +46,8 @@ class LevelsManager
         /* Détermination des bordures à supprimer */
         var leftCase: Case = row[j - 1] || null;
         var rightCase: Case = row[j + 1] || null;
-        var upCase: Case = currentLevel[i - 1] != null ? currentLevel[i - 1][j] : null;
-        var downCase: Case = currentLevel[i + 1] != null ? currentLevel[i + 1][j] : null;
+        var upCase: Case = cases[i - 1] != null ? cases[i - 1][j] : null;
+        var downCase: Case = cases[i + 1] != null ? cases[i + 1][j] : null;
 
         /* Suppression des bordures */
         currentCase.hasBorderLeft(leftCase != null && currentCase.isAWall() && !leftCase.isAWall());
@@ -65,7 +62,7 @@ class LevelsManager
           this.drawPacDot(canvas, currentCase);
 
           /* Incrémentation du nombre de points */
-          this.currentLevelPacDotNumber++;
+          this.pacDotNumber++;
         }
       }
     }
@@ -79,7 +76,7 @@ class LevelsManager
    * @param canvas
    * @param currentCase
    */
-  private drawCase(canvas: Canvas, currentCase: Case): LevelsManager
+  private drawCase(canvas: Canvas, currentCase: Case): LevelManager
   {
     var context: CanvasRenderingContext2D = canvas.getContext();
 
@@ -139,9 +136,9 @@ class LevelsManager
    * @param canvas
    * @param currentCase
    *
-   * @returns {LevelsManager}
+   * @returns {LevelManager}
    */
-  public drawPacDot(canvas: Canvas, currentCase: Case): LevelsManager
+  public drawPacDot(canvas: Canvas, currentCase: Case): LevelManager
   {
     if (currentCase.hasPacDot())
     {
@@ -168,9 +165,9 @@ class LevelsManager
    *
    * @returns {Array<Array<Case>>}
    */
-  public getCurrentCasesLevel(): Array<Array<Case>>
+  public getCases(): Array<Array<Case>>
   {
-    return this.levels.get(this.currentLevel);
+    return this.level.get();
   }
 
   /**
@@ -178,23 +175,23 @@ class LevelsManager
    *
    * @param e
    *
-   * @returns {LevelsManager}
+   * @returns {LevelManager}
    */
-  private pacDotEaten(e: CustomEvent): LevelsManager
+  private pacDotEaten(e: CustomEvent): LevelManager
   {
     /* Les coordonées de la case courante */
     var coords: Point = e.detail;
 
     /* Récupération de la case courante */
-    var currentCasesLevel: Array<Array<Case>> = this.getCurrentCasesLevel();
-    var currentCase: Case = currentCasesLevel[coords.y][coords.x];
+    var cases: Array<Array<Case>> = this.getCases();
+    var currentCase: Case = cases[coords.y][coords.x];
 
     /* Décrémentation s'il y a un point */
     if (currentCase.hasPacDot())
-      this.currentLevelPacDotNumber--;
+      this.pacDotNumber--;
 
     /* Niveau terminé */
-    if (this.currentLevelPacDotNumber <= 0)
+    if (this.pacDotNumber <= 0)
     {
       var event: Event = new CustomEvent('LevelFinished');
       window.dispatchEvent(event);
@@ -210,7 +207,7 @@ class LevelsManager
    */
   public getPowerPellet()
   {
-    var cases: Array<Array<Case>> = this.getCurrentCasesLevel();
+    var cases: Array<Array<Case>> = this.getCases();
     var casesWithPowerPellet: Array<Case> = [];
 
     for (var i: number = 0, l: number = cases.length; i < l; ++i)

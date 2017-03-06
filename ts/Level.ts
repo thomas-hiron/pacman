@@ -5,35 +5,23 @@
 /**
  * Gère le design des niveaux
  */
-class Levels
+class Level
 {
-  private levels: Array<Array<Array<Case>>>;
+  private cases: Array<Array<Case>>;
 
   constructor()
   {
-    this.levels = [];
-
-    this.constructLevel1();
-  }
-
-  /**
-   * Niveau 1
-   *
-   * @returns {Levels}
-   */
-  private constructLevel1(): Levels
-  {
     /* Les blocs avec cases */
-    var cases: Array<Array<Case>> = new Array(20);
+    this.cases = new Array(20);
 
-    for (var i: number = 0, l: number = cases.length; i < l; ++i)
+    for (var i: number = 0, l: number = this.cases.length; i < l; ++i)
     {
-      cases[i] = new Array(15);
+      this.cases[i] = new Array(15);
 
-      for (var j = 0, k = cases[i].length; j < k; ++j)
+      for (var j = 0, k = this.cases[i].length; j < k; ++j)
       {
-        cases[i][j] = new Case();
-        cases[i][j].setCoordinates(j, i);
+        this.cases[i][j] = new Case();
+        this.cases[i][j].setCoordinates(j, i);
       }
     }
 
@@ -64,45 +52,36 @@ class Levels
 
     /* Déclaration de tous les murs */
     for (i = 0, l = wallsCoordinates.length; i < l; ++i)
-      cases[wallsCoordinates[i][0]][wallsCoordinates[i][1]].isAWall(true);
+      this.cases[wallsCoordinates[i][0]][wallsCoordinates[i][1]].isAWall(true);
 
     /* Sinon on met un point */
-    for (i = 0, l = cases.length; i < l; ++i)
+    for (i = 0, l = this.cases.length; i < l; ++i)
     {
-      for (j = 0, k = cases[i].length; j < k; ++j)
+      for (j = 0, k = this.cases[i].length; j < k; ++j)
       {
         /* Ajout du point */
-        if (!cases[i][j].isAWall())
-          cases[i][j].setPacDot(new PacDot());
+        if (!this.cases[i][j].isAWall())
+          this.cases[i][j].setPacDot(new PacDot());
       }
     }
 
     /* Ajout des power pellet, y d'abord */
-    cases[2][1].setPacDot(new PowerPellet());
-    cases[2][13].setPacDot(new PowerPellet());
-    cases[12][2].setPacDot(new PowerPellet());
-    cases[12][12].setPacDot(new PowerPellet());
+    this.cases[2][1].setPacDot(new PowerPellet());
+    this.cases[2][13].setPacDot(new PowerPellet());
+    this.cases[12][2].setPacDot(new PowerPellet());
+    this.cases[12][12].setPacDot(new PowerPellet());
 
     /* Suppression de la case où y'a pacman */
-    cases[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X].setPacDot(null);
-
-    /* Ajout des cases */
-    this.levels.push(cases);
-
-    return this;
+    this.cases[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X].setPacDot(null);
   }
 
   /**
    * Retourne le tableau désiré
    *
-   * @param currentLevel
-   *
    * @returns {Array<Array<Case>>}
    */
-  public get(currentLevel: number): Array<Array<Case>>
+  public get(): Array<Array<Case>>
   {
-    var level: Array<Array<Case>> = this.levels[currentLevel - 1] || null;
-
-    return level;
+    return this.cases;
   }
 }

@@ -390,8 +390,8 @@ class Jeu {
         var canvasLevel = new Canvas();
         canvasLevel.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
         /* Les niveaux */
-        this.levelsManager = new LevelsManager();
-        this.levelsManager.draw(canvasLevel);
+        this.levelManager = new LevelManager();
+        this.levelManager.draw(canvasLevel);
         /* Dessin du niveau */
         this.canvas.getContext().drawImage(canvasLevel.getElement(), 0, Jeu.TOP_HEIGHT);
         /* Le manager des fruits */
@@ -428,7 +428,7 @@ class Jeu {
      */
     start() {
         /* Récupération de toutes les power pellet pour les faire clignoter */
-        this.powerPelletCases = this.levelsManager.getPowerPellet();
+        this.powerPelletCases = this.levelManager.getPowerPellet();
         /* Date de début pour le fruit manager */
         this.fruitsManager.start();
         /* RequestAnimationFrame pour le pacman, les fantomes */
@@ -492,8 +492,8 @@ class Jeu {
         var coords = this.pacman.getPreviousCaseCoords();
         var margin = 5;
         /* Récupération de la case courante */
-        var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
-        var currentCase = currentCasesLevel[coords.y][coords.x];
+        var cases = this.levelManager.getCases();
+        var currentCase = cases[coords.y][coords.x];
         /* Case ok */
         if (currentCase != null && currentCase.hasPacDot()) {
             /* Si c'est un fruit, c'est Jeu qui redessine */
@@ -503,7 +503,7 @@ class Jeu {
                 var canvas = new Canvas();
                 canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
                 /* Dessin */
-                this.levelsManager.drawPacDot(canvas, currentCase);
+                this.levelManager.drawPacDot(canvas, currentCase);
                 /* Dessin du point et suppression de l'ancien */
                 this.canvas.getContext().clearRect(coords.x * Case.CASE_WIDTH + margin, coords.y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
                 this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
@@ -602,7 +602,7 @@ class Jeu {
             canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
             /* Dessin */
             for (var i = 0, l = this.powerPelletCases.length; i < l; ++i)
-                this.levelsManager.drawPacDot(canvas, this.powerPelletCases[i]);
+                this.levelManager.drawPacDot(canvas, this.powerPelletCases[i]);
             /* Dessin du point  */
             this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
         }
@@ -617,8 +617,8 @@ class Jeu {
      * @returns {boolean}
      */
     checkCollision(x, y) {
-        var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
-        return currentCasesLevel[y] == void 0 || currentCasesLevel[y][x] === void 0 || currentCasesLevel[y][x].isAWall();
+        var cases = this.levelManager.getCases();
+        return cases[y] == void 0 || cases[y][x] === void 0 || cases[y][x].isAWall();
     }
     /**
      * Mange le point
@@ -629,8 +629,8 @@ class Jeu {
         /* Les coordonées de la case courante */
         var coords = e.detail;
         /* Récupération de la case courante */
-        var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
-        var currentCase = currentCasesLevel[coords.y][coords.x];
+        var cases = this.levelManager.getCases();
+        var currentCase = cases[coords.y][coords.x];
         /* Augmentation du score */
         this.score.update(currentCase);
         /* Si c'est un fruit, on recommence le compteur */
@@ -660,8 +660,8 @@ class Jeu {
         /* Nettoyage de la case au cas où */
         this.onRemoveFruit(false);
         /* Récupération de la case du milieu */
-        var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
-        var middleCase = currentCasesLevel[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
+        var cases = this.levelManager.getCases();
+        var middleCase = cases[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
         var fruit = e === null ? middleCase.getPacDot() : e.detail;
         var fruitWidth = Fruit.WIDTH;
         var margin = (Case.CASE_WIDTH - fruitWidth) / 2;
@@ -708,8 +708,8 @@ class Jeu {
         this.canvas.getContext().clearRect(Pacman.PACMAN_BASE_X * Case.CASE_WIDTH + margin, Pacman.PACMAN_BASE_Y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, fruitWidth, fruitWidth);
         /* Récupération de la case du milieu et suppression du fruit */
         if (removeFromCase !== false) {
-            var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
-            var middleCase = currentCasesLevel[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
+            var cases = this.levelManager.getCases();
+            var middleCase = cases[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
             middleCase.setPacDot(null);
         }
         return this;
@@ -725,24 +725,15 @@ Jeu.TOP_HEIGHT = 40;
 /**
  * Gère le design des niveaux
  */
-class Levels {
+class Level {
     constructor() {
-        this.levels = [];
-        this.constructLevel1();
-    }
-    /**
-     * Niveau 1
-     *
-     * @returns {Levels}
-     */
-    constructLevel1() {
         /* Les blocs avec cases */
-        var cases = new Array(20);
-        for (var i = 0, l = cases.length; i < l; ++i) {
-            cases[i] = new Array(15);
-            for (var j = 0, k = cases[i].length; j < k; ++j) {
-                cases[i][j] = new Case();
-                cases[i][j].setCoordinates(j, i);
+        this.cases = new Array(20);
+        for (var i = 0, l = this.cases.length; i < l; ++i) {
+            this.cases[i] = new Array(15);
+            for (var j = 0, k = this.cases[i].length; j < k; ++j) {
+                this.cases[i][j] = new Case();
+                this.cases[i][j].setCoordinates(j, i);
             }
         }
         /* On rempli toutes les cases murs */
@@ -770,36 +761,30 @@ class Levels {
         wallsCoordinates.push([9, 8]);
         /* Déclaration de tous les murs */
         for (i = 0, l = wallsCoordinates.length; i < l; ++i)
-            cases[wallsCoordinates[i][0]][wallsCoordinates[i][1]].isAWall(true);
+            this.cases[wallsCoordinates[i][0]][wallsCoordinates[i][1]].isAWall(true);
         /* Sinon on met un point */
-        for (i = 0, l = cases.length; i < l; ++i) {
-            for (j = 0, k = cases[i].length; j < k; ++j) {
+        for (i = 0, l = this.cases.length; i < l; ++i) {
+            for (j = 0, k = this.cases[i].length; j < k; ++j) {
                 /* Ajout du point */
-                if (!cases[i][j].isAWall())
-                    cases[i][j].setPacDot(new PacDot());
+                if (!this.cases[i][j].isAWall())
+                    this.cases[i][j].setPacDot(new PacDot());
             }
         }
         /* Ajout des power pellet, y d'abord */
-        cases[2][1].setPacDot(new PowerPellet());
-        cases[2][13].setPacDot(new PowerPellet());
-        cases[12][2].setPacDot(new PowerPellet());
-        cases[12][12].setPacDot(new PowerPellet());
+        this.cases[2][1].setPacDot(new PowerPellet());
+        this.cases[2][13].setPacDot(new PowerPellet());
+        this.cases[12][2].setPacDot(new PowerPellet());
+        this.cases[12][12].setPacDot(new PowerPellet());
         /* Suppression de la case où y'a pacman */
-        cases[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X].setPacDot(null);
-        /* Ajout des cases */
-        this.levels.push(cases);
-        return this;
+        this.cases[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X].setPacDot(null);
     }
     /**
      * Retourne le tableau désiré
      *
-     * @param currentLevel
-     *
      * @returns {Array<Array<Case>>}
      */
-    get(currentLevel) {
-        var level = this.levels[currentLevel - 1] || null;
-        return level;
+    get() {
+        return this.cases;
     }
 }
 /**
@@ -808,11 +793,10 @@ class Levels {
 /**
  * Gère et dessine les niveaux
  */
-class LevelsManager {
+class LevelManager {
     constructor() {
-        this.currentLevel = 1;
-        this.levels = new Levels();
-        this.currentLevelPacDotNumber = 0;
+        this.level = new Level();
+        this.pacDotNumber = 0;
         /* Listener food eaten */
         window.addEventListener('PacDotEaten', this.pacDotEaten.bind(this), false);
     }
@@ -822,23 +806,20 @@ class LevelsManager {
      * @param canvas
      */
     draw(canvas) {
-        var currentLevel = this.levels.get(this.currentLevel);
+        var cases = this.getCases();
         /* Réinitialisation du nombre de points */
-        this.currentLevelPacDotNumber = 0;
-        /* Prévention de bug */
-        if (currentLevel == null)
-            return this;
+        this.pacDotNumber = 0;
         /* Parcourt de chaque ligne */
-        for (var i = 0, l = currentLevel.length; i < l; ++i) {
-            var row = currentLevel[i];
+        for (var i = 0, l = cases.length; i < l; ++i) {
+            var row = cases[i];
             /* Parcourt de chaque case */
             for (var j = 0, k = row.length; j < k; ++j) {
                 var currentCase = row[j];
                 /* Détermination des bordures à supprimer */
                 var leftCase = row[j - 1] || null;
                 var rightCase = row[j + 1] || null;
-                var upCase = currentLevel[i - 1] != null ? currentLevel[i - 1][j] : null;
-                var downCase = currentLevel[i + 1] != null ? currentLevel[i + 1][j] : null;
+                var upCase = cases[i - 1] != null ? cases[i - 1][j] : null;
+                var downCase = cases[i + 1] != null ? cases[i + 1][j] : null;
                 /* Suppression des bordures */
                 currentCase.hasBorderLeft(leftCase != null && currentCase.isAWall() && !leftCase.isAWall());
                 currentCase.hasBorderRight(rightCase != null && currentCase.isAWall() && !rightCase.isAWall());
@@ -849,7 +830,7 @@ class LevelsManager {
                 if (currentCase.hasPacDot()) {
                     this.drawPacDot(canvas, currentCase);
                     /* Incrémentation du nombre de points */
-                    this.currentLevelPacDotNumber++;
+                    this.pacDotNumber++;
                 }
             }
         }
@@ -904,7 +885,7 @@ class LevelsManager {
      * @param canvas
      * @param currentCase
      *
-     * @returns {LevelsManager}
+     * @returns {LevelManager}
      */
     drawPacDot(canvas, currentCase) {
         if (currentCase.hasPacDot()) {
@@ -927,27 +908,27 @@ class LevelsManager {
      *
      * @returns {Array<Array<Case>>}
      */
-    getCurrentCasesLevel() {
-        return this.levels.get(this.currentLevel);
+    getCases() {
+        return this.level.get();
     }
     /**
      * Lorsqu'un case a été mangée
      *
      * @param e
      *
-     * @returns {LevelsManager}
+     * @returns {LevelManager}
      */
     pacDotEaten(e) {
         /* Les coordonées de la case courante */
         var coords = e.detail;
         /* Récupération de la case courante */
-        var currentCasesLevel = this.getCurrentCasesLevel();
-        var currentCase = currentCasesLevel[coords.y][coords.x];
+        var cases = this.getCases();
+        var currentCase = cases[coords.y][coords.x];
         /* Décrémentation s'il y a un point */
         if (currentCase.hasPacDot())
-            this.currentLevelPacDotNumber--;
+            this.pacDotNumber--;
         /* Niveau terminé */
-        if (this.currentLevelPacDotNumber <= 0) {
+        if (this.pacDotNumber <= 0) {
             var event = new CustomEvent('LevelFinished');
             window.dispatchEvent(event);
         }
@@ -959,7 +940,7 @@ class LevelsManager {
      * @returns {Array<Case>}
      */
     getPowerPellet() {
-        var cases = this.getCurrentCasesLevel();
+        var cases = this.getCases();
         var casesWithPowerPellet = [];
         for (var i = 0, l = cases.length; i < l; ++i) {
             /* Parcourt de chaque case */

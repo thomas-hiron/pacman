@@ -19,7 +19,7 @@ class Jeu
   private canvas: Canvas;
   private pacman: Pacman;
   private time: number;
-  private levelsManager: LevelsManager;
+  private levelManager: LevelManager;
   private fruitsManager: FruitsManager;
   private score: Score;
   private powerPelletCases: Array<Case>;
@@ -54,8 +54,8 @@ class Jeu
     canvasLevel.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
 
     /* Les niveaux */
-    this.levelsManager = new LevelsManager();
-    this.levelsManager.draw(canvasLevel);
+    this.levelManager = new LevelManager();
+    this.levelManager.draw(canvasLevel);
 
     /* Dessin du niveau */
     this.canvas.getContext().drawImage(canvasLevel.getElement(), 0, Jeu.TOP_HEIGHT);
@@ -108,7 +108,7 @@ class Jeu
   private start(): Jeu
   {
     /* Récupération de toutes les power pellet pour les faire clignoter */
-    this.powerPelletCases = this.levelsManager.getPowerPellet();
+    this.powerPelletCases = this.levelManager.getPowerPellet();
 
     /* Date de début pour le fruit manager */
     this.fruitsManager.start();
@@ -196,8 +196,8 @@ class Jeu
     var margin: number = 5;
 
     /* Récupération de la case courante */
-    var currentCasesLevel: Array<Array<Case>> = this.levelsManager.getCurrentCasesLevel();
-    var currentCase: Case = currentCasesLevel[coords.y][coords.x];
+    var cases: Array<Array<Case>> = this.levelManager.getCases();
+    var currentCase: Case = cases[coords.y][coords.x];
 
     /* Case ok */
     if (currentCase != null && currentCase.hasPacDot())
@@ -211,7 +211,7 @@ class Jeu
         canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
 
         /* Dessin */
-        this.levelsManager.drawPacDot(canvas, currentCase);
+        this.levelManager.drawPacDot(canvas, currentCase);
 
         /* Dessin du point et suppression de l'ancien */
         this.canvas.getContext().clearRect(coords.x * Case.CASE_WIDTH + margin, coords.y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
@@ -347,7 +347,7 @@ class Jeu
 
       /* Dessin */
       for (var i = 0, l = this.powerPelletCases.length; i < l; ++i)
-        this.levelsManager.drawPacDot(canvas, this.powerPelletCases[i]);
+        this.levelManager.drawPacDot(canvas, this.powerPelletCases[i]);
 
       /* Dessin du point  */
       this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
@@ -366,9 +366,9 @@ class Jeu
    */
   private checkCollision(x: number, y: number): boolean
   {
-    var currentCasesLevel: Array<Array<Case>> = this.levelsManager.getCurrentCasesLevel();
+    var cases: Array<Array<Case>> = this.levelManager.getCases();
 
-    return currentCasesLevel[y] == void 0 || currentCasesLevel[y][x] === void 0 || currentCasesLevel[y][x].isAWall();
+    return cases[y] == void 0 || cases[y][x] === void 0 || cases[y][x].isAWall();
   }
 
   /**
@@ -382,8 +382,8 @@ class Jeu
     var coords: Point = e.detail;
 
     /* Récupération de la case courante */
-    var currentCasesLevel: Array<Array<Case>> = this.levelsManager.getCurrentCasesLevel();
-    var currentCase: Case = currentCasesLevel[coords.y][coords.x];
+    var cases: Array<Array<Case>> = this.levelManager.getCases();
+    var currentCase: Case = cases[coords.y][coords.x];
 
     /* Augmentation du score */
     this.score.update(currentCase);
@@ -423,8 +423,8 @@ class Jeu
     this.onRemoveFruit(false);
 
     /* Récupération de la case du milieu */
-    var currentCasesLevel: Array<Array<Case>> = this.levelsManager.getCurrentCasesLevel();
-    var middleCase: Case = currentCasesLevel[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
+    var cases: Array<Array<Case>> = this.levelManager.getCases();
+    var middleCase: Case = cases[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
 
     var fruit: Fruit = e === null ? middleCase.getPacDot() : e.detail;
     var fruitWidth: number = Fruit.WIDTH;
@@ -485,8 +485,8 @@ class Jeu
     /* Récupération de la case du milieu et suppression du fruit */
     if (removeFromCase !== false)
     {
-      var currentCasesLevel: Array<Array<Case>> = this.levelsManager.getCurrentCasesLevel();
-      var middleCase: Case = currentCasesLevel[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
+      var cases: Array<Array<Case>> = this.levelManager.getCases();
+      var middleCase: Case = cases[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
       middleCase.setPacDot(null);
     }
 
