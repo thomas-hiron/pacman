@@ -362,6 +362,10 @@ FruitsManager.APPEARANCE_DURATION = 10000;
  */
 /**
  * Initialise le jeu, créer les niveaux, lance pacman, les fantomes,...
+ *
+ * Liens :
+ *  http://gameinternals.com/post/2072558330/understanding-pac-man-ghost-behavior
+ *  http://www.grospixels.com/site/trucpac.php
  */
 class Jeu {
     constructor() {
@@ -657,7 +661,7 @@ class Jeu {
         this.onRemoveFruit(false);
         /* Récupération de la case du milieu */
         var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
-        var middleCase = currentCasesLevel[11][7];
+        var middleCase = currentCasesLevel[10][7];
         var fruit = e === null ? middleCase.getPacDot() : e.detail;
         var fruitWidth = Fruit.WIDTH;
         var margin = (Case.CASE_WIDTH - fruitWidth) / 2;
@@ -701,11 +705,11 @@ class Jeu {
         var fruitWidth = Fruit.WIDTH;
         var margin = (Case.CASE_WIDTH - fruitWidth) / 2;
         /* Suppression dans le canvas */
-        this.canvas.getContext().clearRect(7 * Case.CASE_WIDTH + margin, 11 * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, fruitWidth, fruitWidth);
+        this.canvas.getContext().clearRect(7 * Case.CASE_WIDTH + margin, 10 * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, fruitWidth, fruitWidth);
         /* Récupération de la case du milieu et suppression du fruit */
         if (removeFromCase !== false) {
             var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
-            var middleCase = currentCasesLevel[11][7];
+            var middleCase = currentCasesLevel[10][7];
             middleCase.setPacDot(null);
         }
         return this;
@@ -750,10 +754,10 @@ class Levels {
             [5, 1], [5, 3], [5, 5], [5, 7], [5, 9], [5, 11], [5, 13],
             [6, 1], [6, 13],
             [7, 1], [7, 2], [7, 3], [7, 4], [7, 5], [7, 7], [7, 9], [7, 10], [7, 11], [7, 12], [7, 13],
-            [9, 0], [9, 1], [9, 2], [9, 3], [9, 11], [9, 12], [9, 13], [9, 14],
-            [11, 0], [11, 1], [11, 2], [11, 3], [11, 11], [11, 12], [11, 13], [11, 14],
-            [12, 3], [12, 5], [12, 6], [12, 7], [12, 8], [12, 9], [12, 11],
-            [13, 1], [13, 3], [13, 7], [13, 11], [13, 13],
+            [9, 0], [9, 1], [9, 2], [9, 3], [9, 4], [9, 10], [9, 11], [9, 12], [9, 13], [9, 14],
+            [11, 0], [11, 1], [11, 2], [11, 3], [11, 5], [11, 6], [11, 7], [11, 8], [11, 9], [11, 11], [11, 12], [11, 13], [11, 14],
+            [12, 3], [12, 7], [12, 11],
+            [13, 1], [13, 3], [13, 5], [13, 7], [13, 9], [13, 11], [13, 13],
             [14, 3], [14, 5], [14, 7], [14, 9], [14, 11],
             [15, 1], [15, 5], [15, 9], [15, 13],
             [16, 1], [16, 2], [16, 3], [16, 4], [16, 5], [16, 7], [16, 9], [16, 10], [16, 11], [16, 12], [16, 13],
@@ -761,16 +765,9 @@ class Levels {
             [18, 1], [18, 2], [18, 3], [18, 4], [18, 5], [18, 6], [18, 7], [18, 8], [18, 9], [18, 10], [18, 11], [18, 12], [18, 13]
         ];
         /* Le conteneur des fantomes */
-        wallsCoordinates.push([9, 5]);
         wallsCoordinates.push([9, 6]);
         wallsCoordinates.push([9, 7]);
         wallsCoordinates.push([9, 8]);
-        wallsCoordinates.push([9, 9]);
-        wallsCoordinates.push([10, 5]);
-        wallsCoordinates.push([10, 6]);
-        wallsCoordinates.push([10, 7]);
-        wallsCoordinates.push([10, 8]);
-        wallsCoordinates.push([10, 9]);
         /* Déclaration de tous les murs */
         for (i = 0, l = wallsCoordinates.length; i < l; ++i)
             cases[wallsCoordinates[i][0]][wallsCoordinates[i][1]].isAWall(true);
@@ -788,7 +785,7 @@ class Levels {
         cases[12][2].setPacDot(new PowerPellet());
         cases[12][12].setPacDot(new PowerPellet());
         /* Suppression de la case où y'a pacman */
-        cases[11][7].setPacDot(null);
+        cases[10][7].setPacDot(null);
         /* Ajout des cases */
         this.levels.push(cases);
         return this;
@@ -1013,7 +1010,7 @@ class Pacman {
         };
         this.coordinates = {
             x: 7 * Case.CASE_WIDTH,
-            y: 11 * Case.CASE_WIDTH
+            y: 10 * Case.CASE_WIDTH
         };
         this.currentStep = 0;
         this.stepNumber = 12;

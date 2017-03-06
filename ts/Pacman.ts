@@ -106,7 +106,7 @@ class Pacman
 
     this.coordinates = {
       x: 7 * Case.CASE_WIDTH,
-      y: 11 * Case.CASE_WIDTH
+      y: 10 * Case.CASE_WIDTH
     };
 
     this.currentStep = 0;
