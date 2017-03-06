@@ -72,7 +72,7 @@ class Level
     this.tiles[12][12].setPacDot(new PowerPellet());
 
     /* Suppression de la case où y'a pacman */
-    this.tiles[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X].setPacDot(null);
+    this.tiles[Pacman.BASE_Y][Pacman.BASE_X].setPacDot(null);
   }
 
   /**

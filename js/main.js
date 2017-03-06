@@ -332,6 +332,10 @@ class Ghost {
         return this.canvas;
     }
 }
+Ghost.SIZE = {
+    w: 24,
+    h: 24
+};
 /**
  * Fantôme rose
  *  Prend pacman en ambuscade (vise 4 cases devant pacman)
@@ -633,10 +637,10 @@ class Jeu {
     animatePacman() {
         var pacman = this.pacman;
         /* Pour centrer dans la case */
-        var margin = (Tile.TILE_WIDTH - pacman.getSize().w) / 2;
+        var margin = (Tile.TILE_WIDTH - Pacman.SIZE.w) / 2;
         var ctx = this.canvas.getContext();
         /* Suppression du pacman courant */
-        ctx.clearRect(pacman.getX() + margin, pacman.getY() + margin + Jeu.TOP_HEIGHT, pacman.getSize().w, pacman.getSize().h);
+        ctx.clearRect(pacman.getX() + margin, pacman.getY() + margin + Jeu.TOP_HEIGHT, Pacman.SIZE.w, Pacman.SIZE.h);
         /* Instruction de modification des coordonées */
         pacman.move();
         /* Instruction d'animation */
@@ -824,7 +828,7 @@ class Jeu {
         this.onRemoveFruit(false);
         /* Récupération de la case du milieu */
         var tiles = this.levelManager.getTiles();
-        var middleTile = tiles[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
+        var middleTile = tiles[Pacman.BASE_Y][Pacman.BASE_X];
         var fruit = e === null ? middleTile.getPacDot() : e.detail;
         var fruitWidth = Fruit.WIDTH;
         var margin = (Tile.TILE_WIDTH - fruitWidth) / 2;
@@ -868,11 +872,11 @@ class Jeu {
         var fruitWidth = Fruit.WIDTH;
         var margin = (Tile.TILE_WIDTH - fruitWidth) / 2;
         /* Suppression dans le canvas */
-        this.canvas.getContext().clearRect(Pacman.PACMAN_BASE_X * Tile.TILE_WIDTH + margin, Pacman.PACMAN_BASE_Y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT, fruitWidth, fruitWidth);
+        this.canvas.getContext().clearRect(Pacman.BASE_X * Tile.TILE_WIDTH + margin, Pacman.BASE_Y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT, fruitWidth, fruitWidth);
         /* Récupération de la case du milieu et suppression du fruit */
         if (removeFromTile !== false) {
             var tiles = this.levelManager.getTiles();
-            var middleTile = tiles[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
+            var middleTile = tiles[Pacman.BASE_Y][Pacman.BASE_X];
             middleTile.setPacDot(null);
         }
         return this;
@@ -939,7 +943,7 @@ class Level {
         this.tiles[12][2].setPacDot(new PowerPellet());
         this.tiles[12][12].setPacDot(new PowerPellet());
         /* Suppression de la case où y'a pacman */
-        this.tiles[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X].setPacDot(null);
+        this.tiles[Pacman.BASE_Y][Pacman.BASE_X].setPacDot(null);
     }
     /**
      * Retourne le tableau désiré
@@ -1148,10 +1152,6 @@ class Pacman {
      * Le constructeur qui initialise les variables
      */
     constructor() {
-        this.size = {
-            w: 24,
-            h: 24
-        };
         this.coordinates = {
             x: 7 * Tile.TILE_WIDTH,
             y: 10 * Tile.TILE_WIDTH
@@ -1169,12 +1169,6 @@ class Pacman {
     setCollideFunction(callback) {
         this.checkCollision = callback;
         return this;
-    }
-    /**
-     * @returns {Size}
-     */
-    getSize() {
-        return this.size;
     }
     /**
      * @returns {number}
@@ -1205,7 +1199,7 @@ class Pacman {
         /* Création du canvas */
         this.canvas = new Canvas();
         /* Initialisation de la taille du canvas */
-        this.canvas.setSize(this.size.w, this.size.h);
+        this.canvas.setSize(Pacman.SIZE.w, Pacman.SIZE.h);
         /* Initialisation de la direction */
         this.direction = Directions.Right;
         this.nextDirection = this.direction;
@@ -1341,7 +1335,7 @@ class Pacman {
         /* Le context du pacman */
         var ctx = this.canvas.getContext();
         /* Taille */
-        var size = this.size;
+        var size = Pacman.SIZE;
         /* Largeur de la case */
         var tileWidth = Tile.TILE_WIDTH;
         /* Suppression du context */
@@ -1448,8 +1442,12 @@ class Pacman {
         return coords;
     }
 }
-Pacman.PACMAN_BASE_X = 7;
-Pacman.PACMAN_BASE_Y = 10;
+Pacman.BASE_X = 7;
+Pacman.BASE_Y = 10;
+Pacman.SIZE = {
+    w: 24,
+    h: 24
+};
 /**
  * Created by mac pro on 05/03/2017.
  */

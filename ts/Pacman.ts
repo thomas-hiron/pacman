@@ -7,18 +7,17 @@
  */
 class Pacman
 {
-  public static PACMAN_BASE_X = 7;
-  public static PACMAN_BASE_Y = 10;
+  public static BASE_X: number = 7;
+  public static BASE_Y: number = 10;
+  public static SIZE: Size = {
+    w: 24,
+    h: 24
+  };
 
   /**
    * Le canvas pour pacman
    */
   private canvas: Canvas;
-
-  /**
-   * La taille de pacman
-   */
-  private size: Size;
 
   /**
    * Les coordonnées de départ
@@ -64,14 +63,6 @@ class Pacman
   }
 
   /**
-   * @returns {Size}
-   */
-  public getSize(): Size
-  {
-    return this.size;
-  }
-
-  /**
    * @returns {number}
    */
   public getX(): number
@@ -102,11 +93,6 @@ class Pacman
    */
   public constructor()
   {
-    this.size = {
-      w: 24,
-      h: 24
-    };
-
     this.coordinates = {
       x: 7 * Tile.TILE_WIDTH,
       y: 10 * Tile.TILE_WIDTH
@@ -129,7 +115,7 @@ class Pacman
     this.canvas = new Canvas();
 
     /* Initialisation de la taille du canvas */
-    this.canvas.setSize(this.size.w, this.size.h);
+    this.canvas.setSize(Pacman.SIZE.w, Pacman.SIZE.h);
 
     /* Initialisation de la direction */
     this.direction = Directions.Right;
@@ -301,7 +287,7 @@ class Pacman
     var ctx: CanvasRenderingContext2D = this.canvas.getContext();
 
     /* Taille */
-    var size: Size = this.size;
+    var size: Size = Pacman.SIZE;
 
     /* Largeur de la case */
     var tileWidth: number = Tile.TILE_WIDTH;

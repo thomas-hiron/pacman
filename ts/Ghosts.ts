@@ -7,6 +7,11 @@
  */
 abstract class Ghost
 {
+  public static SIZE: Size = {
+    w: 24,
+    h: 24
+  };
+
   /* La direction */
   protected direction: number;
   /* Le mode courant */

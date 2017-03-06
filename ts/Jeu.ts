@@ -170,11 +170,11 @@ class Jeu
   {
     var pacman: Pacman = this.pacman;
     /* Pour centrer dans la case */
-    var margin: number = (Tile.TILE_WIDTH - pacman.getSize().w) / 2;
+    var margin: number = (Tile.TILE_WIDTH - Pacman.SIZE.w) / 2;
     var ctx = this.canvas.getContext();
 
     /* Suppression du pacman courant */
-    ctx.clearRect(pacman.getX() + margin, pacman.getY() + margin + Jeu.TOP_HEIGHT, pacman.getSize().w, pacman.getSize().h);
+    ctx.clearRect(pacman.getX() + margin, pacman.getY() + margin + Jeu.TOP_HEIGHT, Pacman.SIZE.w, Pacman.SIZE.h);
 
     /* Instruction de modification des coordonées */
     pacman.move();
@@ -428,7 +428,7 @@ class Jeu
 
     /* Récupération de la case du milieu */
     var tiles: Array<Array<Tile>> = this.levelManager.getTiles();
-    var middleTile: Tile = tiles[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
+    var middleTile: Tile = tiles[Pacman.BASE_Y][Pacman.BASE_X];
 
     var fruit: Fruit = e === null ? middleTile.getPacDot() : e.detail;
     var fruitWidth: number = Fruit.WIDTH;
@@ -482,7 +482,7 @@ class Jeu
 
     /* Suppression dans le canvas */
     this.canvas.getContext().clearRect(
-      Pacman.PACMAN_BASE_X * Tile.TILE_WIDTH + margin, Pacman.PACMAN_BASE_Y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT,
+      Pacman.BASE_X * Tile.TILE_WIDTH + margin, Pacman.BASE_Y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT,
       fruitWidth, fruitWidth
     );
 
@@ -490,7 +490,7 @@ class Jeu
     if (removeFromTile !== false)
     {
       var tiles: Array<Array<Tile>> = this.levelManager.getTiles();
-      var middleTile: Tile = tiles[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
+      var middleTile: Tile = tiles[Pacman.BASE_Y][Pacman.BASE_X];
       middleTile.setPacDot(null);
     }
 
