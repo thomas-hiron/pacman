@@ -4,4 +4,84 @@
 
 class GhostsManager
 {
+  /* Les intervalles */
+  private chaseInterval: number;
+  private scatterInterval: number;
+  private frightenInterval: number;
+
+  /* Les fantômes */
+  private pinky: Pinky;
+  private blinky: Blinky;
+  private inky: Inky;
+  private clyde: Clyde;
+
+  /* Pour gérer l'intervalle */
+  private time: number;
+
+  /* Gère le numéro de la vague */
+  private waveNumber: number;
+
+  /* Le mode courant */
+  private mode: number;
+
+  constructor()
+  {
+
+  }
+
+  /**
+   * Change de mode si besoin et déplace les fantômes
+   *
+   * @param pacmanCenter
+   *
+   * @returns {GhostsManager}
+   */
+  public moveGhosts(pacmanCenter: Point): GhostsManager
+  {
+
+    return this;
+  }
+
+  /**
+   * Anime les fantômes dans leur canvas
+   *
+   * @returns {GhostsManager}
+   */
+  public animateGhosts(): GhostsManager
+  {
+    return this;
+  }
+
+  /**
+   * Change le mode et le numéro de la vague si besoin lorsque l'intervalle est atteint
+   *
+   * @returns {GhostsManager}
+   */
+  private changeMode(): GhostsManager
+  {
+    return this;
+  }
+
+  /**
+   * Renvoie les coordonnées des fantômes
+   *
+   * @returns {Array}
+   */
+  public getGhostsCoords(): Array<Point>
+  {
+    return [{
+      x: 0,
+      y: 0
+    }];
+  }
+
+  /**
+   * Retourne la position des fantômes et leur canvas pour les redissiner
+   *
+   * @returns {{}}
+   */
+  public getGhostsCoordsAndCanvas(): Object
+  {
+    return {};
+  }
 }
