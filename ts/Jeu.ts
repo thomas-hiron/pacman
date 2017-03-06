@@ -4,6 +4,10 @@
 
 /**
  * Initialise le jeu, créer les niveaux, lance pacman, les fantomes,...
+ *
+ * Liens :
+ *  http://gameinternals.com/post/2072558330/understanding-pac-man-ghost-behavior
+ *  http://www.grospixels.com/site/trucpac.php
  */
 class Jeu
 {
