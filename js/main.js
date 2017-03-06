@@ -248,6 +248,77 @@ FruitsManager.APPEARANCE_DURATION = 10000;
  * Un fantôme
  */
 class Ghost {
+    /**
+     * Renvoie la direction à prendre pour arriver le plus rapidement à la case ciblée
+     *
+     * @returns {number}
+     */
+    findBestPath() {
+        return 0;
+    }
+    /**
+     * Déplace le fantôme
+     *  Tout droit si dans une case
+     *  Appelle targetTile et findBestPath si c'est un croisement
+     *
+     * @param pacmanCenter
+     *
+     * @returns {Ghost}
+     */
+    move(pacmanCenter) {
+        return this;
+    }
+    /**
+     * Fait l'animation du fantôme dans le canvas
+     *
+     * @returns {Ghost}
+     */
+    animate() {
+        return this;
+    }
+    /**
+     * Sort le fantôme de la maison
+     *
+     * @returns {Ghost}
+     */
+    getOutFromHome() {
+        return this;
+    }
+    /**
+     * Renvoie la direction pour
+     *
+     * @returns {number}
+     */
+    getDirection() {
+        return this.direction;
+    }
+    /**
+     * Modifie le mode
+     *
+     * @param mode
+     *
+     * @returns {Ghost}
+     */
+    changeMode(mode) {
+        this.mode = mode;
+        return this;
+    }
+    /**
+     * Renvoie les coordonnées
+     *
+     * @returns {Point}
+     */
+    getCoordinates() {
+        return this.coordinates;
+    }
+    /**
+     * Renvoie le canvas
+     *
+     * @returns {Canvas}
+     */
+    getCanvas() {
+        return this.canvas;
+    }
 }
 /**
  * Fantôme rose
@@ -256,6 +327,28 @@ class Ghost {
  *  Sort immédiatement
  */
 class Pinky extends Ghost {
+    constructor() {
+        super();
+        this.direction = null;
+        this.mode = null;
+        this.coordinates = {
+            x: 0,
+            y: 0
+        };
+        this.cornerCoordinates = {
+            x: 0,
+            y: 0
+        };
+        this.color = '#000000';
+    }
+    /**
+     * Détermine la case à laquelle se rendre
+     *
+     * @returns {null}
+     */
+    targetTile() {
+        return null;
+    }
 }
 /**
  * Fantôme rouge
@@ -264,6 +357,28 @@ class Pinky extends Ghost {
  *  Sorti dès le début
  */
 class Blinky extends Ghost {
+    constructor() {
+        super();
+        this.direction = null;
+        this.mode = null;
+        this.coordinates = {
+            x: 0,
+            y: 0
+        };
+        this.cornerCoordinates = {
+            x: 0,
+            y: 0
+        };
+        this.color = '#000000';
+    }
+    /**
+     * Détermine la case à laquelle se rendre
+     *
+     * @returns {null}
+     */
+    targetTile() {
+        return null;
+    }
 }
 /**
  * Fantôme bleu
@@ -272,6 +387,28 @@ class Blinky extends Ghost {
  *  Sort dès qu'il y a 30 points mangés
  */
 class Inky extends Ghost {
+    constructor() {
+        super();
+        this.direction = null;
+        this.mode = null;
+        this.coordinates = {
+            x: 0,
+            y: 0
+        };
+        this.cornerCoordinates = {
+            x: 0,
+            y: 0
+        };
+        this.color = '#000000';
+    }
+    /**
+     * Détermine la case à laquelle se rendre
+     *
+     * @returns {null}
+     */
+    targetTile() {
+        return null;
+    }
 }
 /**
  * Fantôme orange
@@ -280,6 +417,28 @@ class Inky extends Ghost {
  *  Sort dès qu'il y a 1/3 des points mangés
  */
 class Clyde extends Ghost {
+    constructor() {
+        super();
+        this.direction = null;
+        this.mode = null;
+        this.coordinates = {
+            x: 0,
+            y: 0
+        };
+        this.cornerCoordinates = {
+            x: 0,
+            y: 0
+        };
+        this.color = '#000000';
+    }
+    /**
+     * Détermine la case à laquelle se rendre
+     *
+     * @returns {null}
+     */
+    targetTile() {
+        return null;
+    }
 }
 /**
  * Created by mac pro on 06/03/2017.

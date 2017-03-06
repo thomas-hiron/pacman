@@ -7,7 +7,116 @@
  */
 abstract class Ghost
 {
+  /* La direction */
+  protected direction: number;
+  /* Le mode courant */
+  protected mode: number;
+  /* Les coordonnées du fantôme */
+  protected coordinates: Point;
+  /* Les coordonées des coins respectifs */
+  protected cornerCoordinates: Point;
+  /* La couleur du fantôme */
+  protected color: string;
 
+  /* Le canvas de chaque fantôme */
+  private canvas: Canvas;
+  /* Le décalage en px pour le mouvement */
+  private stepPx: number;
+  /* L'étape courante d'animation */
+  private currentStep: number;
+
+  /**
+   * Vise une case selon le caractère
+   */
+  protected abstract targetTile(): Tile;
+
+  /**
+   * Renvoie la direction à prendre pour arriver le plus rapidement à la case ciblée
+   *
+   * @returns {number}
+   */
+  private findBestPath(): number
+  {
+    return 0;
+  }
+
+  /**
+   * Déplace le fantôme
+   *  Tout droit si dans une case
+   *  Appelle targetTile et findBestPath si c'est un croisement
+   *
+   * @param pacmanCenter
+   *
+   * @returns {Ghost}
+   */
+  public move(pacmanCenter: Point): Ghost
+  {
+    return this;
+  }
+
+  /**
+   * Fait l'animation du fantôme dans le canvas
+   *
+   * @returns {Ghost}
+   */
+  public animate(): Ghost
+  {
+    return this;
+  }
+
+  /**
+   * Sort le fantôme de la maison
+   *
+   * @returns {Ghost}
+   */
+  public getOutFromHome(): Ghost
+  {
+    return this;
+  }
+
+  /**
+   * Renvoie la direction pour
+   *
+   * @returns {number}
+   */
+  public getDirection(): number
+  {
+    return this.direction;
+  }
+
+  /**
+   * Modifie le mode
+   *
+   * @param mode
+   *
+   * @returns {Ghost}
+   */
+  public changeMode(mode: number): Ghost
+  {
+    this.mode = mode;
+
+    return this;
+  }
+
+  /**
+   * Renvoie les coordonnées
+   *
+   * @returns {Point}
+   */
+  public getCoordinates(): Point
+  {
+    return this.coordinates;
+  }
+
+  /**
+   * Renvoie le canvas
+   *
+   * @returns {Canvas}
+   */
+  public getCanvas(): Canvas
+  {
+    return this.canvas;
+  }
 }
 
 /**
@@ -18,7 +127,32 @@ abstract class Ghost
  */
 class Pinky extends Ghost
 {
+  constructor()
+  {
+    super();
 
+    this.direction = null;
+    this.mode = null;
+    this.coordinates = {
+      x: 0,
+      y: 0
+    };
+    this.cornerCoordinates = {
+      x: 0,
+      y: 0
+    };
+    this.color = '#000000';
+  }
+
+  /**
+   * Détermine la case à laquelle se rendre
+   *
+   * @returns {null}
+   */
+  protected targetTile(): Tile
+  {
+    return null;
+  }
 }
 
 /**
@@ -29,7 +163,32 @@ class Pinky extends Ghost
  */
 class Blinky extends Ghost
 {
+  constructor()
+  {
+    super();
 
+    this.direction = null;
+    this.mode = null;
+    this.coordinates = {
+      x: 0,
+      y: 0
+    };
+    this.cornerCoordinates = {
+      x: 0,
+      y: 0
+    };
+    this.color = '#000000';
+  }
+
+  /**
+   * Détermine la case à laquelle se rendre
+   *
+   * @returns {null}
+   */
+  protected targetTile(): Tile
+  {
+    return null;
+  }
 }
 
 /**
@@ -40,7 +199,32 @@ class Blinky extends Ghost
  */
 class Inky extends Ghost
 {
+  constructor()
+  {
+    super();
 
+    this.direction = null;
+    this.mode = null;
+    this.coordinates = {
+      x: 0,
+      y: 0
+    };
+    this.cornerCoordinates = {
+      x: 0,
+      y: 0
+    };
+    this.color = '#000000';
+  }
+
+  /**
+   * Détermine la case à laquelle se rendre
+   *
+   * @returns {null}
+   */
+  protected targetTile(): Tile
+  {
+    return null;
+  }
 }
 
 /**
@@ -51,5 +235,30 @@ class Inky extends Ghost
  */
 class Clyde extends Ghost
 {
+  constructor()
+  {
+    super();
 
+    this.direction = null;
+    this.mode = null;
+    this.coordinates = {
+      x: 0,
+      y: 0
+    };
+    this.cornerCoordinates = {
+      x: 0,
+      y: 0
+    };
+    this.color = '#000000';
+  }
+
+  /**
+   * Détermine la case à laquelle se rendre
+   *
+   * @returns {null}
+   */
+  protected targetTile(): Tile
+  {
+    return null;
+  }
 }
