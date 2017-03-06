@@ -7,21 +7,21 @@
  */
 class Level
 {
-  private cases: Array<Array<Case>>;
+  private tiles: Array<Array<Tile>>;
 
   constructor()
   {
     /* Les blocs avec cases */
-    this.cases = new Array(20);
+    this.tiles = new Array(20);
 
-    for (var i: number = 0, l: number = this.cases.length; i < l; ++i)
+    for (var i: number = 0, l: number = this.tiles.length; i < l; ++i)
     {
-      this.cases[i] = new Array(15);
+      this.tiles[i] = new Array(15);
 
-      for (var j = 0, k = this.cases[i].length; j < k; ++j)
+      for (var j = 0, k = this.tiles[i].length; j < k; ++j)
       {
-        this.cases[i][j] = new Case();
-        this.cases[i][j].setCoordinates(j, i);
+        this.tiles[i][j] = new Tile();
+        this.tiles[i][j].setCoordinates(j, i);
       }
     }
 
@@ -52,36 +52,36 @@ class Level
 
     /* Déclaration de tous les murs */
     for (i = 0, l = wallsCoordinates.length; i < l; ++i)
-      this.cases[wallsCoordinates[i][0]][wallsCoordinates[i][1]].isAWall(true);
+      this.tiles[wallsCoordinates[i][0]][wallsCoordinates[i][1]].isAWall(true);
 
     /* Sinon on met un point */
-    for (i = 0, l = this.cases.length; i < l; ++i)
+    for (i = 0, l = this.tiles.length; i < l; ++i)
     {
-      for (j = 0, k = this.cases[i].length; j < k; ++j)
+      for (j = 0, k = this.tiles[i].length; j < k; ++j)
       {
         /* Ajout du point */
-        if (!this.cases[i][j].isAWall())
-          this.cases[i][j].setPacDot(new PacDot());
+        if (!this.tiles[i][j].isAWall())
+          this.tiles[i][j].setPacDot(new PacDot());
       }
     }
 
     /* Ajout des power pellet, y d'abord */
-    this.cases[2][1].setPacDot(new PowerPellet());
-    this.cases[2][13].setPacDot(new PowerPellet());
-    this.cases[12][2].setPacDot(new PowerPellet());
-    this.cases[12][12].setPacDot(new PowerPellet());
+    this.tiles[2][1].setPacDot(new PowerPellet());
+    this.tiles[2][13].setPacDot(new PowerPellet());
+    this.tiles[12][2].setPacDot(new PowerPellet());
+    this.tiles[12][12].setPacDot(new PowerPellet());
 
     /* Suppression de la case où y'a pacman */
-    this.cases[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X].setPacDot(null);
+    this.tiles[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X].setPacDot(null);
   }
 
   /**
    * Retourne le tableau désiré
    *
-   * @returns {Array<Array<Case>>}
+   * @returns {Array<Array<Tile>>}
    */
-  public get(): Array<Array<Case>>
+  public get(): Array<Array<Tile>>
   {
-    return this.cases;
+    return this.tiles;
   }
 }

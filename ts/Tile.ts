@@ -2,9 +2,9 @@
  * Created by thiron on 03/07/2015.
  */
 
-class Case
+class Tile
 {
-  public static CASE_WIDTH = 40;
+  public static TILE_WIDTH = 40;
 
   private pacDot: PacDot;
   private wall: boolean;
@@ -115,9 +115,9 @@ class Case
    * Ajoute le point
    *
    * @param pacDot
-   * @returns {Case}
+   * @returns {Tile}
    */
-  public setPacDot(pacDot: PacDot): Case
+  public setPacDot(pacDot: PacDot): Tile
   {
     this.pacDot = pacDot;
 

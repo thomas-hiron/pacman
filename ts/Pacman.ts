@@ -108,8 +108,8 @@ class Pacman
     };
 
     this.coordinates = {
-      x: 7 * Case.CASE_WIDTH,
-      y: 10 * Case.CASE_WIDTH
+      x: 7 * Tile.TILE_WIDTH,
+      y: 10 * Tile.TILE_WIDTH
     };
 
     this.currentStep = 0;
@@ -206,7 +206,7 @@ class Pacman
   public move()
   {
     /* Largeur de la case */
-    var caseWidth: number = Case.CASE_WIDTH;
+    var tileWidth: number = Tile.TILE_WIDTH;
 
     /* Pas de collision par défaut */
     var collisionWithNextDirection: boolean = false;
@@ -217,15 +217,15 @@ class Pacman
     var newY: number = this.coordinates.y;
 
     /* Si dans une case, on change de direction, si possible */
-    if (this.coordinates.x % caseWidth == 0 && this.coordinates.y % caseWidth == 0)
+    if (this.coordinates.x % tileWidth == 0 && this.coordinates.y % tileWidth == 0)
     {
       /* Les cases suivantes en fonction de la direction courante et suivante */
-      var nextCaseCoordsWithNextDirection: Point = this.getNextCaseCoords(this.nextDirection);
-      var nextCaseCoordsWithCurrentDirection: Point = this.getNextCaseCoords(this.direction);
+      var nextTileCoordsWithNextDirection: Point = this.getNextTileCoords(this.nextDirection);
+      var nextTileCoordsWithCurrentDirection: Point = this.getNextTileCoords(this.direction);
 
       /* Vérification que pas de collision */
-      collisionWithNextDirection = this.checkCollision(nextCaseCoordsWithNextDirection.x, nextCaseCoordsWithNextDirection.y);
-      collisionWithCurrentDirection = this.checkCollision(nextCaseCoordsWithCurrentDirection.x, nextCaseCoordsWithCurrentDirection.y);
+      collisionWithNextDirection = this.checkCollision(nextTileCoordsWithNextDirection.x, nextTileCoordsWithNextDirection.y);
+      collisionWithCurrentDirection = this.checkCollision(nextTileCoordsWithCurrentDirection.x, nextTileCoordsWithCurrentDirection.y);
 
       /* Changement de direction que si pas de collision avec la prochaine direction */
       if (!collisionWithNextDirection)
@@ -244,26 +244,26 @@ class Pacman
     }
 
     /* En fonction de la direction, modification des coords et de l'angle, si 15% dans la case, on supprime le point */
-    var percentInCase: number;
+    var percentInTile: number;
     switch (this.direction)
     {
       case Directions.Left:
-        percentInCase = 100 - this.coordinates.x % caseWidth * 100 / caseWidth;
+        percentInTile = 100 - this.coordinates.x % tileWidth * 100 / tileWidth;
         newX -= this.stepPx;
         this.angle = 180;
         break;
       case Directions.Right:
-        percentInCase = this.coordinates.x % caseWidth * 100 / caseWidth;
+        percentInTile = this.coordinates.x % tileWidth * 100 / tileWidth;
         newX += this.stepPx;
         this.angle = 0;
         break;
       case Directions.Up:
-        percentInCase = 100 - this.coordinates.y % caseWidth * 100 / caseWidth;
+        percentInTile = 100 - this.coordinates.y % tileWidth * 100 / tileWidth;
         newY -= this.stepPx;
         this.angle = 270;
         break;
       case Directions.Down:
-        percentInCase = this.coordinates.y % caseWidth * 100 / caseWidth;
+        percentInTile = this.coordinates.y % tileWidth * 100 / tileWidth;
         newY += this.stepPx;
         this.angle = 90;
         break;
@@ -277,12 +277,12 @@ class Pacman
     }
 
     /* Suppression du point */
-    if (percentInCase == 75)
+    if (percentInTile == 75)
     {
       /* Les coordonées de la case */
-      var currentCaseCoords: Point = this.getCurrentCaseCoords();
+      var currentTileCoords: Point = this.getCurrentTileCoords();
 
-      var event: Event = new CustomEvent('PacDotEaten', {'detail': currentCaseCoords});
+      var event: Event = new CustomEvent('PacDotEaten', {'detail': currentTileCoords});
       window.dispatchEvent(event);
     }
 
@@ -304,7 +304,7 @@ class Pacman
     var size: Size = this.size;
 
     /* Largeur de la case */
-    var caseWidth: number = Case.CASE_WIDTH;
+    var tileWidth: number = Tile.TILE_WIDTH;
 
     /* Suppression du context */
     ctx.clearRect(0, 0, size.w, size.h);
@@ -337,7 +337,7 @@ class Pacman
     ctx.fill();
 
     /* La marge */
-    var margin: number = (caseWidth - size.w) / 2;
+    var margin: number = (tileWidth - size.w) / 2;
 
     /* Restauration du context */
     ctx.restore();
@@ -353,32 +353,32 @@ class Pacman
    *
    * @returns {Point}
    */
-  private getNextCaseCoords(direction: number): Point
+  private getNextTileCoords(direction: number): Point
   {
     /* La case suivante avec la prochaine direction */
-    var nextCaseCoords: Point = {
-      x: this.coordinates.x / Case.CASE_WIDTH,
-      y: this.coordinates.y / Case.CASE_WIDTH
+    var nextTileCoords: Point = {
+      x: this.coordinates.x / Tile.TILE_WIDTH,
+      y: this.coordinates.y / Tile.TILE_WIDTH
     };
 
     /* Modification de la case suivante */
     switch (direction)
     {
       case Directions.Left:
-        nextCaseCoords.x--;
+        nextTileCoords.x--;
         break;
       case Directions.Right:
-        nextCaseCoords.x++;
+        nextTileCoords.x++;
         break;
       case Directions.Up:
-        nextCaseCoords.y--;
+        nextTileCoords.y--;
         break;
       case Directions.Down:
-        nextCaseCoords.y++;
+        nextTileCoords.y++;
         break;
     }
 
-    return nextCaseCoords;
+    return nextTileCoords;
   }
 
   /**
@@ -386,15 +386,15 @@ class Pacman
    *
    * @returns {Point}
    */
-  public getCurrentCaseCoords()
+  public getCurrentTileCoords()
   {
-    var moduloX: number = this.coordinates.x % Case.CASE_WIDTH;
-    var moduloY: number = this.coordinates.y % Case.CASE_WIDTH;
+    var moduloX: number = this.coordinates.x % Tile.TILE_WIDTH;
+    var moduloY: number = this.coordinates.y % Tile.TILE_WIDTH;
 
     /* Suppression pour avoir la case */
     var coords: Point = {
-      x: (this.coordinates.x - moduloX) / Case.CASE_WIDTH,
-      y: (this.coordinates.y - moduloY) / Case.CASE_WIDTH
+      x: (this.coordinates.x - moduloX) / Tile.TILE_WIDTH,
+      y: (this.coordinates.y - moduloY) / Tile.TILE_WIDTH
     };
 
     /* Suivant la direction, c'est pas forcément la bonne case */
@@ -411,9 +411,9 @@ class Pacman
    *
    * @returns {Point}
    */
-  public getPreviousCaseCoords()
+  public getPreviousTileCoords()
   {
-    var coords = this.getCurrentCaseCoords();
+    var coords = this.getCurrentTileCoords();
 
     /* Suivant la direction, c'est pas forcément la bonne case */
     switch (this.direction)

@@ -22,7 +22,7 @@ class Jeu
   private levelManager: LevelManager;
   private fruitsManager: FruitsManager;
   private score: Score;
-  private powerPelletCases: Array<Case>;
+  private powerPelletTiles: Array<Tile>;
 
   public constructor()
   {
@@ -108,7 +108,7 @@ class Jeu
   private start(): Jeu
   {
     /* Récupération de toutes les power pellet pour les faire clignoter */
-    this.powerPelletCases = this.levelManager.getPowerPellet();
+    this.powerPelletTiles = this.levelManager.getPowerPellet();
 
     /* Date de début pour le fruit manager */
     this.fruitsManager.start();
@@ -166,7 +166,7 @@ class Jeu
   {
     var pacman: Pacman = this.pacman;
     /* Pour centrer dans la case */
-    var margin: number = (Case.CASE_WIDTH - pacman.getSize().w) / 2;
+    var margin: number = (Tile.TILE_WIDTH - pacman.getSize().w) / 2;
     var ctx = this.canvas.getContext();
 
     /* Suppression du pacman courant */
@@ -192,18 +192,18 @@ class Jeu
   private drawCurrentPacDot(): Jeu
   {
     /* La case de pacman */
-    var coords: Point = this.pacman.getPreviousCaseCoords();
+    var coords: Point = this.pacman.getPreviousTileCoords();
     var margin: number = 5;
 
     /* Récupération de la case courante */
-    var cases: Array<Array<Case>> = this.levelManager.getCases();
-    var currentCase: Case = cases[coords.y][coords.x];
+    var tiles: Array<Array<Tile>> = this.levelManager.getTiles();
+    var currentTile: Tile = tiles[coords.y][coords.x];
 
-    /* Case ok */
-    if (currentCase != null && currentCase.hasPacDot())
+    /* Tile ok */
+    if (currentTile != null && currentTile.hasPacDot())
     {
       /* Si c'est un fruit, c'est Jeu qui redessine */
-      if (currentCase.getPacDot() instanceof Fruit)
+      if (currentTile.getPacDot() instanceof Fruit)
         this.onNewFruit(null);
       else
       {
@@ -211,10 +211,10 @@ class Jeu
         canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
 
         /* Dessin */
-        this.levelManager.drawPacDot(canvas, currentCase);
+        this.levelManager.drawPacDot(canvas, currentTile);
 
         /* Dessin du point et suppression de l'ancien */
-        this.canvas.getContext().clearRect(coords.x * Case.CASE_WIDTH + margin, coords.y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
+        this.canvas.getContext().clearRect(coords.x * Tile.TILE_WIDTH + margin, coords.y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
         this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
       }
     }
@@ -303,12 +303,12 @@ class Jeu
     var context: CanvasRenderingContext2D = this.canvas.getContext();
 
     /* Suppression */
-    context.clearRect(7 * Case.CASE_WIDTH, 10 * Case.CASE_WIDTH - 5, Case.CASE_WIDTH, Case.CASE_WIDTH);
+    context.clearRect(7 * Tile.TILE_WIDTH, 10 * Tile.TILE_WIDTH - 5, Tile.TILE_WIDTH, Tile.TILE_WIDTH);
 
     /* Dessin de la ligne */
     context.beginPath();
-    context.moveTo(7 * Case.CASE_WIDTH, 10 * Case.CASE_WIDTH);
-    context.lineTo(8 * Case.CASE_WIDTH, 10 * Case.CASE_WIDTH);
+    context.moveTo(7 * Tile.TILE_WIDTH, 10 * Tile.TILE_WIDTH);
+    context.lineTo(8 * Tile.TILE_WIDTH, 10 * Tile.TILE_WIDTH);
     context.strokeStyle = 'white';
     context.lineWidth = 1;
     context.stroke();
@@ -329,13 +329,13 @@ class Jeu
     var margin: number = 10;
 
     /* Suppression dans les deux cas */
-    for (var i = 0, l = this.powerPelletCases.length; i < l; ++i)
+    for (var i = 0, l = this.powerPelletTiles.length; i < l; ++i)
     {
       context.clearRect(
-        this.powerPelletCases[i].getCoordinates().x * Case.CASE_WIDTH + margin,
-        this.powerPelletCases[i].getCoordinates().y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT,
-        Case.CASE_WIDTH / 2,
-        Case.CASE_WIDTH / 2
+        this.powerPelletTiles[i].getCoordinates().x * Tile.TILE_WIDTH + margin,
+        this.powerPelletTiles[i].getCoordinates().y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT,
+        Tile.TILE_WIDTH / 2,
+        Tile.TILE_WIDTH / 2
       );
     }
 
@@ -346,8 +346,8 @@ class Jeu
       canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
 
       /* Dessin */
-      for (var i = 0, l = this.powerPelletCases.length; i < l; ++i)
-        this.levelManager.drawPacDot(canvas, this.powerPelletCases[i]);
+      for (var i = 0, l = this.powerPelletTiles.length; i < l; ++i)
+        this.levelManager.drawPacDot(canvas, this.powerPelletTiles[i]);
 
       /* Dessin du point  */
       this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
@@ -366,9 +366,9 @@ class Jeu
    */
   private checkCollision(x: number, y: number): boolean
   {
-    var cases: Array<Array<Case>> = this.levelManager.getCases();
+    var tiles: Array<Array<Tile>> = this.levelManager.getTiles();
 
-    return cases[y] == void 0 || cases[y][x] === void 0 || cases[y][x].isAWall();
+    return tiles[y] == void 0 || tiles[y][x] === void 0 || tiles[y][x].isAWall();
   }
 
   /**
@@ -382,18 +382,18 @@ class Jeu
     var coords: Point = e.detail;
 
     /* Récupération de la case courante */
-    var cases: Array<Array<Case>> = this.levelManager.getCases();
-    var currentCase: Case = cases[coords.y][coords.x];
+    var tiles: Array<Array<Tile>> = this.levelManager.getTiles();
+    var currentTile: Tile = tiles[coords.y][coords.x];
 
     /* Augmentation du score */
-    this.score.update(currentCase);
+    this.score.update(currentTile);
 
     /* Si c'est un fruit, on recommence le compteur */
-    if (currentCase.getPacDot() instanceof Fruit)
+    if (currentTile.getPacDot() instanceof Fruit)
       this.fruitsManager.start();
 
     /* Suppression du point */
-    currentCase.setPacDot(null);
+    currentTile.setPacDot(null);
 
     return this;
   }
@@ -423,16 +423,16 @@ class Jeu
     this.onRemoveFruit(false);
 
     /* Récupération de la case du milieu */
-    var cases: Array<Array<Case>> = this.levelManager.getCases();
-    var middleCase: Case = cases[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
+    var tiles: Array<Array<Tile>> = this.levelManager.getTiles();
+    var middleTile: Tile = tiles[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
 
-    var fruit: Fruit = e === null ? middleCase.getPacDot() : e.detail;
+    var fruit: Fruit = e === null ? middleTile.getPacDot() : e.detail;
     var fruitWidth: number = Fruit.WIDTH;
-    var margin: number = (Case.CASE_WIDTH - fruitWidth) / 2;
+    var margin: number = (Tile.TILE_WIDTH - fruitWidth) / 2;
     var index: number = 0;
 
     /* Ajout du fruit */
-    middleCase.setPacDot(fruit);
+    middleTile.setPacDot(fruit);
 
     if (fruit instanceof Strawberry)
       index = 1;
@@ -458,7 +458,7 @@ class Jeu
       /* La taille du fruit */
       fruitWidth, fruitWidth,
       /* La position dans le canvas */
-      middleCase.getCoordinates().x * Case.CASE_WIDTH + margin, middleCase.getCoordinates().y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT,
+      middleTile.getCoordinates().x * Tile.TILE_WIDTH + margin, middleTile.getCoordinates().y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT,
       /*  La taille du fruit */
       fruitWidth, fruitWidth
     );
@@ -471,23 +471,23 @@ class Jeu
    *
    * @returns {Jeu}
    */
-  private onRemoveFruit(removeFromCase: boolean = true): Jeu
+  private onRemoveFruit(removeFromTile: boolean = true): Jeu
   {
     var fruitWidth: number = Fruit.WIDTH;
-    var margin: number = (Case.CASE_WIDTH - fruitWidth) / 2;
+    var margin: number = (Tile.TILE_WIDTH - fruitWidth) / 2;
 
     /* Suppression dans le canvas */
     this.canvas.getContext().clearRect(
-      Pacman.PACMAN_BASE_X * Case.CASE_WIDTH + margin, Pacman.PACMAN_BASE_Y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT,
+      Pacman.PACMAN_BASE_X * Tile.TILE_WIDTH + margin, Pacman.PACMAN_BASE_Y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT,
       fruitWidth, fruitWidth
     );
 
     /* Récupération de la case du milieu et suppression du fruit */
-    if (removeFromCase !== false)
+    if (removeFromTile !== false)
     {
-      var cases: Array<Array<Case>> = this.levelManager.getCases();
-      var middleCase: Case = cases[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
-      middleCase.setPacDot(null);
+      var tiles: Array<Array<Tile>> = this.levelManager.getTiles();
+      var middleTile: Tile = tiles[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
+      middleTile.setPacDot(null);
     }
 
     return this;

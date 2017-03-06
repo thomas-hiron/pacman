@@ -24,14 +24,14 @@ class Score
   /**
    * Augmente le score en fonction de la case
    *
-   * @param currentCase
+   * @param tile
    *
    * @returns {Score}
    */
-  public update(currentCase: Case)
+  public update(tile: Tile)
   {
-    if (currentCase.getPacDot() instanceof PacDot)
-      this.score += currentCase.getPacDot().getScoreValue();
+    if (tile.getPacDot() instanceof PacDot)
+      this.score += tile.getPacDot().getScoreValue();
 
     return this;
   }

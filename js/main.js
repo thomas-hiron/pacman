@@ -55,119 +55,6 @@ class Canvas {
 /**
  * Created by thiron on 03/07/2015.
  */
-class Case {
-    constructor() {
-        this.wall = false;
-        this.pacDot = null;
-        this.coordinates = {
-            x: 0,
-            y: 0
-        };
-        /* Initialisation des bordures */
-        this.borderLeft = true;
-        this.borderRight = true;
-        this.borderTop = true;
-        this.borderBottom = true;
-    }
-    /**
-     * Getter/Setter
-     *
-     * @returns {boolean}
-     */
-    isAWall(isAWall = null) {
-        if (isAWall !== null)
-            this.wall = isAWall;
-        return this.wall;
-    }
-    /**
-     * S'il y a une bordure à gauche
-     */
-    hasBorderLeft(hasBorder = null) {
-        if (hasBorder !== null)
-            this.borderLeft = hasBorder;
-        return this.borderLeft;
-    }
-    /**
-     * S'il y a une bordure à droite
-     */
-    hasBorderRight(hasBorder = null) {
-        if (hasBorder !== null)
-            this.borderRight = hasBorder;
-        return this.borderRight;
-    }
-    /**
-     * S'il y a une bordure en haut
-     */
-    hasBorderTop(hasBorder = null) {
-        if (hasBorder !== null)
-            this.borderTop = hasBorder;
-        return this.borderTop;
-    }
-    /**
-     * S'il y a une bordure en bas
-     */
-    hasBorderBottom(hasBorder = null) {
-        if (hasBorder !== null)
-            this.borderBottom = hasBorder;
-        return this.borderBottom;
-    }
-    /**
-     * Les coordonnées
-     *
-     * @param i
-     * @param j
-     */
-    setCoordinates(i, j) {
-        this.coordinates.x = i;
-        this.coordinates.y = j;
-    }
-    /**
-     * Retourne les coordonnées
-     *
-     * @returns {Point}
-     */
-    getCoordinates() {
-        return this.coordinates;
-    }
-    /**
-     * Ajoute le point
-     *
-     * @param pacDot
-     * @returns {Case}
-     */
-    setPacDot(pacDot) {
-        this.pacDot = pacDot;
-        return this;
-    }
-    /**
-     * S'il y a un power pellet
-     *
-     * @returns {boolean}
-     */
-    hasPowerPellet() {
-        return this.pacDot != null && this.pacDot instanceof PowerPellet;
-    }
-    /**
-     * S'il y a un pacdot
-     *
-     * @returns {boolean}
-     */
-    hasPacDot() {
-        return this.pacDot != null;
-    }
-    /**
-     * Getter
-     *
-     * @returns {PacDot}
-     */
-    getPacDot() {
-        return this.pacDot;
-    }
-}
-Case.CASE_WIDTH = 40;
-/**
- * Created by thiron on 03/07/2015.
- */
 var Directions;
 (function (Directions) {
     Directions[Directions["Left"] = 0] = "Left";
@@ -428,7 +315,7 @@ class Jeu {
      */
     start() {
         /* Récupération de toutes les power pellet pour les faire clignoter */
-        this.powerPelletCases = this.levelManager.getPowerPellet();
+        this.powerPelletTiles = this.levelManager.getPowerPellet();
         /* Date de début pour le fruit manager */
         this.fruitsManager.start();
         /* RequestAnimationFrame pour le pacman, les fantomes */
@@ -470,7 +357,7 @@ class Jeu {
     animatePacman() {
         var pacman = this.pacman;
         /* Pour centrer dans la case */
-        var margin = (Case.CASE_WIDTH - pacman.getSize().w) / 2;
+        var margin = (Tile.TILE_WIDTH - pacman.getSize().w) / 2;
         var ctx = this.canvas.getContext();
         /* Suppression du pacman courant */
         ctx.clearRect(pacman.getX() + margin, pacman.getY() + margin + Jeu.TOP_HEIGHT, pacman.getSize().w, pacman.getSize().h);
@@ -489,23 +376,23 @@ class Jeu {
      */
     drawCurrentPacDot() {
         /* La case de pacman */
-        var coords = this.pacman.getPreviousCaseCoords();
+        var coords = this.pacman.getPreviousTileCoords();
         var margin = 5;
         /* Récupération de la case courante */
-        var cases = this.levelManager.getCases();
-        var currentCase = cases[coords.y][coords.x];
-        /* Case ok */
-        if (currentCase != null && currentCase.hasPacDot()) {
+        var tiles = this.levelManager.getTiles();
+        var currentTile = tiles[coords.y][coords.x];
+        /* Tile ok */
+        if (currentTile != null && currentTile.hasPacDot()) {
             /* Si c'est un fruit, c'est Jeu qui redessine */
-            if (currentCase.getPacDot() instanceof Fruit)
+            if (currentTile.getPacDot() instanceof Fruit)
                 this.onNewFruit(null);
             else {
                 var canvas = new Canvas();
                 canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
                 /* Dessin */
-                this.levelManager.drawPacDot(canvas, currentCase);
+                this.levelManager.drawPacDot(canvas, currentTile);
                 /* Dessin du point et suppression de l'ancien */
-                this.canvas.getContext().clearRect(coords.x * Case.CASE_WIDTH + margin, coords.y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
+                this.canvas.getContext().clearRect(coords.x * Tile.TILE_WIDTH + margin, coords.y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
                 this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
             }
         }
@@ -572,11 +459,11 @@ class Jeu {
     drawEscapeDoor() {
         var context = this.canvas.getContext();
         /* Suppression */
-        context.clearRect(7 * Case.CASE_WIDTH, 10 * Case.CASE_WIDTH - 5, Case.CASE_WIDTH, Case.CASE_WIDTH);
+        context.clearRect(7 * Tile.TILE_WIDTH, 10 * Tile.TILE_WIDTH - 5, Tile.TILE_WIDTH, Tile.TILE_WIDTH);
         /* Dessin de la ligne */
         context.beginPath();
-        context.moveTo(7 * Case.CASE_WIDTH, 10 * Case.CASE_WIDTH);
-        context.lineTo(8 * Case.CASE_WIDTH, 10 * Case.CASE_WIDTH);
+        context.moveTo(7 * Tile.TILE_WIDTH, 10 * Tile.TILE_WIDTH);
+        context.lineTo(8 * Tile.TILE_WIDTH, 10 * Tile.TILE_WIDTH);
         context.strokeStyle = 'white';
         context.lineWidth = 1;
         context.stroke();
@@ -593,16 +480,16 @@ class Jeu {
         var context = this.canvas.getContext();
         var margin = 10;
         /* Suppression dans les deux cas */
-        for (var i = 0, l = this.powerPelletCases.length; i < l; ++i) {
-            context.clearRect(this.powerPelletCases[i].getCoordinates().x * Case.CASE_WIDTH + margin, this.powerPelletCases[i].getCoordinates().y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, Case.CASE_WIDTH / 2, Case.CASE_WIDTH / 2);
+        for (var i = 0, l = this.powerPelletTiles.length; i < l; ++i) {
+            context.clearRect(this.powerPelletTiles[i].getCoordinates().x * Tile.TILE_WIDTH + margin, this.powerPelletTiles[i].getCoordinates().y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT, Tile.TILE_WIDTH / 2, Tile.TILE_WIDTH / 2);
         }
         /* Redessin */
         if (date.getMilliseconds() >= 500) {
             var canvas = new Canvas();
             canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
             /* Dessin */
-            for (var i = 0, l = this.powerPelletCases.length; i < l; ++i)
-                this.levelManager.drawPacDot(canvas, this.powerPelletCases[i]);
+            for (var i = 0, l = this.powerPelletTiles.length; i < l; ++i)
+                this.levelManager.drawPacDot(canvas, this.powerPelletTiles[i]);
             /* Dessin du point  */
             this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
         }
@@ -617,8 +504,8 @@ class Jeu {
      * @returns {boolean}
      */
     checkCollision(x, y) {
-        var cases = this.levelManager.getCases();
-        return cases[y] == void 0 || cases[y][x] === void 0 || cases[y][x].isAWall();
+        var tiles = this.levelManager.getTiles();
+        return tiles[y] == void 0 || tiles[y][x] === void 0 || tiles[y][x].isAWall();
     }
     /**
      * Mange le point
@@ -629,15 +516,15 @@ class Jeu {
         /* Les coordonées de la case courante */
         var coords = e.detail;
         /* Récupération de la case courante */
-        var cases = this.levelManager.getCases();
-        var currentCase = cases[coords.y][coords.x];
+        var tiles = this.levelManager.getTiles();
+        var currentTile = tiles[coords.y][coords.x];
         /* Augmentation du score */
-        this.score.update(currentCase);
+        this.score.update(currentTile);
         /* Si c'est un fruit, on recommence le compteur */
-        if (currentCase.getPacDot() instanceof Fruit)
+        if (currentTile.getPacDot() instanceof Fruit)
             this.fruitsManager.start();
         /* Suppression du point */
-        currentCase.setPacDot(null);
+        currentTile.setPacDot(null);
         return this;
     }
     /**
@@ -660,14 +547,14 @@ class Jeu {
         /* Nettoyage de la case au cas où */
         this.onRemoveFruit(false);
         /* Récupération de la case du milieu */
-        var cases = this.levelManager.getCases();
-        var middleCase = cases[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
-        var fruit = e === null ? middleCase.getPacDot() : e.detail;
+        var tiles = this.levelManager.getTiles();
+        var middleTile = tiles[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
+        var fruit = e === null ? middleTile.getPacDot() : e.detail;
         var fruitWidth = Fruit.WIDTH;
-        var margin = (Case.CASE_WIDTH - fruitWidth) / 2;
+        var margin = (Tile.TILE_WIDTH - fruitWidth) / 2;
         var index = 0;
         /* Ajout du fruit */
-        middleCase.setPacDot(fruit);
+        middleTile.setPacDot(fruit);
         if (fruit instanceof Strawberry)
             index = 1;
         else if (fruit instanceof Orange)
@@ -691,7 +578,7 @@ class Jeu {
         /* La taille du fruit */
         fruitWidth, fruitWidth, 
         /* La position dans le canvas */
-        middleCase.getCoordinates().x * Case.CASE_WIDTH + margin, middleCase.getCoordinates().y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, 
+        middleTile.getCoordinates().x * Tile.TILE_WIDTH + margin, middleTile.getCoordinates().y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT, 
         /*  La taille du fruit */
         fruitWidth, fruitWidth);
         return this;
@@ -701,16 +588,16 @@ class Jeu {
      *
      * @returns {Jeu}
      */
-    onRemoveFruit(removeFromCase = true) {
+    onRemoveFruit(removeFromTile = true) {
         var fruitWidth = Fruit.WIDTH;
-        var margin = (Case.CASE_WIDTH - fruitWidth) / 2;
+        var margin = (Tile.TILE_WIDTH - fruitWidth) / 2;
         /* Suppression dans le canvas */
-        this.canvas.getContext().clearRect(Pacman.PACMAN_BASE_X * Case.CASE_WIDTH + margin, Pacman.PACMAN_BASE_Y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, fruitWidth, fruitWidth);
+        this.canvas.getContext().clearRect(Pacman.PACMAN_BASE_X * Tile.TILE_WIDTH + margin, Pacman.PACMAN_BASE_Y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT, fruitWidth, fruitWidth);
         /* Récupération de la case du milieu et suppression du fruit */
-        if (removeFromCase !== false) {
-            var cases = this.levelManager.getCases();
-            var middleCase = cases[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
-            middleCase.setPacDot(null);
+        if (removeFromTile !== false) {
+            var tiles = this.levelManager.getTiles();
+            var middleTile = tiles[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
+            middleTile.setPacDot(null);
         }
         return this;
     }
@@ -728,12 +615,12 @@ Jeu.TOP_HEIGHT = 40;
 class Level {
     constructor() {
         /* Les blocs avec cases */
-        this.cases = new Array(20);
-        for (var i = 0, l = this.cases.length; i < l; ++i) {
-            this.cases[i] = new Array(15);
-            for (var j = 0, k = this.cases[i].length; j < k; ++j) {
-                this.cases[i][j] = new Case();
-                this.cases[i][j].setCoordinates(j, i);
+        this.tiles = new Array(20);
+        for (var i = 0, l = this.tiles.length; i < l; ++i) {
+            this.tiles[i] = new Array(15);
+            for (var j = 0, k = this.tiles[i].length; j < k; ++j) {
+                this.tiles[i][j] = new Tile();
+                this.tiles[i][j].setCoordinates(j, i);
             }
         }
         /* On rempli toutes les cases murs */
@@ -761,30 +648,30 @@ class Level {
         wallsCoordinates.push([9, 8]);
         /* Déclaration de tous les murs */
         for (i = 0, l = wallsCoordinates.length; i < l; ++i)
-            this.cases[wallsCoordinates[i][0]][wallsCoordinates[i][1]].isAWall(true);
+            this.tiles[wallsCoordinates[i][0]][wallsCoordinates[i][1]].isAWall(true);
         /* Sinon on met un point */
-        for (i = 0, l = this.cases.length; i < l; ++i) {
-            for (j = 0, k = this.cases[i].length; j < k; ++j) {
+        for (i = 0, l = this.tiles.length; i < l; ++i) {
+            for (j = 0, k = this.tiles[i].length; j < k; ++j) {
                 /* Ajout du point */
-                if (!this.cases[i][j].isAWall())
-                    this.cases[i][j].setPacDot(new PacDot());
+                if (!this.tiles[i][j].isAWall())
+                    this.tiles[i][j].setPacDot(new PacDot());
             }
         }
         /* Ajout des power pellet, y d'abord */
-        this.cases[2][1].setPacDot(new PowerPellet());
-        this.cases[2][13].setPacDot(new PowerPellet());
-        this.cases[12][2].setPacDot(new PowerPellet());
-        this.cases[12][12].setPacDot(new PowerPellet());
+        this.tiles[2][1].setPacDot(new PowerPellet());
+        this.tiles[2][13].setPacDot(new PowerPellet());
+        this.tiles[12][2].setPacDot(new PowerPellet());
+        this.tiles[12][12].setPacDot(new PowerPellet());
         /* Suppression de la case où y'a pacman */
-        this.cases[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X].setPacDot(null);
+        this.tiles[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X].setPacDot(null);
     }
     /**
      * Retourne le tableau désiré
      *
-     * @returns {Array<Array<Case>>}
+     * @returns {Array<Array<Tile>>}
      */
     get() {
-        return this.cases;
+        return this.tiles;
     }
 }
 /**
@@ -806,29 +693,29 @@ class LevelManager {
      * @param canvas
      */
     draw(canvas) {
-        var cases = this.getCases();
+        var tiles = this.getTiles();
         /* Réinitialisation du nombre de points */
         this.pacDotNumber = 0;
         /* Parcourt de chaque ligne */
-        for (var i = 0, l = cases.length; i < l; ++i) {
-            var row = cases[i];
+        for (var i = 0, l = tiles.length; i < l; ++i) {
+            var row = tiles[i];
             /* Parcourt de chaque case */
             for (var j = 0, k = row.length; j < k; ++j) {
-                var currentCase = row[j];
+                var tile = row[j];
                 /* Détermination des bordures à supprimer */
-                var leftCase = row[j - 1] || null;
-                var rightCase = row[j + 1] || null;
-                var upCase = cases[i - 1] != null ? cases[i - 1][j] : null;
-                var downCase = cases[i + 1] != null ? cases[i + 1][j] : null;
+                var leftTile = row[j - 1] || null;
+                var rightTile = row[j + 1] || null;
+                var upTile = tiles[i - 1] != null ? tiles[i - 1][j] : null;
+                var downTile = tiles[i + 1] != null ? tiles[i + 1][j] : null;
                 /* Suppression des bordures */
-                currentCase.hasBorderLeft(leftCase != null && currentCase.isAWall() && !leftCase.isAWall());
-                currentCase.hasBorderRight(rightCase != null && currentCase.isAWall() && !rightCase.isAWall());
-                currentCase.hasBorderTop(upCase != null && currentCase.isAWall() && !upCase.isAWall());
-                currentCase.hasBorderBottom(downCase != null && currentCase.isAWall() && !downCase.isAWall());
+                tile.hasBorderLeft(leftTile != null && tile.isAWall() && !leftTile.isAWall());
+                tile.hasBorderRight(rightTile != null && tile.isAWall() && !rightTile.isAWall());
+                tile.hasBorderTop(upTile != null && tile.isAWall() && !upTile.isAWall());
+                tile.hasBorderBottom(downTile != null && tile.isAWall() && !downTile.isAWall());
                 /* Dessine la case courante et le point */
-                this.drawCase(canvas, currentCase);
-                if (currentCase.hasPacDot()) {
-                    this.drawPacDot(canvas, currentCase);
+                this.drawTile(canvas, tile);
+                if (tile.hasPacDot()) {
+                    this.drawPacDot(canvas, tile);
                     /* Incrémentation du nombre de points */
                     this.pacDotNumber++;
                 }
@@ -840,32 +727,32 @@ class LevelManager {
      * Dessine la case courante
      *
      * @param canvas
-     * @param currentCase
+     * @param tile
      */
-    drawCase(canvas, currentCase) {
+    drawTile(canvas, tile) {
         var context = canvas.getContext();
         context.beginPath();
         context.strokeStyle = "#012EB6";
         context.lineWidth = 4;
-        var coordinates = currentCase.getCoordinates();
-        if (currentCase.hasBorderLeft()) {
-            context.moveTo(coordinates.x * Case.CASE_WIDTH, coordinates.y * Case.CASE_WIDTH);
-            context.lineTo(coordinates.x * Case.CASE_WIDTH, (coordinates.y + 1) * Case.CASE_WIDTH);
+        var coordinates = tile.getCoordinates();
+        if (tile.hasBorderLeft()) {
+            context.moveTo(coordinates.x * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH);
+            context.lineTo(coordinates.x * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH);
         }
         /* Bordure droite */
-        if (currentCase.hasBorderRight()) {
-            context.moveTo((coordinates.x + 1) * Case.CASE_WIDTH, coordinates.y * Case.CASE_WIDTH);
-            context.lineTo((coordinates.x + 1) * Case.CASE_WIDTH, (coordinates.y + 1) * Case.CASE_WIDTH);
+        if (tile.hasBorderRight()) {
+            context.moveTo((coordinates.x + 1) * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH);
+            context.lineTo((coordinates.x + 1) * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH);
         }
         /* Bordure haut */
-        if (currentCase.hasBorderTop()) {
-            context.moveTo(coordinates.x * Case.CASE_WIDTH, coordinates.y * Case.CASE_WIDTH);
-            context.lineTo((coordinates.x + 1) * Case.CASE_WIDTH, coordinates.y * Case.CASE_WIDTH);
+        if (tile.hasBorderTop()) {
+            context.moveTo(coordinates.x * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH);
+            context.lineTo((coordinates.x + 1) * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH);
         }
         /* Bordure bas */
-        if (currentCase.hasBorderBottom()) {
-            context.moveTo(coordinates.x * Case.CASE_WIDTH, (coordinates.y + 1) * Case.CASE_WIDTH);
-            context.lineTo((coordinates.x + 1) * Case.CASE_WIDTH, (coordinates.y + 1) * Case.CASE_WIDTH);
+        if (tile.hasBorderBottom()) {
+            context.moveTo(coordinates.x * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH);
+            context.lineTo((coordinates.x + 1) * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH);
         }
         /* Bordure */
         context.stroke();
@@ -883,18 +770,18 @@ class LevelManager {
      * Dessine le point
      *
      * @param canvas
-     * @param currentCase
+     * @param tile
      *
      * @returns {LevelManager}
      */
-    drawPacDot(canvas, currentCase) {
-        if (currentCase.hasPacDot()) {
+    drawPacDot(canvas, tile) {
+        if (tile.hasPacDot()) {
             var context = canvas.getContext();
-            var coordinates = currentCase.getCoordinates();
-            var radius = currentCase.getPacDot() instanceof PowerPellet ? 6 : 3;
-            var margin = Case.CASE_WIDTH / 2;
+            var coordinates = tile.getCoordinates();
+            var radius = tile.getPacDot() instanceof PowerPellet ? 6 : 3;
+            var margin = Tile.TILE_WIDTH / 2;
             context.beginPath();
-            context.arc(coordinates.x * Case.CASE_WIDTH + margin, coordinates.y * Case.CASE_WIDTH + margin, radius, 0, 2 * Math.PI, false);
+            context.arc(coordinates.x * Tile.TILE_WIDTH + margin, coordinates.y * Tile.TILE_WIDTH + margin, radius, 0, 2 * Math.PI, false);
             context.fillStyle = 'white';
             context.strokeStyle = 'white';
             context.lineWidth = 0;
@@ -906,9 +793,9 @@ class LevelManager {
     /**
      * Récupère toutes les cases du niveau courant
      *
-     * @returns {Array<Array<Case>>}
+     * @returns {Array<Array<Tile>>}
      */
-    getCases() {
+    getTiles() {
         return this.level.get();
     }
     /**
@@ -922,10 +809,10 @@ class LevelManager {
         /* Les coordonées de la case courante */
         var coords = e.detail;
         /* Récupération de la case courante */
-        var cases = this.getCases();
-        var currentCase = cases[coords.y][coords.x];
+        var tiles = this.getTiles();
+        var tile = tiles[coords.y][coords.x];
         /* Décrémentation s'il y a un point */
-        if (currentCase.hasPacDot())
+        if (tile.hasPacDot())
             this.pacDotNumber--;
         /* Niveau terminé */
         if (this.pacDotNumber <= 0) {
@@ -937,19 +824,19 @@ class LevelManager {
     /**
      * Récupère les gros points
      *
-     * @returns {Array<Case>}
+     * @returns {Array<Tile>}
      */
     getPowerPellet() {
-        var cases = this.getCases();
-        var casesWithPowerPellet = [];
-        for (var i = 0, l = cases.length; i < l; ++i) {
+        var tiles = this.getTiles();
+        var tilesWithPowerPellet = [];
+        for (var i = 0, l = tiles.length; i < l; ++i) {
             /* Parcourt de chaque case */
-            for (var j = 0, k = cases[i].length; j < k; ++j) {
-                if (cases[i][j].hasPowerPellet())
-                    casesWithPowerPellet.push(cases[i][j]);
+            for (var j = 0, k = tiles[i].length; j < k; ++j) {
+                if (tiles[i][j].hasPowerPellet())
+                    tilesWithPowerPellet.push(tiles[i][j]);
             }
         }
-        return casesWithPowerPellet;
+        return tilesWithPowerPellet;
     }
 }
 /**
@@ -990,8 +877,8 @@ class Pacman {
             h: 24
         };
         this.coordinates = {
-            x: 7 * Case.CASE_WIDTH,
-            y: 10 * Case.CASE_WIDTH
+            x: 7 * Tile.TILE_WIDTH,
+            y: 10 * Tile.TILE_WIDTH
         };
         this.currentStep = 0;
         this.stepNumber = 12;
@@ -1103,7 +990,7 @@ class Pacman {
      */
     move() {
         /* Largeur de la case */
-        var caseWidth = Case.CASE_WIDTH;
+        var tileWidth = Tile.TILE_WIDTH;
         /* Pas de collision par défaut */
         var collisionWithNextDirection = false;
         var collisionWithCurrentDirection = false;
@@ -1111,13 +998,13 @@ class Pacman {
         var newX = this.coordinates.x;
         var newY = this.coordinates.y;
         /* Si dans une case, on change de direction, si possible */
-        if (this.coordinates.x % caseWidth == 0 && this.coordinates.y % caseWidth == 0) {
+        if (this.coordinates.x % tileWidth == 0 && this.coordinates.y % tileWidth == 0) {
             /* Les cases suivantes en fonction de la direction courante et suivante */
-            var nextCaseCoordsWithNextDirection = this.getNextCaseCoords(this.nextDirection);
-            var nextCaseCoordsWithCurrentDirection = this.getNextCaseCoords(this.direction);
+            var nextTileCoordsWithNextDirection = this.getNextTileCoords(this.nextDirection);
+            var nextTileCoordsWithCurrentDirection = this.getNextTileCoords(this.direction);
             /* Vérification que pas de collision */
-            collisionWithNextDirection = this.checkCollision(nextCaseCoordsWithNextDirection.x, nextCaseCoordsWithNextDirection.y);
-            collisionWithCurrentDirection = this.checkCollision(nextCaseCoordsWithCurrentDirection.x, nextCaseCoordsWithCurrentDirection.y);
+            collisionWithNextDirection = this.checkCollision(nextTileCoordsWithNextDirection.x, nextTileCoordsWithNextDirection.y);
+            collisionWithCurrentDirection = this.checkCollision(nextTileCoordsWithCurrentDirection.x, nextTileCoordsWithCurrentDirection.y);
             /* Changement de direction que si pas de collision avec la prochaine direction */
             if (!collisionWithNextDirection)
                 this.direction = this.nextDirection;
@@ -1131,25 +1018,25 @@ class Pacman {
                 this.direction = this.nextDirection;
         }
         /* En fonction de la direction, modification des coords et de l'angle, si 15% dans la case, on supprime le point */
-        var percentInCase;
+        var percentInTile;
         switch (this.direction) {
             case Directions.Left:
-                percentInCase = 100 - this.coordinates.x % caseWidth * 100 / caseWidth;
+                percentInTile = 100 - this.coordinates.x % tileWidth * 100 / tileWidth;
                 newX -= this.stepPx;
                 this.angle = 180;
                 break;
             case Directions.Right:
-                percentInCase = this.coordinates.x % caseWidth * 100 / caseWidth;
+                percentInTile = this.coordinates.x % tileWidth * 100 / tileWidth;
                 newX += this.stepPx;
                 this.angle = 0;
                 break;
             case Directions.Up:
-                percentInCase = 100 - this.coordinates.y % caseWidth * 100 / caseWidth;
+                percentInTile = 100 - this.coordinates.y % tileWidth * 100 / tileWidth;
                 newY -= this.stepPx;
                 this.angle = 270;
                 break;
             case Directions.Down:
-                percentInCase = this.coordinates.y % caseWidth * 100 / caseWidth;
+                percentInTile = this.coordinates.y % tileWidth * 100 / tileWidth;
                 newY += this.stepPx;
                 this.angle = 90;
                 break;
@@ -1160,10 +1047,10 @@ class Pacman {
             this.coordinates.y = newY;
         }
         /* Suppression du point */
-        if (percentInCase == 75) {
+        if (percentInTile == 75) {
             /* Les coordonées de la case */
-            var currentCaseCoords = this.getCurrentCaseCoords();
-            var event = new CustomEvent('PacDotEaten', { 'detail': currentCaseCoords });
+            var currentTileCoords = this.getCurrentTileCoords();
+            var event = new CustomEvent('PacDotEaten', { 'detail': currentTileCoords });
             window.dispatchEvent(event);
         }
         /* Retour de l'instance */
@@ -1180,7 +1067,7 @@ class Pacman {
         /* Taille */
         var size = this.size;
         /* Largeur de la case */
-        var caseWidth = Case.CASE_WIDTH;
+        var tileWidth = Tile.TILE_WIDTH;
         /* Suppression du context */
         ctx.clearRect(0, 0, size.w, size.h);
         /* Enregistrement du context */
@@ -1204,7 +1091,7 @@ class Pacman {
         ctx.arc(size.w / 2, size.h / 2, size.w / 2, inclinaison2 * Math.PI, (inclinaison2 + 1) * Math.PI, false);
         ctx.fill();
         /* La marge */
-        var margin = (caseWidth - size.w) / 2;
+        var margin = (tileWidth - size.w) / 2;
         /* Restauration du context */
         ctx.restore();
         /* Retour de l'instance */
@@ -1217,41 +1104,41 @@ class Pacman {
      *
      * @returns {Point}
      */
-    getNextCaseCoords(direction) {
+    getNextTileCoords(direction) {
         /* La case suivante avec la prochaine direction */
-        var nextCaseCoords = {
-            x: this.coordinates.x / Case.CASE_WIDTH,
-            y: this.coordinates.y / Case.CASE_WIDTH
+        var nextTileCoords = {
+            x: this.coordinates.x / Tile.TILE_WIDTH,
+            y: this.coordinates.y / Tile.TILE_WIDTH
         };
         /* Modification de la case suivante */
         switch (direction) {
             case Directions.Left:
-                nextCaseCoords.x--;
+                nextTileCoords.x--;
                 break;
             case Directions.Right:
-                nextCaseCoords.x++;
+                nextTileCoords.x++;
                 break;
             case Directions.Up:
-                nextCaseCoords.y--;
+                nextTileCoords.y--;
                 break;
             case Directions.Down:
-                nextCaseCoords.y++;
+                nextTileCoords.y++;
                 break;
         }
-        return nextCaseCoords;
+        return nextTileCoords;
     }
     /**
      * Récupère les coordonnées de la case courante
      *
      * @returns {Point}
      */
-    getCurrentCaseCoords() {
-        var moduloX = this.coordinates.x % Case.CASE_WIDTH;
-        var moduloY = this.coordinates.y % Case.CASE_WIDTH;
+    getCurrentTileCoords() {
+        var moduloX = this.coordinates.x % Tile.TILE_WIDTH;
+        var moduloY = this.coordinates.y % Tile.TILE_WIDTH;
         /* Suppression pour avoir la case */
         var coords = {
-            x: (this.coordinates.x - moduloX) / Case.CASE_WIDTH,
-            y: (this.coordinates.y - moduloY) / Case.CASE_WIDTH
+            x: (this.coordinates.x - moduloX) / Tile.TILE_WIDTH,
+            y: (this.coordinates.y - moduloY) / Tile.TILE_WIDTH
         };
         /* Suivant la direction, c'est pas forcément la bonne case */
         if (this.direction == Directions.Right)
@@ -1265,8 +1152,8 @@ class Pacman {
      *
      * @returns {Point}
      */
-    getPreviousCaseCoords() {
-        var coords = this.getCurrentCaseCoords();
+    getPreviousTileCoords() {
+        var coords = this.getCurrentTileCoords();
         /* Suivant la direction, c'est pas forcément la bonne case */
         switch (this.direction) {
             case Directions.Left:
@@ -1306,16 +1193,129 @@ class Score {
     /**
      * Augmente le score en fonction de la case
      *
-     * @param currentCase
+     * @param tile
      *
      * @returns {Score}
      */
-    update(currentCase) {
-        if (currentCase.getPacDot() instanceof PacDot)
-            this.score += currentCase.getPacDot().getScoreValue();
+    update(tile) {
+        if (tile.getPacDot() instanceof PacDot)
+            this.score += tile.getPacDot().getScoreValue();
         return this;
     }
 }
 /* Constantes de score */
 Score.PAC_DOT = 10;
 Score.POWER_PELLET = 50;
+/**
+ * Created by thiron on 03/07/2015.
+ */
+class Tile {
+    constructor() {
+        this.wall = false;
+        this.pacDot = null;
+        this.coordinates = {
+            x: 0,
+            y: 0
+        };
+        /* Initialisation des bordures */
+        this.borderLeft = true;
+        this.borderRight = true;
+        this.borderTop = true;
+        this.borderBottom = true;
+    }
+    /**
+     * Getter/Setter
+     *
+     * @returns {boolean}
+     */
+    isAWall(isAWall = null) {
+        if (isAWall !== null)
+            this.wall = isAWall;
+        return this.wall;
+    }
+    /**
+     * S'il y a une bordure à gauche
+     */
+    hasBorderLeft(hasBorder = null) {
+        if (hasBorder !== null)
+            this.borderLeft = hasBorder;
+        return this.borderLeft;
+    }
+    /**
+     * S'il y a une bordure à droite
+     */
+    hasBorderRight(hasBorder = null) {
+        if (hasBorder !== null)
+            this.borderRight = hasBorder;
+        return this.borderRight;
+    }
+    /**
+     * S'il y a une bordure en haut
+     */
+    hasBorderTop(hasBorder = null) {
+        if (hasBorder !== null)
+            this.borderTop = hasBorder;
+        return this.borderTop;
+    }
+    /**
+     * S'il y a une bordure en bas
+     */
+    hasBorderBottom(hasBorder = null) {
+        if (hasBorder !== null)
+            this.borderBottom = hasBorder;
+        return this.borderBottom;
+    }
+    /**
+     * Les coordonnées
+     *
+     * @param i
+     * @param j
+     */
+    setCoordinates(i, j) {
+        this.coordinates.x = i;
+        this.coordinates.y = j;
+    }
+    /**
+     * Retourne les coordonnées
+     *
+     * @returns {Point}
+     */
+    getCoordinates() {
+        return this.coordinates;
+    }
+    /**
+     * Ajoute le point
+     *
+     * @param pacDot
+     * @returns {Tile}
+     */
+    setPacDot(pacDot) {
+        this.pacDot = pacDot;
+        return this;
+    }
+    /**
+     * S'il y a un power pellet
+     *
+     * @returns {boolean}
+     */
+    hasPowerPellet() {
+        return this.pacDot != null && this.pacDot instanceof PowerPellet;
+    }
+    /**
+     * S'il y a un pacdot
+     *
+     * @returns {boolean}
+     */
+    hasPacDot() {
+        return this.pacDot != null;
+    }
+    /**
+     * Getter
+     *
+     * @returns {PacDot}
+     */
+    getPacDot() {
+        return this.pacDot;
+    }
+}
+Tile.TILE_WIDTH = 40;

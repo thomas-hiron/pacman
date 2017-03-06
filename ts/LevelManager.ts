@@ -28,38 +28,38 @@ class LevelManager
    */
   public draw(canvas: Canvas): LevelManager
   {
-    var cases: Array<Array<Case>> = this.getCases();
+    var tiles: Array<Array<Tile>> = this.getTiles();
 
     /* Réinitialisation du nombre de points */
     this.pacDotNumber = 0;
 
     /* Parcourt de chaque ligne */
-    for (var i: number = 0, l: number = cases.length; i < l; ++i)
+    for (var i: number = 0, l: number = tiles.length; i < l; ++i)
     {
-      var row: Array<Case> = cases[i];
+      var row: Array<Tile> = tiles[i];
 
       /* Parcourt de chaque case */
       for (var j: number = 0, k: number = row.length; j < k; ++j)
       {
-        var currentCase: Case = row[j];
+        var tile: Tile = row[j];
 
         /* Détermination des bordures à supprimer */
-        var leftCase: Case = row[j - 1] || null;
-        var rightCase: Case = row[j + 1] || null;
-        var upCase: Case = cases[i - 1] != null ? cases[i - 1][j] : null;
-        var downCase: Case = cases[i + 1] != null ? cases[i + 1][j] : null;
+        var leftTile: Tile = row[j - 1] || null;
+        var rightTile: Tile = row[j + 1] || null;
+        var upTile: Tile = tiles[i - 1] != null ? tiles[i - 1][j] : null;
+        var downTile: Tile = tiles[i + 1] != null ? tiles[i + 1][j] : null;
 
         /* Suppression des bordures */
-        currentCase.hasBorderLeft(leftCase != null && currentCase.isAWall() && !leftCase.isAWall());
-        currentCase.hasBorderRight(rightCase != null && currentCase.isAWall() && !rightCase.isAWall());
-        currentCase.hasBorderTop(upCase != null && currentCase.isAWall() && !upCase.isAWall());
-        currentCase.hasBorderBottom(downCase != null && currentCase.isAWall() && !downCase.isAWall());
+        tile.hasBorderLeft(leftTile != null && tile.isAWall() && !leftTile.isAWall());
+        tile.hasBorderRight(rightTile != null && tile.isAWall() && !rightTile.isAWall());
+        tile.hasBorderTop(upTile != null && tile.isAWall() && !upTile.isAWall());
+        tile.hasBorderBottom(downTile != null && tile.isAWall() && !downTile.isAWall());
 
         /* Dessine la case courante et le point */
-        this.drawCase(canvas, currentCase);
-        if (currentCase.hasPacDot())
+        this.drawTile(canvas, tile);
+        if (tile.hasPacDot())
         {
-          this.drawPacDot(canvas, currentCase);
+          this.drawPacDot(canvas, tile);
 
           /* Incrémentation du nombre de points */
           this.pacDotNumber++;
@@ -74,9 +74,9 @@ class LevelManager
    * Dessine la case courante
    *
    * @param canvas
-   * @param currentCase
+   * @param tile
    */
-  private drawCase(canvas: Canvas, currentCase: Case): LevelManager
+  private drawTile(canvas: Canvas, tile: Tile): LevelManager
   {
     var context: CanvasRenderingContext2D = canvas.getContext();
 
@@ -84,33 +84,33 @@ class LevelManager
     context.strokeStyle = "#012EB6";
     context.lineWidth = 4;
 
-    var coordinates: Point = currentCase.getCoordinates();
+    var coordinates: Point = tile.getCoordinates();
 
-    if (currentCase.hasBorderLeft())
+    if (tile.hasBorderLeft())
     {
-      context.moveTo(coordinates.x * Case.CASE_WIDTH, coordinates.y * Case.CASE_WIDTH);
-      context.lineTo(coordinates.x * Case.CASE_WIDTH, (coordinates.y + 1) * Case.CASE_WIDTH);
+      context.moveTo(coordinates.x * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH);
+      context.lineTo(coordinates.x * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH);
     }
 
     /* Bordure droite */
-    if (currentCase.hasBorderRight())
+    if (tile.hasBorderRight())
     {
-      context.moveTo((coordinates.x + 1) * Case.CASE_WIDTH, coordinates.y * Case.CASE_WIDTH);
-      context.lineTo((coordinates.x + 1) * Case.CASE_WIDTH, (coordinates.y + 1) * Case.CASE_WIDTH);
+      context.moveTo((coordinates.x + 1) * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH);
+      context.lineTo((coordinates.x + 1) * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH);
     }
 
     /* Bordure haut */
-    if (currentCase.hasBorderTop())
+    if (tile.hasBorderTop())
     {
-      context.moveTo(coordinates.x * Case.CASE_WIDTH, coordinates.y * Case.CASE_WIDTH);
-      context.lineTo((coordinates.x + 1) * Case.CASE_WIDTH, coordinates.y * Case.CASE_WIDTH);
+      context.moveTo(coordinates.x * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH);
+      context.lineTo((coordinates.x + 1) * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH);
     }
 
     /* Bordure bas */
-    if (currentCase.hasBorderBottom())
+    if (tile.hasBorderBottom())
     {
-      context.moveTo(coordinates.x * Case.CASE_WIDTH, (coordinates.y + 1) * Case.CASE_WIDTH);
-      context.lineTo((coordinates.x + 1) * Case.CASE_WIDTH, (coordinates.y + 1) * Case.CASE_WIDTH);
+      context.moveTo(coordinates.x * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH);
+      context.lineTo((coordinates.x + 1) * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH);
     }
 
     /* Bordure */
@@ -134,22 +134,22 @@ class LevelManager
    * Dessine le point
    *
    * @param canvas
-   * @param currentCase
+   * @param tile
    *
    * @returns {LevelManager}
    */
-  public drawPacDot(canvas: Canvas, currentCase: Case): LevelManager
+  public drawPacDot(canvas: Canvas, tile: Tile): LevelManager
   {
-    if (currentCase.hasPacDot())
+    if (tile.hasPacDot())
     {
       var context: CanvasRenderingContext2D = canvas.getContext();
-      var coordinates: Point = currentCase.getCoordinates();
+      var coordinates: Point = tile.getCoordinates();
 
-      var radius: number = currentCase.getPacDot() instanceof PowerPellet ? 6 : 3;
-      var margin: number = Case.CASE_WIDTH / 2;
+      var radius: number = tile.getPacDot() instanceof PowerPellet ? 6 : 3;
+      var margin: number = Tile.TILE_WIDTH / 2;
 
       context.beginPath();
-      context.arc(coordinates.x * Case.CASE_WIDTH + margin, coordinates.y * Case.CASE_WIDTH + margin, radius, 0, 2 * Math.PI, false);
+      context.arc(coordinates.x * Tile.TILE_WIDTH + margin, coordinates.y * Tile.TILE_WIDTH + margin, radius, 0, 2 * Math.PI, false);
       context.fillStyle = 'white';
       context.strokeStyle = 'white';
       context.lineWidth = 0;
@@ -163,9 +163,9 @@ class LevelManager
   /**
    * Récupère toutes les cases du niveau courant
    *
-   * @returns {Array<Array<Case>>}
+   * @returns {Array<Array<Tile>>}
    */
-  public getCases(): Array<Array<Case>>
+  public getTiles(): Array<Array<Tile>>
   {
     return this.level.get();
   }
@@ -183,11 +183,11 @@ class LevelManager
     var coords: Point = e.detail;
 
     /* Récupération de la case courante */
-    var cases: Array<Array<Case>> = this.getCases();
-    var currentCase: Case = cases[coords.y][coords.x];
+    var tiles: Array<Array<Tile>> = this.getTiles();
+    var tile: Tile = tiles[coords.y][coords.x];
 
     /* Décrémentation s'il y a un point */
-    if (currentCase.hasPacDot())
+    if (tile.hasPacDot())
       this.pacDotNumber--;
 
     /* Niveau terminé */
@@ -203,23 +203,23 @@ class LevelManager
   /**
    * Récupère les gros points
    *
-   * @returns {Array<Case>}
+   * @returns {Array<Tile>}
    */
   public getPowerPellet()
   {
-    var cases: Array<Array<Case>> = this.getCases();
-    var casesWithPowerPellet: Array<Case> = [];
+    var tiles: Array<Array<Tile>> = this.getTiles();
+    var tilesWithPowerPellet: Array<Tile> = [];
 
-    for (var i: number = 0, l: number = cases.length; i < l; ++i)
+    for (var i: number = 0, l: number = tiles.length; i < l; ++i)
     {
       /* Parcourt de chaque case */
-      for (var j: number = 0, k: number = cases[i].length; j < k; ++j)
+      for (var j: number = 0, k: number = tiles[i].length; j < k; ++j)
       {
-        if (cases[i][j].hasPowerPellet())
-          casesWithPowerPellet.push(cases[i][j]);
+        if (tiles[i][j].hasPowerPellet())
+          tilesWithPowerPellet.push(tiles[i][j]);
       }
     }
 
-    return casesWithPowerPellet;
+    return tilesWithPowerPellet;
   }
 }
