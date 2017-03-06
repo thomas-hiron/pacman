@@ -26,7 +26,18 @@ class GhostsManager
 
   constructor()
   {
+    /* Initialisation des intervalles et autres */
+    this.chaseInterval = 20;
+    this.scatterInterval = 7;
+    this.frightenInterval = 7;
+    this.waveNumber = 1;
+    this.mode = Modes.Scatter;
 
+    /* Instanciation des fantômes */
+    this.pinky = new Pinky();
+    this.blinky = new Blinky();
+    this.inky = new Inky();
+    this.clyde = new Clyde();
   }
 
   /**

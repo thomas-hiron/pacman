@@ -62,6 +62,12 @@ var Directions;
     Directions[Directions["Up"] = 2] = "Up";
     Directions[Directions["Down"] = 3] = "Down";
 })(Directions || (Directions = {}));
+var Modes;
+(function (Modes) {
+    Modes[Modes["Chase"] = 0] = "Chase";
+    Modes[Modes["Scatter"] = 1] = "Scatter";
+    Modes[Modes["Frightened"] = 2] = "Frightened";
+})(Modes || (Modes = {}));
 /**
  * Created by mac pro on 04/03/2017.
  */
@@ -248,6 +254,12 @@ FruitsManager.APPEARANCE_DURATION = 10000;
  * Un fantôme
  */
 class Ghost {
+    constructor() {
+        /* Le décalage en px pour le mouvement */
+        this.stepPx = 2;
+        /* L'étape courante d'animation */
+        this.currentStep = 0;
+    }
     /**
      * Renvoie la direction à prendre pour arriver le plus rapidement à la case ciblée
      *
@@ -329,7 +341,7 @@ class Ghost {
 class Pinky extends Ghost {
     constructor() {
         super();
-        this.direction = null;
+        this.direction = Directions.Left;
         this.mode = null;
         this.coordinates = {
             x: 0,
@@ -359,7 +371,7 @@ class Pinky extends Ghost {
 class Blinky extends Ghost {
     constructor() {
         super();
-        this.direction = null;
+        this.direction = Directions.Left;
         this.mode = null;
         this.coordinates = {
             x: 0,
@@ -389,7 +401,7 @@ class Blinky extends Ghost {
 class Inky extends Ghost {
     constructor() {
         super();
-        this.direction = null;
+        this.direction = Directions.Left;
         this.mode = null;
         this.coordinates = {
             x: 0,
@@ -419,7 +431,7 @@ class Inky extends Ghost {
 class Clyde extends Ghost {
     constructor() {
         super();
-        this.direction = null;
+        this.direction = Directions.Left;
         this.mode = null;
         this.coordinates = {
             x: 0,
@@ -445,6 +457,17 @@ class Clyde extends Ghost {
  */
 class GhostsManager {
     constructor() {
+        /* Initialisation des intervalles et autres */
+        this.chaseInterval = 20;
+        this.scatterInterval = 7;
+        this.frightenInterval = 7;
+        this.waveNumber = 1;
+        this.mode = Modes.Scatter;
+        /* Instanciation des fantômes */
+        this.pinky = new Pinky();
+        this.blinky = new Blinky();
+        this.inky = new Inky();
+        this.clyde = new Clyde();
     }
     /**
      * Change de mode si besoin et déplace les fantômes

@@ -8,3 +8,9 @@ enum Directions {
   Up,
   Down
 }
+
+enum Modes {
+  Chase,
+  Scatter,
+  Frightened
+}

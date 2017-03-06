@@ -21,9 +21,9 @@ abstract class Ghost
   /* Le canvas de chaque fantôme */
   private canvas: Canvas;
   /* Le décalage en px pour le mouvement */
-  private stepPx: number;
+  private stepPx: number = 2;
   /* L'étape courante d'animation */
-  private currentStep: number;
+  private currentStep: number = 0;
 
   /**
    * Vise une case selon le caractère
@@ -131,7 +131,7 @@ class Pinky extends Ghost
   {
     super();
 
-    this.direction = null;
+    this.direction = Directions.Left;
     this.mode = null;
     this.coordinates = {
       x: 0,
@@ -167,7 +167,7 @@ class Blinky extends Ghost
   {
     super();
 
-    this.direction = null;
+    this.direction = Directions.Left;
     this.mode = null;
     this.coordinates = {
       x: 0,
@@ -203,7 +203,7 @@ class Inky extends Ghost
   {
     super();
 
-    this.direction = null;
+    this.direction = Directions.Left;
     this.mode = null;
     this.coordinates = {
       x: 0,
@@ -239,7 +239,7 @@ class Clyde extends Ghost
   {
     super();
 
-    this.direction = null;
+    this.direction = Directions.Left;
     this.mode = null;
     this.coordinates = {
       x: 0,
