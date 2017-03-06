@@ -661,7 +661,7 @@ class Jeu {
         this.onRemoveFruit(false);
         /* Récupération de la case du milieu */
         var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
-        var middleCase = currentCasesLevel[10][7];
+        var middleCase = currentCasesLevel[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
         var fruit = e === null ? middleCase.getPacDot() : e.detail;
         var fruitWidth = Fruit.WIDTH;
         var margin = (Case.CASE_WIDTH - fruitWidth) / 2;
@@ -705,11 +705,11 @@ class Jeu {
         var fruitWidth = Fruit.WIDTH;
         var margin = (Case.CASE_WIDTH - fruitWidth) / 2;
         /* Suppression dans le canvas */
-        this.canvas.getContext().clearRect(7 * Case.CASE_WIDTH + margin, 10 * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, fruitWidth, fruitWidth);
+        this.canvas.getContext().clearRect(Pacman.PACMAN_BASE_X * Case.CASE_WIDTH + margin, Pacman.PACMAN_BASE_Y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, fruitWidth, fruitWidth);
         /* Récupération de la case du milieu et suppression du fruit */
         if (removeFromCase !== false) {
             var currentCasesLevel = this.levelsManager.getCurrentCasesLevel();
-            var middleCase = currentCasesLevel[10][7];
+            var middleCase = currentCasesLevel[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
             middleCase.setPacDot(null);
         }
         return this;
@@ -785,7 +785,7 @@ class Levels {
         cases[12][2].setPacDot(new PowerPellet());
         cases[12][12].setPacDot(new PowerPellet());
         /* Suppression de la case où y'a pacman */
-        cases[10][7].setPacDot(null);
+        cases[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X].setPacDot(null);
         /* Ajout des cases */
         this.levels.push(cases);
         return this;
@@ -1304,6 +1304,8 @@ class Pacman {
         return coords;
     }
 }
+Pacman.PACMAN_BASE_X = 7;
+Pacman.PACMAN_BASE_Y = 10;
 /**
  * Created by mac pro on 05/03/2017.
  */

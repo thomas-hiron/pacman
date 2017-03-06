@@ -84,7 +84,7 @@ class Levels
     cases[12][12].setPacDot(new PowerPellet());
 
     /* Suppression de la case où y'a pacman */
-    cases[10][7].setPacDot(null);
+    cases[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X].setPacDot(null);
 
     /* Ajout des cases */
     this.levels.push(cases);

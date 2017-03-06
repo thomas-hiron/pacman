@@ -424,7 +424,7 @@ class Jeu
 
     /* Récupération de la case du milieu */
     var currentCasesLevel: Array<Array<Case>> = this.levelsManager.getCurrentCasesLevel();
-    var middleCase: Case = currentCasesLevel[10][7];
+    var middleCase: Case = currentCasesLevel[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
 
     var fruit: Fruit = e === null ? middleCase.getPacDot() : e.detail;
     var fruitWidth: number = Fruit.WIDTH;
@@ -477,13 +477,16 @@ class Jeu
     var margin: number = (Case.CASE_WIDTH - fruitWidth) / 2;
 
     /* Suppression dans le canvas */
-    this.canvas.getContext().clearRect(7 * Case.CASE_WIDTH + margin, 10 * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT, fruitWidth, fruitWidth);
+    this.canvas.getContext().clearRect(
+      Pacman.PACMAN_BASE_X * Case.CASE_WIDTH + margin, Pacman.PACMAN_BASE_Y * Case.CASE_WIDTH + margin + Jeu.TOP_HEIGHT,
+      fruitWidth, fruitWidth
+    );
 
     /* Récupération de la case du milieu et suppression du fruit */
     if (removeFromCase !== false)
     {
       var currentCasesLevel: Array<Array<Case>> = this.levelsManager.getCurrentCasesLevel();
-      var middleCase: Case = currentCasesLevel[10][7];
+      var middleCase: Case = currentCasesLevel[Pacman.PACMAN_BASE_Y][Pacman.PACMAN_BASE_X];
       middleCase.setPacDot(null);
     }
 

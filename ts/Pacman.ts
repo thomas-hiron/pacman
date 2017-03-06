@@ -7,6 +7,9 @@
  */
 class Pacman
 {
+  public static PACMAN_BASE_X = 7;
+  public static PACMAN_BASE_Y = 10;
+
   /**
    * Le canvas pour pacman
    */
