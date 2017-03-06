@@ -21,6 +21,7 @@ class Jeu
   private time: number;
   private levelManager: LevelManager;
   private fruitsManager: FruitsManager;
+  private ghostsManager: GhostsManager;
   private score: Score;
   private powerPelletTiles: Array<Tile>;
 
@@ -62,6 +63,9 @@ class Jeu
 
     /* Le manager des fruits */
     this.fruitsManager = new FruitsManager();
+
+    /* Le ghosts manager */
+    this.ghostsManager = new GhostsManager();
 
     /* Le score */
     this.score = new Score();

@@ -557,6 +557,8 @@ class Jeu {
         this.canvas.getContext().drawImage(canvasLevel.getElement(), 0, Jeu.TOP_HEIGHT);
         /* Le manager des fruits */
         this.fruitsManager = new FruitsManager();
+        /* Le ghosts manager */
+        this.ghostsManager = new GhostsManager();
         /* Le score */
         this.score = new Score();
         /* Dessin du haut */
