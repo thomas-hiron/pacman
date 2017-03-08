@@ -158,7 +158,7 @@ class Pinky extends Ghost
       x: 0,
       y: 0
     };
-    this.color = '#000000';
+    this.color = '#fdc3d4';
   }
 
   /**
@@ -194,7 +194,7 @@ class Blinky extends Ghost
       x: 14,
       y: 0
     };
-    this.color = '#000000';
+    this.color = '#fd3b11';
   }
 
   /**
@@ -230,7 +230,7 @@ class Inky extends Ghost
       x: 14,
       y: 19
     };
-    this.color = '#000000';
+    this.color = '#49dfca';
   }
 
   /**
@@ -266,7 +266,7 @@ class Clyde extends Ghost
       x: 0,
       y: 19
     };
-    this.color = '#000000';
+    this.color = '#ffbf57';
   }
 
   /**
