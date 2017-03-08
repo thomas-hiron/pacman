@@ -13,3 +13,9 @@ interface Size
   w: number;
   h: number;
 }
+
+interface CanvasAndCoords
+{
+  canvas: Canvas;
+  coords: Point;
+}

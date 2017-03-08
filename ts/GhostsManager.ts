@@ -111,10 +111,27 @@ class GhostsManager
   /**
    * Retourne la position des fantômes et leur canvas pour les redissiner
    *
-   * @returns {{}}
+   * @returns {{canvas: Canvas, coords: Point}[]}
    */
-  public getGhostsCoordsAndCanvas(): Object
+  public getGhostsCoordsAndCanvas(): Array<CanvasAndCoords>
   {
-    return {};
+    return [
+      {
+        'canvas': this.pinky.getCanvas(),
+        'coords': this.pinky.getCoordinates()
+      },
+      {
+        'canvas': this.blinky.getCanvas(),
+        'coords': this.blinky.getCoordinates()
+      },
+      {
+        'canvas': this.inky.getCanvas(),
+        'coords': this.inky.getCoordinates()
+      },
+      {
+        'canvas': this.clyde.getCanvas(),
+        'coords': this.clyde.getCoordinates()
+      },
+    ];
   }
 }

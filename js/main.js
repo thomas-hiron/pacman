@@ -261,6 +261,20 @@ class Ghost {
         this.currentStep = 0;
     }
     /**
+     * Initialise les fantômes
+     * @returns {Ghost}
+     */
+    init() {
+        this.canvas = new Canvas();
+        this.canvas.setSize(Ghost.SIZE.w, Ghost.SIZE.h);
+        /* TMP, dessin d'un rectangle */
+        var context = this.canvas.getContext();
+        context.fillStyle = this.color;
+        context.rect(0, 0, Ghost.SIZE.w, Ghost.SIZE.h);
+        context.fill();
+        return this;
+    }
+    /**
      * Renvoie la direction à prendre pour arriver le plus rapidement à la case ciblée
      *
      * @returns {number}
@@ -348,14 +362,14 @@ class Pinky extends Ghost {
         this.direction = Directions.Left;
         this.mode = null;
         this.coordinates = {
-            x: 0,
-            y: 0
+            x: 7 * Tile.TILE_WIDTH,
+            y: 9 * Tile.TILE_WIDTH
         };
         this.cornerCoordinates = {
             x: 0,
             y: 0
         };
-        this.color = '#000000';
+        this.color = '#fdc3d4';
     }
     /**
      * Détermine la case à laquelle se rendre
@@ -378,14 +392,14 @@ class Blinky extends Ghost {
         this.direction = Directions.Left;
         this.mode = null;
         this.coordinates = {
-            x: 0,
-            y: 0
+            x: 7 * Tile.TILE_WIDTH,
+            y: 8 * Tile.TILE_WIDTH
         };
         this.cornerCoordinates = {
-            x: 0,
+            x: 14,
             y: 0
         };
-        this.color = '#000000';
+        this.color = '#fd3b11';
     }
     /**
      * Détermine la case à laquelle se rendre
@@ -408,14 +422,14 @@ class Inky extends Ghost {
         this.direction = Directions.Left;
         this.mode = null;
         this.coordinates = {
-            x: 0,
-            y: 0
+            x: 6 * Tile.TILE_WIDTH,
+            y: 9 * Tile.TILE_WIDTH
         };
         this.cornerCoordinates = {
-            x: 0,
-            y: 0
+            x: 14,
+            y: 19
         };
-        this.color = '#000000';
+        this.color = '#49dfca';
     }
     /**
      * Détermine la case à laquelle se rendre
@@ -438,14 +452,14 @@ class Clyde extends Ghost {
         this.direction = Directions.Left;
         this.mode = null;
         this.coordinates = {
-            x: 0,
-            y: 0
+            x: 8 * Tile.TILE_WIDTH,
+            y: 9 * Tile.TILE_WIDTH
         };
         this.cornerCoordinates = {
             x: 0,
-            y: 0
+            y: 19
         };
-        this.color = '#000000';
+        this.color = '#ffbf57';
     }
     /**
      * Détermine la case à laquelle se rendre
@@ -472,6 +486,24 @@ class GhostsManager {
         this.blinky = new Blinky();
         this.inky = new Inky();
         this.clyde = new Clyde();
+    }
+    /**
+     * Initialise tous les fantômes
+     *
+     * @returns {GhostsManager}
+     */
+    init() {
+        /* Initialisation des fantômes et des canvas */
+        this.pinky.init();
+        this.blinky.init();
+        this.inky.init();
+        this.clyde.init();
+        /* Changement des modes */
+        this.pinky.changeMode(this.mode);
+        this.blinky.changeMode(this.mode);
+        this.inky.changeMode(this.mode);
+        this.clyde.changeMode(this.mode);
+        return this;
     }
     /**
      * Change de mode si besoin et déplace les fantômes
@@ -513,10 +545,27 @@ class GhostsManager {
     /**
      * Retourne la position des fantômes et leur canvas pour les redissiner
      *
-     * @returns {{}}
+     * @returns {{canvas: Canvas, coords: Point}[]}
      */
     getGhostsCoordsAndCanvas() {
-        return {};
+        return [
+            {
+                'canvas': this.pinky.getCanvas(),
+                'coords': this.pinky.getCoordinates()
+            },
+            {
+                'canvas': this.blinky.getCanvas(),
+                'coords': this.blinky.getCoordinates()
+            },
+            {
+                'canvas': this.inky.getCanvas(),
+                'coords': this.inky.getCoordinates()
+            },
+            {
+                'canvas': this.clyde.getCanvas(),
+                'coords': this.clyde.getCoordinates()
+            },
+        ];
     }
 }
 /**
@@ -563,6 +612,7 @@ class Jeu {
         this.fruitsManager = new FruitsManager();
         /* Le ghosts manager */
         this.ghostsManager = new GhostsManager();
+        this.ghostsManager.init();
         /* Le score */
         this.score = new Score();
         /* Dessin du haut */
@@ -614,12 +664,14 @@ class Jeu {
             this.drawCurrentPacDot();
             /* Clignotement des points */
             this.flashPowerPellet();
-            /* Animation de pacman */
-            this.animatePacman();
-            /* Mise à jour du score */
-            this.drawScore();
             /* Dessin de la porte de sortie des fantomes */
             this.drawEscapeDoor();
+            /* Animation de pacman */
+            this.animatePacman();
+            /* Animation des fantômes */
+            this.animateGhosts();
+            /* Mise à jour du score */
+            this.drawScore();
             /* Notification de la nouvelle frame au fruitsManager */
             this.fruitsManager.onRequestAnimFrame();
             /* Mise à jour du temps */
@@ -647,6 +699,25 @@ class Jeu {
         pacman.animate();
         /* Dessin dans le canvas principal */
         ctx.drawImage(pacman.getCanvasElem(), pacman.getX() + margin, pacman.getY() + margin + Jeu.TOP_HEIGHT);
+        return this;
+    }
+    /**
+     * Anime les fantômes
+     *
+     * @returns {Jeu}
+     */
+    animateGhosts() {
+        var context = this.canvas.getContext();
+        var margin = (Tile.TILE_WIDTH - Ghost.SIZE.w) / 2;
+        // TODO : Supprimer les fantômes
+        // TODO : Déplacer les fantômes
+        // TODO : Animer les fantômes
+        /* Dessin des fantômes */
+        var coordsAndCanvas = this.ghostsManager.getGhostsCoordsAndCanvas();
+        for (var i = 0, l = coordsAndCanvas.length; i < l; ++i) {
+            var obj = coordsAndCanvas[i];
+            context.drawImage(obj.canvas.getElement(), obj.coords.x + margin, obj.coords.y + margin + Jeu.TOP_HEIGHT);
+        }
         return this;
     }
     /**

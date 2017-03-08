@@ -44,6 +44,12 @@ abstract class Ghost
     this.canvas = new Canvas();
     this.canvas.setSize(Ghost.SIZE.w, Ghost.SIZE.h);
 
+    /* TMP, dessin d'un rectangle */
+    var context: CanvasRenderingContext2D = this.canvas.getContext();
+    context.fillStyle = this.color;
+    context.rect(0, 0, Ghost.SIZE.w, Ghost.SIZE.h);
+    context.fill();
+
     return this;
   }
 
@@ -151,8 +157,8 @@ class Pinky extends Ghost
     this.direction = Directions.Left;
     this.mode = null;
     this.coordinates = {
-      x: 7,
-      y: 9
+      x: 7 * Tile.TILE_WIDTH,
+      y: 9 * Tile.TILE_WIDTH
     };
     this.cornerCoordinates = {
       x: 0,
@@ -187,8 +193,8 @@ class Blinky extends Ghost
     this.direction = Directions.Left;
     this.mode = null;
     this.coordinates = {
-      x: 7,
-      y: 8
+      x: 7 * Tile.TILE_WIDTH,
+      y: 8 * Tile.TILE_WIDTH
     };
     this.cornerCoordinates = {
       x: 14,
@@ -223,8 +229,8 @@ class Inky extends Ghost
     this.direction = Directions.Left;
     this.mode = null;
     this.coordinates = {
-      x: 6,
-      y: 9
+      x: 6 * Tile.TILE_WIDTH,
+      y: 9 * Tile.TILE_WIDTH
     };
     this.cornerCoordinates = {
       x: 14,
@@ -259,8 +265,8 @@ class Clyde extends Ghost
     this.direction = Directions.Left;
     this.mode = null;
     this.coordinates = {
-      x: 8,
-      y: 9
+      x: 8 * Tile.TILE_WIDTH,
+      y: 9 * Tile.TILE_WIDTH
     };
     this.cornerCoordinates = {
       x: 0,
