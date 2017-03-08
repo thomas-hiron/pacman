@@ -36,6 +36,18 @@ abstract class Ghost
   protected abstract targetTile(): Tile;
 
   /**
+   * Initialise les fantômes
+   * @returns {Ghost}
+   */
+  public init(): Ghost
+  {
+    this.canvas = new Canvas();
+    this.canvas.setSize(Ghost.SIZE.w, Ghost.SIZE.h);
+
+    return this;
+  }
+
+  /**
    * Renvoie la direction à prendre pour arriver le plus rapidement à la case ciblée
    *
    * @returns {number}
@@ -139,8 +151,8 @@ class Pinky extends Ghost
     this.direction = Directions.Left;
     this.mode = null;
     this.coordinates = {
-      x: 0,
-      y: 0
+      x: 7,
+      y: 9
     };
     this.cornerCoordinates = {
       x: 0,
@@ -175,11 +187,11 @@ class Blinky extends Ghost
     this.direction = Directions.Left;
     this.mode = null;
     this.coordinates = {
-      x: 0,
-      y: 0
+      x: 7,
+      y: 8
     };
     this.cornerCoordinates = {
-      x: 0,
+      x: 14,
       y: 0
     };
     this.color = '#000000';
@@ -211,12 +223,12 @@ class Inky extends Ghost
     this.direction = Directions.Left;
     this.mode = null;
     this.coordinates = {
-      x: 0,
-      y: 0
+      x: 6,
+      y: 9
     };
     this.cornerCoordinates = {
-      x: 0,
-      y: 0
+      x: 14,
+      y: 19
     };
     this.color = '#000000';
   }
@@ -247,12 +259,12 @@ class Clyde extends Ghost
     this.direction = Directions.Left;
     this.mode = null;
     this.coordinates = {
-      x: 0,
-      y: 0
+      x: 8,
+      y: 9
     };
     this.cornerCoordinates = {
       x: 0,
-      y: 0
+      y: 19
     };
     this.color = '#000000';
   }

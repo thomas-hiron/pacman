@@ -41,6 +41,28 @@ class GhostsManager
   }
 
   /**
+   * Initialise tous les fantômes
+   *
+   * @returns {GhostsManager}
+   */
+  public init(): GhostsManager
+  {
+    /* Initialisation des fantômes et des canvas */
+    this.pinky.init();
+    this.blinky.init();
+    this.inky.init();
+    this.clyde.init();
+
+    /* Changement des modes */
+    this.pinky.changeMode(this.mode);
+    this.blinky.changeMode(this.mode);
+    this.inky.changeMode(this.mode);
+    this.clyde.changeMode(this.mode);
+
+    return this;
+  }
+
+  /**
    * Change de mode si besoin et déplace les fantômes
    *
    * @param pacmanCenter

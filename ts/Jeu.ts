@@ -66,6 +66,7 @@ class Jeu
 
     /* Le ghosts manager */
     this.ghostsManager = new GhostsManager();
+    this.ghostsManager.init();
 
     /* Le score */
     this.score = new Score();
