@@ -427,6 +427,9 @@ class Ghost {
                     this.direction = this.findBestPath(this.cornerCoordinates);
                     break;
                 case Modes.Chase:
+                    /* Récupération de la bonne case */
+                    var target = this.targetTile(pacmanCenter);
+                    this.direction = this.findBestPath(target);
                     break;
                 case Modes.Frightened:
                     break;
@@ -529,9 +532,11 @@ class Pinky extends Ghost {
     /**
      * Détermine la case à laquelle se rendre
      *
+     * @param pacmanCenter
+     *
      * @returns {null}
      */
-    targetTile() {
+    targetTile(pacmanCenter) {
         return null;
     }
 }
@@ -559,10 +564,12 @@ class Blinky extends Ghost {
     /**
      * Détermine la case à laquelle se rendre
      *
+     * @param pacmanCenter
+     *
      * @returns {null}
      */
-    targetTile() {
-        return null;
+    targetTile(pacmanCenter) {
+        return TileFunctions.getTileCoordinates(pacmanCenter);
     }
 }
 /**
@@ -589,9 +596,11 @@ class Inky extends Ghost {
     /**
      * Détermine la case à laquelle se rendre
      *
+     * @param pacmanCenter
+     *
      * @returns {null}
      */
-    targetTile() {
+    targetTile(pacmanCenter) {
         return null;
     }
 }
@@ -619,9 +628,11 @@ class Clyde extends Ghost {
     /**
      * Détermine la case à laquelle se rendre
      *
+     * @param pacmanCenter
+     *
      * @returns {null}
      */
-    targetTile() {
+    targetTile(pacmanCenter) {
         return null;
     }
 }
@@ -1875,5 +1886,21 @@ class TileFunctions {
                 y: tileCoords.y + 1
             }
         ];
+    }
+    /**
+     * Renvoie la case dont le param est le centre
+     *
+     * @param center
+     *
+     * @returns {{x: number, y: number}}
+     */
+    static getTileCoordinates(center) {
+        var moduloX = center.x % Tile.TILE_WIDTH;
+        var moduloY = center.y % Tile.TILE_WIDTH;
+        /* Suppression pour avoir la case */
+        return {
+            x: (center.x - moduloX) / Tile.TILE_WIDTH,
+            y: (center.y - moduloY) / Tile.TILE_WIDTH
+        };
     }
 }

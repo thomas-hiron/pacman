@@ -39,4 +39,23 @@ class TileFunctions
       }
     ];
   }
+
+  /**
+   * Renvoie la case dont le param est le centre
+   *
+   * @param center
+   *
+   * @returns {{x: number, y: number}}
+   */
+  public static getTileCoordinates(center: Point): Point
+  {
+    var moduloX: number = center.x % Tile.TILE_WIDTH;
+    var moduloY: number = center.y % Tile.TILE_WIDTH;
+
+    /* Suppression pour avoir la case */
+    return {
+      x: (center.x - moduloX) / Tile.TILE_WIDTH,
+      y: (center.y - moduloY) / Tile.TILE_WIDTH
+    };
+  }
 }

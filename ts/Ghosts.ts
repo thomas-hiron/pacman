@@ -36,7 +36,7 @@ abstract class Ghost
   /**
    * Vise une case selon le caractère
    */
-  protected abstract targetTile(): Tile;
+  protected abstract targetTile(pacmanCenter: Point): Point;
 
   /**
    * @param callback
@@ -249,6 +249,10 @@ abstract class Ghost
 
         case Modes.Chase :
 
+          /* Récupération de la bonne case */
+          var target: Point = this.targetTile(pacmanCenter);
+          this.direction = this.findBestPath(target);
+
           break;
 
         case Modes.Frightened :
@@ -370,9 +374,11 @@ class Pinky extends Ghost
   /**
    * Détermine la case à laquelle se rendre
    *
+   * @param pacmanCenter
+   *
    * @returns {null}
    */
-  protected targetTile(): Tile
+  protected targetTile(pacmanCenter: Point): Point
   {
     return null;
   }
@@ -406,11 +412,13 @@ class Blinky extends Ghost
   /**
    * Détermine la case à laquelle se rendre
    *
+   * @param pacmanCenter
+   *
    * @returns {null}
    */
-  protected targetTile(): Tile
+  protected targetTile(pacmanCenter: Point): Point
   {
-    return null;
+    return TileFunctions.getTileCoordinates(pacmanCenter);
   }
 }
 
@@ -442,9 +450,11 @@ class Inky extends Ghost
   /**
    * Détermine la case à laquelle se rendre
    *
+   * @param pacmanCenter
+   *
    * @returns {null}
    */
-  protected targetTile(): Tile
+  protected targetTile(pacmanCenter: Point): Point
   {
     return null;
   }
@@ -478,9 +488,11 @@ class Clyde extends Ghost
   /**
    * Détermine la case à laquelle se rendre
    *
+   * @param pacmanCenter
+   *
    * @returns {null}
    */
-  protected targetTile(): Tile
+  protected targetTile(pacmanCenter: Point): Point
   {
     return null;
   }
