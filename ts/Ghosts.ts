@@ -30,10 +30,25 @@ abstract class Ghost
   /* L'étape courante d'animation */
   private currentStep: number = 0;
 
+  /* La méthode de détection de collison */
+  private checkCollision: any;
+
   /**
    * Vise une case selon le caractère
    */
   protected abstract targetTile(): Tile;
+
+  /**
+   * @param callback
+   *
+   * @returns {Ghost}
+   */
+  public setCollideFunction(callback: any)
+  {
+    this.checkCollision = callback;
+
+    return this;
+  }
 
   /**
    * Initialise les fantômes
@@ -56,11 +71,153 @@ abstract class Ghost
   /**
    * Renvoie la direction à prendre pour arriver le plus rapidement à la case ciblée
    *
+   * @param tileCoords La case à aller
+   * @see https://en.wikipedia.org/wiki/Pathfinding
+   *
    * @returns {number}
    */
-  private findBestPath(): number
+  private findBestPath(tileCoords: Point): number
   {
-    return 0;
+    /* Les coordonnées de la case courante */
+    var currentTileCoords: Point = {
+      x: this.coordinates.x / Tile.TILE_WIDTH,
+      y: this.coordinates.y / Tile.TILE_WIDTH
+    }
+
+    /* La liste principale, initialisée avec la case, contient toutes les cases permettant de tracer le chemin */
+    var mainList: Array<PointIndexed> = [{
+      x: tileCoords.x,
+      y: tileCoords.y,
+      i: 0
+    }];
+
+    /* Pour chaque élément de la liste principale */
+    var destinationTile: Point = null;
+    for (var i = 0 ; i < mainList.length ; ++i)
+    {
+      /* Récupération des 4 cases autour */
+      var adjacentTiles: Array<Point> = TileFunctions.getAdjacentTiles({
+        x: mainList[i].x,
+        y: mainList[i].y
+      });
+
+      /* Parcourt des 4 cases trouvées */
+      for (var j = 0 ; j < 4 ; ++j)
+      {
+        /* Collision */
+        var collisionDetected: boolean = this.checkCollision(adjacentTiles[j].x, adjacentTiles[j].y);
+        /* La case a déjà été ajoutée */
+        var alreadyAdded: boolean = false;
+
+        /* Vérification si case a déjà été ajoutée (même coords et index inférieur ou égal) */
+        for (var k = 0, l = mainList.length ; k < l ; ++k)
+        {
+          if (mainList[k].x == adjacentTiles[j].x && mainList[k].y == adjacentTiles[j].y && mainList[k].i <= i)
+          {
+            alreadyAdded = true;
+            break;
+          }
+        }
+
+        /* Pas de collision et pas déjà ajoutée, ajout dans la liste principale */
+        if (!collisionDetected && !alreadyAdded)
+        {
+          mainList.push({
+            x: adjacentTiles[j].x,
+            y: adjacentTiles[j].y,
+            i: mainList[i].i + 1
+          });
+        }
+
+        /* Arrêt de la boucle si la case de destination a été trouvée et qu'il faut pas faire demi-tour */
+        if (adjacentTiles[j].x == currentTileCoords.x && adjacentTiles[j].y == currentTileCoords.y)
+        {
+          /* On vérifie qu'il faut pas faire demi-tour */
+          for (k = mainList.length - 1 ; k >= 0 ; --k)
+          {
+            /* Le compteur précédent */
+            if (mainList[k].i == mainList[i].i)
+            {
+              /* Si c'est bien collé */
+              if (this.isNextTo(currentTileCoords, mainList[k]))
+              {
+                /* Et pas de demi-tour, alors ajout */
+                if (!this.hasToGoBackwards(currentTileCoords, mainList[k]))
+                {
+                  destinationTile = mainList[k];
+                  break;
+                }
+              }
+            }
+            /* Pour ne pas parcourir les entrées inutilement */
+            else if (mainList[k].i < mainList[i].i)
+              break;
+          }
+
+          break;
+        }
+      }
+
+      /* Stop boucle, chemin trouvé */
+      if (destinationTile != null)
+        break;
+    }
+
+    /* Récupération de la bonne direction, par défaut la courante */
+    var direction: number = this.direction;
+    /* Gauche */
+    if (currentTileCoords.x == destinationTile.x + 1)
+      direction = Directions.Left;
+    /* Droite */
+    if (currentTileCoords.x == destinationTile.x - 1)
+      direction = Directions.Right;
+    /* Haut */
+    if (currentTileCoords.y == destinationTile.y + 1)
+      direction = Directions.Up;
+    /* Bas */
+    if (currentTileCoords.y == destinationTile.y - 1)
+      direction = Directions.Down;
+
+    return direction;
+  }
+
+  /**
+   * Détermine si deux cases sont collées
+   *
+   * @param fromTile
+   * @param toTile
+   *
+   * @returns {boolean}
+   */
+  private isNextTo(fromTile: Point, toTile: Point): boolean
+  {
+    return (
+      Math.abs(fromTile.x - toTile.x) == 1 && fromTile.y == toTile.y ||
+      Math.abs(fromTile.y - toTile.y) == 1 && fromTile.x == toTile.x
+    );
+  }
+
+  /**
+   * S'il doit faire demi-tour pour atteindre la case de destination
+   *
+   * @returns {boolean}
+   */
+  private hasToGoBackwards(fromTile: Point, toTile: Point): boolean
+  {
+    /* Gauche */
+    if (fromTile.x == toTile.x + 1)
+      return this.direction == Directions.Right;
+    /* Droite */
+    if (fromTile.x == toTile.x - 1)
+      return this.direction == Directions.Left;
+    /* Haut */
+    if (fromTile.y == toTile.y + 1)
+      return this.direction == Directions.Down;
+    /* Bas */
+    if (fromTile.y == toTile.y - 1)
+      return this.direction == Directions.Up;
+
+    return true;
   }
 
   /**
@@ -74,6 +231,43 @@ abstract class Ghost
    */
   public move(pacmanCenter: Point): Ghost
   {
+    /* Si dans une case */
+    if (this.coordinates.x % Tile.TILE_WIDTH == 0 && this.coordinates.y % Tile.TILE_WIDTH == 0)
+    {
+      switch (this.mode)
+      {
+        /* Dans le coin attribué */
+        case Modes.Scatter :
+          this.direction = this.findBestPath(this.cornerCoordinates);
+          break;
+
+        case Modes.Chase :
+
+          break;
+
+        case Modes.Frightened :
+
+          break;
+      }
+    }
+
+    /* Déplacement */
+    switch (this.direction)
+    {
+      case Directions.Left:
+        this.coordinates.x -= this.stepPx;
+        break;
+      case Directions.Right:
+        this.coordinates.x += this.stepPx;
+        break;
+      case Directions.Up:
+        this.coordinates.y -= this.stepPx;
+        break;
+      case Directions.Down:
+        this.coordinates.y += this.stepPx;
+        break;
+    }
+
     return this;
   }
 

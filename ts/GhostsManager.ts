@@ -41,6 +41,21 @@ class GhostsManager
   }
 
   /**
+   * @param callback
+   *
+   * @returns {GhostsManager}
+   */
+  public setCollideFunction(callback: any)
+  {
+    this.pinky.setCollideFunction(callback);
+    this.blinky.setCollideFunction(callback);
+    this.inky.setCollideFunction(callback);
+    this.clyde.setCollideFunction(callback);
+
+    return this;
+  }
+
+  /**
    * Initialise tous les fantômes
    *
    * @returns {GhostsManager}
@@ -71,6 +86,7 @@ class GhostsManager
    */
   public moveGhosts(pacmanCenter: Point): GhostsManager
   {
+    this.blinky.move(pacmanCenter);
 
     return this;
   }

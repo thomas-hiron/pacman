@@ -66,6 +66,7 @@ class Jeu
 
     /* Le ghosts manager */
     this.ghostsManager = new GhostsManager();
+    this.ghostsManager.setCollideFunction(this.checkCollision.bind(this));
     this.ghostsManager.init();
 
     /* Le score */
@@ -211,7 +212,11 @@ class Jeu
       context.clearRect(obj.coords.x + margin, obj.coords.y + margin + Jeu.TOP_HEIGHT, Ghost.SIZE.w, Ghost.SIZE.h);
     }
 
-    // TODO : Déplacer les fantômes
+    // Déplacement des fantômes en passant le centre de pacman en paramètre
+    this.ghostsManager.moveGhosts({
+      x: this.pacman.getX() + Tile.TILE_WIDTH / 2,
+      y: this.pacman.getY() + Tile.TILE_WIDTH / 2
+    });
 
     // TODO : Animer les fantômes
 

@@ -261,6 +261,15 @@ class Ghost {
         this.currentStep = 0;
     }
     /**
+     * @param callback
+     *
+     * @returns {Ghost}
+     */
+    setCollideFunction(callback) {
+        this.checkCollision = callback;
+        return this;
+    }
+    /**
      * Initialise les fantômes
      * @returns {Ghost}
      */
@@ -277,10 +286,124 @@ class Ghost {
     /**
      * Renvoie la direction à prendre pour arriver le plus rapidement à la case ciblée
      *
+     * @param tileCoords La case à aller
+     * @see https://en.wikipedia.org/wiki/Pathfinding
+     *
      * @returns {number}
      */
-    findBestPath() {
-        return 0;
+    findBestPath(tileCoords) {
+        /* Les coordonnées de la case courante */
+        var currentTileCoords = {
+            x: this.coordinates.x / Tile.TILE_WIDTH,
+            y: this.coordinates.y / Tile.TILE_WIDTH
+        };
+        /* La liste principale, initialisée avec la case, contient toutes les cases permettant de tracer le chemin */
+        var mainList = [{
+                x: tileCoords.x,
+                y: tileCoords.y,
+                i: 0
+            }];
+        /* Pour chaque élément de la liste principale */
+        var destinationTile = null;
+        for (var i = 0; i < mainList.length; ++i) {
+            /* Récupération des 4 cases autour */
+            var adjacentTiles = TileFunctions.getAdjacentTiles({
+                x: mainList[i].x,
+                y: mainList[i].y
+            });
+            /* Parcourt des 4 cases trouvées */
+            for (var j = 0; j < 4; ++j) {
+                /* Collision */
+                var collisionDetected = this.checkCollision(adjacentTiles[j].x, adjacentTiles[j].y);
+                /* La case a déjà été ajoutée */
+                var alreadyAdded = false;
+                /* Vérification si case a déjà été ajoutée (même coords et index inférieur ou égal) */
+                for (var k = 0, l = mainList.length; k < l; ++k) {
+                    if (mainList[k].x == adjacentTiles[j].x && mainList[k].y == adjacentTiles[j].y && mainList[k].i <= i) {
+                        alreadyAdded = true;
+                        break;
+                    }
+                }
+                /* Pas de collision et pas déjà ajoutée, ajout dans la liste principale */
+                if (!collisionDetected && !alreadyAdded) {
+                    mainList.push({
+                        x: adjacentTiles[j].x,
+                        y: adjacentTiles[j].y,
+                        i: mainList[i].i + 1
+                    });
+                }
+                /* Arrêt de la boucle si la case de destination a été trouvée et qu'il faut pas faire demi-tour */
+                if (adjacentTiles[j].x == currentTileCoords.x && adjacentTiles[j].y == currentTileCoords.y) {
+                    /* On vérifie qu'il faut pas faire demi-tour */
+                    for (k = mainList.length - 1; k >= 0; --k) {
+                        /* Le compteur précédent */
+                        if (mainList[k].i == mainList[i].i) {
+                            /* Si c'est bien collé */
+                            if (this.isNextTo(currentTileCoords, mainList[k])) {
+                                /* Et pas de demi-tour, alors ajout */
+                                if (!this.hasToGoBackwards(currentTileCoords, mainList[k])) {
+                                    destinationTile = mainList[k];
+                                    break;
+                                }
+                            }
+                        }
+                        else if (mainList[k].i < mainList[i].i)
+                            break;
+                    }
+                    break;
+                }
+            }
+            /* Stop boucle, chemin trouvé */
+            if (destinationTile != null)
+                break;
+        }
+        /* Récupération de la bonne direction, par défaut la courante */
+        var direction = this.direction;
+        /* Gauche */
+        if (currentTileCoords.x == destinationTile.x + 1)
+            direction = Directions.Left;
+        /* Droite */
+        if (currentTileCoords.x == destinationTile.x - 1)
+            direction = Directions.Right;
+        /* Haut */
+        if (currentTileCoords.y == destinationTile.y + 1)
+            direction = Directions.Up;
+        /* Bas */
+        if (currentTileCoords.y == destinationTile.y - 1)
+            direction = Directions.Down;
+        return direction;
+    }
+    /**
+     * Détermine si deux cases sont collées
+     *
+     * @param fromTile
+     * @param toTile
+     *
+     * @returns {boolean}
+     */
+    isNextTo(fromTile, toTile) {
+        return (Math.abs(fromTile.x - toTile.x) == 1 && fromTile.y == toTile.y ||
+            Math.abs(fromTile.y - toTile.y) == 1 && fromTile.x == toTile.x);
+    }
+    /**
+     * S'il doit faire demi-tour pour atteindre la case de destination
+     *
+     * @returns {boolean}
+     */
+    hasToGoBackwards(fromTile, toTile) {
+        /* Gauche */
+        if (fromTile.x == toTile.x + 1)
+            return this.direction == Directions.Right;
+        /* Droite */
+        if (fromTile.x == toTile.x - 1)
+            return this.direction == Directions.Left;
+        /* Haut */
+        if (fromTile.y == toTile.y + 1)
+            return this.direction == Directions.Down;
+        /* Bas */
+        if (fromTile.y == toTile.y - 1)
+            return this.direction == Directions.Up;
+        return true;
     }
     /**
      * Déplace le fantôme
@@ -292,6 +415,34 @@ class Ghost {
      * @returns {Ghost}
      */
     move(pacmanCenter) {
+        /* Si dans une case */
+        if (this.coordinates.x % Tile.TILE_WIDTH == 0 && this.coordinates.y % Tile.TILE_WIDTH == 0) {
+            switch (this.mode) {
+                /* Dans le coin attribué */
+                case Modes.Scatter:
+                    this.direction = this.findBestPath(this.cornerCoordinates);
+                    break;
+                case Modes.Chase:
+                    break;
+                case Modes.Frightened:
+                    break;
+            }
+        }
+        /* Déplacement */
+        switch (this.direction) {
+            case Directions.Left:
+                this.coordinates.x -= this.stepPx;
+                break;
+            case Directions.Right:
+                this.coordinates.x += this.stepPx;
+                break;
+            case Directions.Up:
+                this.coordinates.y -= this.stepPx;
+                break;
+            case Directions.Down:
+                this.coordinates.y += this.stepPx;
+                break;
+        }
         return this;
     }
     /**
@@ -488,6 +639,18 @@ class GhostsManager {
         this.clyde = new Clyde();
     }
     /**
+     * @param callback
+     *
+     * @returns {GhostsManager}
+     */
+    setCollideFunction(callback) {
+        this.pinky.setCollideFunction(callback);
+        this.blinky.setCollideFunction(callback);
+        this.inky.setCollideFunction(callback);
+        this.clyde.setCollideFunction(callback);
+        return this;
+    }
+    /**
      * Initialise tous les fantômes
      *
      * @returns {GhostsManager}
@@ -513,6 +676,7 @@ class GhostsManager {
      * @returns {GhostsManager}
      */
     moveGhosts(pacmanCenter) {
+        this.blinky.move(pacmanCenter);
         return this;
     }
     /**
@@ -612,6 +776,7 @@ class Jeu {
         this.fruitsManager = new FruitsManager();
         /* Le ghosts manager */
         this.ghostsManager = new GhostsManager();
+        this.ghostsManager.setCollideFunction(this.checkCollision.bind(this));
         this.ghostsManager.init();
         /* Le score */
         this.score = new Score();
@@ -715,7 +880,11 @@ class Jeu {
             var obj = coordsAndCanvas[i];
             context.clearRect(obj.coords.x + margin, obj.coords.y + margin + Jeu.TOP_HEIGHT, Ghost.SIZE.w, Ghost.SIZE.h);
         }
-        // TODO : Déplacer les fantômes
+        // Déplacement des fantômes en passant le centre de pacman en paramètre
+        this.ghostsManager.moveGhosts({
+            x: this.pacman.getX() + Tile.TILE_WIDTH / 2,
+            y: this.pacman.getY() + Tile.TILE_WIDTH / 2
+        });
         // TODO : Animer les fantômes
         /* Dessin des fantômes */
         for (i = 0, l = coordsAndCanvas.length; i < l; ++i) {
@@ -1668,3 +1837,42 @@ class Tile {
     }
 }
 Tile.TILE_WIDTH = 40;
+/**
+ * Created by thiron on 09/03/2017.
+ */
+/**
+ * Classe avec des méthodes statiques traiter les cases
+ */
+class TileFunctions {
+    /**
+     * Renvoie les 4 cases autour de la case courante
+     *
+     * @param tileCoords
+     *
+     * @returns {Point[]}
+     */
+    static getAdjacentTiles(tileCoords) {
+        return [
+            /* Gauche */
+            {
+                x: tileCoords.x - 1,
+                y: tileCoords.y
+            },
+            /* Droite */
+            {
+                x: tileCoords.x + 1,
+                y: tileCoords.y
+            },
+            /* Haut */
+            {
+                x: tileCoords.x,
+                y: tileCoords.y - 1
+            },
+            /* Bas */
+            {
+                x: tileCoords.x,
+                y: tileCoords.y + 1
+            }
+        ];
+    }
+}

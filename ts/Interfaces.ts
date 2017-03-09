@@ -8,6 +8,13 @@ interface Point
   y:number;
 }
 
+interface PointIndexed
+{
+  x:number;
+  y:number;
+  i:number;
+}
+
 interface Size
 {
   w: number;
