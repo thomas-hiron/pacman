@@ -34,12 +34,12 @@ class LevelManager
     this.pacDotNumber = 0;
 
     /* Parcourt de chaque ligne */
-    for (var i: number = 0, l: number = tiles.length; i < l; ++i)
+    for (var i: number = 0, l: number = tiles.length ; i < l ; ++i)
     {
       var row: Array<Tile> = tiles[i];
 
       /* Parcourt de chaque case */
-      for (var j: number = 0, k: number = row.length; j < k; ++j)
+      for (var j: number = 0, k: number = row.length ; j < k ; ++j)
       {
         var tile: Tile = row[j];
 
@@ -187,7 +187,7 @@ class LevelManager
     var tile: Tile = tiles[coords.y][coords.x];
 
     /* Décrémentation s'il y a un point */
-    if (tile.hasPacDot())
+    if (tile.hasPacDot() && !(tile.getPacDot() instanceof Fruit))
       this.pacDotNumber--;
 
     /* Niveau terminé */
@@ -210,10 +210,10 @@ class LevelManager
     var tiles: Array<Array<Tile>> = this.getTiles();
     var tilesWithPowerPellet: Array<Tile> = [];
 
-    for (var i: number = 0, l: number = tiles.length; i < l; ++i)
+    for (var i: number = 0, l: number = tiles.length ; i < l ; ++i)
     {
       /* Parcourt de chaque case */
-      for (var j: number = 0, k: number = tiles[i].length; j < k; ++j)
+      for (var j: number = 0, k: number = tiles[i].length ; j < k ; ++j)
       {
         if (tiles[i][j].hasPowerPellet())
           tilesWithPowerPellet.push(tiles[i][j]);

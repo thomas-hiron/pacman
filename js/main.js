@@ -1340,7 +1340,7 @@ class LevelManager {
         var tiles = this.getTiles();
         var tile = tiles[coords.y][coords.x];
         /* Décrémentation s'il y a un point */
-        if (tile.hasPacDot())
+        if (tile.hasPacDot() && !(tile.getPacDot() instanceof Fruit))
             this.pacDotNumber--;
         /* Niveau terminé */
         if (this.pacDotNumber <= 0) {
@@ -1725,9 +1725,6 @@ class Score {
         return this;
     }
 }
-/* Constantes de score */
-Score.PAC_DOT = 10;
-Score.POWER_PELLET = 50;
 /**
  * Created by thiron on 03/07/2015.
  */
