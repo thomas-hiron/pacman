@@ -116,7 +116,7 @@ class Jeu
     this.powerPelletTiles = this.levelManager.getPowerPellet();
 
     /* Date de début pour le fruit manager */
-    this.fruitsManager.start();
+    //this.fruitsManager.start();
 
     /* RequestAnimationFrame pour le pacman, les fantomes */
     requestAnimFrame(this.draw.bind(this));
@@ -138,13 +138,13 @@ class Jeu
       this.drawCurrentPacDot();
 
       /* Clignotement des points */
-      this.flashPowerPellet();
+      //this.flashPowerPellet();
 
       /* Dessin de la porte de sortie des fantomes */
       this.drawEscapeDoor();
 
       /* Animation de pacman */
-      this.animatePacman();
+      //this.animatePacman();
 
       /* Animation des fantômes */
       this.animateGhosts();
@@ -175,10 +175,10 @@ class Jeu
     var pacman: Pacman = this.pacman;
     /* Pour centrer dans la case */
     var margin: number = (Tile.TILE_WIDTH - Pacman.SIZE.w) / 2;
-    var ctx = this.canvas.getContext();
+    var context = this.canvas.getContext();
 
     /* Suppression du pacman courant */
-    ctx.clearRect(pacman.getX() + margin, pacman.getY() + margin + Jeu.TOP_HEIGHT, Pacman.SIZE.w, Pacman.SIZE.h);
+    context.clearRect(pacman.getX() + margin, pacman.getY() + margin + Jeu.TOP_HEIGHT, Pacman.SIZE.w, Pacman.SIZE.h);
 
     /* Instruction de modification des coordonées */
     pacman.move();
@@ -187,7 +187,7 @@ class Jeu
     pacman.animate();
 
     /* Dessin dans le canvas principal */
-    ctx.drawImage(pacman.getCanvasElem(), pacman.getX() + margin, pacman.getY() + margin + Jeu.TOP_HEIGHT);
+    context.drawImage(pacman.getCanvasElem(), pacman.getX() + margin, pacman.getY() + margin + Jeu.TOP_HEIGHT);
 
     return this;
   }
@@ -201,17 +201,23 @@ class Jeu
   {
     var context: CanvasRenderingContext2D = this.canvas.getContext();
     var margin: number = (Tile.TILE_WIDTH - Ghost.SIZE.w) / 2;
+    var coordsAndCanvas: Array<CanvasAndCoords> = this.ghostsManager.getGhostsCoordsAndCanvas();
 
-    // TODO : Supprimer les fantômes
+    // Suppression des fantômes
+
+    for (var i = 0, l = coordsAndCanvas.length; i < l; ++i)
+    {
+      var obj: CanvasAndCoords = coordsAndCanvas[i];
+      context.clearRect(obj.coords.x + margin, obj.coords.y + margin + Jeu.TOP_HEIGHT, Ghost.SIZE.w, Ghost.SIZE.h);
+    }
 
     // TODO : Déplacer les fantômes
 
     // TODO : Animer les fantômes
 
     /* Dessin des fantômes */
-    var coordsAndCanvas: Array<CanvasAndCoords> = this.ghostsManager.getGhostsCoordsAndCanvas();
 
-    for (var i = 0, l = coordsAndCanvas.length; i < l; ++i)
+    for (i = 0, l = coordsAndCanvas.length; i < l; ++i)
     {
       var obj: CanvasAndCoords = coordsAndCanvas[i];
       context.drawImage(obj.canvas.getElement(), obj.coords.x + margin, obj.coords.y + margin + Jeu.TOP_HEIGHT);
