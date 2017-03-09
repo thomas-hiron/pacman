@@ -82,7 +82,7 @@ abstract class Ghost
     var currentTileCoords: Point = {
       x: this.coordinates.x / Tile.TILE_WIDTH,
       y: this.coordinates.y / Tile.TILE_WIDTH
-    }
+    };
 
     /* La liste principale, initialisée avec la case, contient toutes les cases permettant de tracer le chemin */
     var mainList: Array<PointIndexed> = [{
@@ -119,19 +119,12 @@ abstract class Ghost
           }
         }
 
-        /* Pas de collision et pas déjà ajoutée, ajout dans la liste principale */
-        if (!collisionDetected && !alreadyAdded)
-        {
-          mainList.push({
-            x: adjacentTiles[j].x,
-            y: adjacentTiles[j].y,
-            i: mainList[i].i + 1
-          });
-        }
-
         /* Arrêt de la boucle si la case de destination a été trouvée et qu'il faut pas faire demi-tour */
         if (adjacentTiles[j].x == currentTileCoords.x && adjacentTiles[j].y == currentTileCoords.y)
         {
+          /* Toutes les cases qui représentent un chemin possible */
+          var nextCases: Array<Point> = [];
+
           /* On vérifie qu'il faut pas faire demi-tour */
           for (k = mainList.length - 1 ; k >= 0 ; --k)
           {
@@ -143,10 +136,7 @@ abstract class Ghost
               {
                 /* Et pas de demi-tour, alors ajout */
                 if (!this.hasToGoBackwards(currentTileCoords, mainList[k]))
-                {
-                  destinationTile = mainList[k];
-                  break;
-                }
+                  nextCases.push(mainList[k]);
               }
             }
             /* Pour ne pas parcourir les entrées inutilement */
@@ -154,7 +144,20 @@ abstract class Ghost
               break;
           }
 
+          /* Récupération d'une des cases possibles */
+          var random: number = Math.floor(Math.random() * nextCases.length);
+          destinationTile = nextCases[random];
+
           break;
+        }
+        /* Pas de collision et pas déjà ajoutée, ajout dans la liste principale */
+        else if (!collisionDetected && !alreadyAdded)
+        {
+          mainList.push({
+            x: adjacentTiles[j].x,
+            y: adjacentTiles[j].y,
+            i: mainList[i].i + 1
+          });
         }
       }
 
@@ -165,18 +168,21 @@ abstract class Ghost
 
     /* Récupération de la bonne direction, par défaut la courante */
     var direction: number = this.direction;
-    /* Gauche */
-    if (currentTileCoords.x == destinationTile.x + 1)
-      direction = Directions.Left;
-    /* Droite */
-    if (currentTileCoords.x == destinationTile.x - 1)
-      direction = Directions.Right;
-    /* Haut */
-    if (currentTileCoords.y == destinationTile.y + 1)
-      direction = Directions.Up;
-    /* Bas */
-    if (currentTileCoords.y == destinationTile.y - 1)
-      direction = Directions.Down;
+    if (destinationTile != null)
+    {
+      /* Gauche */
+      if (currentTileCoords.x == destinationTile.x + 1)
+        direction = Directions.Left;
+      /* Droite */
+      if (currentTileCoords.x == destinationTile.x - 1)
+        direction = Directions.Right;
+      /* Haut */
+      if (currentTileCoords.y == destinationTile.y + 1)
+        direction = Directions.Up;
+      /* Bas */
+      if (currentTileCoords.y == destinationTile.y - 1)
+        direction = Directions.Down;
+    }
 
     return direction;
   }

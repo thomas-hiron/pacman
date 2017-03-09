@@ -324,16 +324,10 @@ class Ghost {
                         break;
                     }
                 }
-                /* Pas de collision et pas déjà ajoutée, ajout dans la liste principale */
-                if (!collisionDetected && !alreadyAdded) {
-                    mainList.push({
-                        x: adjacentTiles[j].x,
-                        y: adjacentTiles[j].y,
-                        i: mainList[i].i + 1
-                    });
-                }
                 /* Arrêt de la boucle si la case de destination a été trouvée et qu'il faut pas faire demi-tour */
                 if (adjacentTiles[j].x == currentTileCoords.x && adjacentTiles[j].y == currentTileCoords.y) {
+                    /* Toutes les cases qui représentent un chemin possible */
+                    var nextCases = [];
                     /* On vérifie qu'il faut pas faire demi-tour */
                     for (k = mainList.length - 1; k >= 0; --k) {
                         /* Le compteur précédent */
@@ -341,16 +335,24 @@ class Ghost {
                             /* Si c'est bien collé */
                             if (this.isNextTo(currentTileCoords, mainList[k])) {
                                 /* Et pas de demi-tour, alors ajout */
-                                if (!this.hasToGoBackwards(currentTileCoords, mainList[k])) {
-                                    destinationTile = mainList[k];
-                                    break;
-                                }
+                                if (!this.hasToGoBackwards(currentTileCoords, mainList[k]))
+                                    nextCases.push(mainList[k]);
                             }
                         }
                         else if (mainList[k].i < mainList[i].i)
                             break;
                     }
+                    /* Récupération d'une des cases possibles */
+                    var random = Math.floor(Math.random() * nextCases.length);
+                    destinationTile = nextCases[random];
                     break;
+                }
+                else if (!collisionDetected && !alreadyAdded) {
+                    mainList.push({
+                        x: adjacentTiles[j].x,
+                        y: adjacentTiles[j].y,
+                        i: mainList[i].i + 1
+                    });
                 }
             }
             /* Stop boucle, chemin trouvé */
@@ -359,18 +361,20 @@ class Ghost {
         }
         /* Récupération de la bonne direction, par défaut la courante */
         var direction = this.direction;
-        /* Gauche */
-        if (currentTileCoords.x == destinationTile.x + 1)
-            direction = Directions.Left;
-        /* Droite */
-        if (currentTileCoords.x == destinationTile.x - 1)
-            direction = Directions.Right;
-        /* Haut */
-        if (currentTileCoords.y == destinationTile.y + 1)
-            direction = Directions.Up;
-        /* Bas */
-        if (currentTileCoords.y == destinationTile.y - 1)
-            direction = Directions.Down;
+        if (destinationTile != null) {
+            /* Gauche */
+            if (currentTileCoords.x == destinationTile.x + 1)
+                direction = Directions.Left;
+            /* Droite */
+            if (currentTileCoords.x == destinationTile.x - 1)
+                direction = Directions.Right;
+            /* Haut */
+            if (currentTileCoords.y == destinationTile.y + 1)
+                direction = Directions.Up;
+            /* Bas */
+            if (currentTileCoords.y == destinationTile.y - 1)
+                direction = Directions.Down;
+        }
         return direction;
     }
     /**
