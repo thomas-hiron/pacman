@@ -369,7 +369,7 @@ class Pacman
    *
    * @returns {Point}
    */
-  public getCurrentTileCoords()
+  private getCurrentTileCoords()
   {
     return TileFunctions.getTileCoordinates({
       x: this.coordinates.x + Pacman.SIZE.w / 2,
