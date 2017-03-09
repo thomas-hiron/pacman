@@ -242,7 +242,7 @@ class Jeu
 
     /* Récupération de la case courante */
     var tiles: Array<Array<Tile>> = this.levelManager.getTiles();
-    var currentTile: Tile = tiles[coords.y][coords.x];
+    var currentTile: Tile = tiles[coords.y] != void 0 ? tiles[coords.y][coords.x] : null;
 
     /* Tile ok */
     if (currentTile != null && currentTile.hasPacDot())
