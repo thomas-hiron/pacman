@@ -1635,10 +1635,7 @@ class Pacman {
      */
     getNextTileCoords(direction) {
         /* La case suivante avec la prochaine direction */
-        var nextTileCoords = {
-            x: this.coordinates.x / Tile.TILE_WIDTH,
-            y: this.coordinates.y / Tile.TILE_WIDTH
-        };
+        var nextTileCoords = this.getCurrentTileCoords();
         /* Modification de la case suivante */
         switch (direction) {
             case Directions.Left:
@@ -1662,19 +1659,10 @@ class Pacman {
      * @returns {Point}
      */
     getCurrentTileCoords() {
-        var moduloX = this.coordinates.x % Tile.TILE_WIDTH;
-        var moduloY = this.coordinates.y % Tile.TILE_WIDTH;
-        /* Suppression pour avoir la case */
-        var coords = {
-            x: (this.coordinates.x - moduloX) / Tile.TILE_WIDTH,
-            y: (this.coordinates.y - moduloY) / Tile.TILE_WIDTH
-        };
-        /* Suivant la direction, c'est pas forcément la bonne case */
-        if (this.direction == Directions.Right)
-            coords.x++;
-        else if (this.direction == Directions.Down)
-            coords.y++;
-        return coords;
+        return TileFunctions.getTileCoordinates({
+            x: this.coordinates.x + Pacman.SIZE.w / 2,
+            y: this.coordinates.y + Pacman.SIZE.h / 2
+        });
     }
     /**
      * Récupère les coordonnées de la case précédente (celle derrière pacman)
@@ -1688,14 +1676,8 @@ class Pacman {
             case Directions.Left:
                 coords.x++;
                 break;
-            case Directions.Right:
-                coords.x--;
-                break;
             case Directions.Up:
                 coords.y++;
-                break;
-            case Directions.Down:
-                coords.y--;
                 break;
         }
         return coords;

@@ -342,10 +342,7 @@ class Pacman
   private getNextTileCoords(direction: number): Point
   {
     /* La case suivante avec la prochaine direction */
-    var nextTileCoords: Point = {
-      x: this.coordinates.x / Tile.TILE_WIDTH,
-      y: this.coordinates.y / Tile.TILE_WIDTH
-    };
+    var nextTileCoords: Point = this.getCurrentTileCoords();
 
     /* Modification de la case suivante */
     switch (direction)
@@ -374,22 +371,10 @@ class Pacman
    */
   public getCurrentTileCoords()
   {
-    var moduloX: number = this.coordinates.x % Tile.TILE_WIDTH;
-    var moduloY: number = this.coordinates.y % Tile.TILE_WIDTH;
-
-    /* Suppression pour avoir la case */
-    var coords: Point = {
-      x: (this.coordinates.x - moduloX) / Tile.TILE_WIDTH,
-      y: (this.coordinates.y - moduloY) / Tile.TILE_WIDTH
-    };
-
-    /* Suivant la direction, c'est pas forcément la bonne case */
-    if (this.direction == Directions.Right)
-      coords.x++;
-    else if (this.direction == Directions.Down)
-      coords.y++;
-
-    return coords;
+    return TileFunctions.getTileCoordinates({
+      x: this.coordinates.x + Pacman.SIZE.w / 2,
+      y: this.coordinates.y + Pacman.SIZE.h / 2
+    });
   }
 
   /**
@@ -407,14 +392,8 @@ class Pacman
       case Directions.Left:
         coords.x++;
         break;
-      case Directions.Right:
-        coords.x--;
-        break;
       case Directions.Up:
         coords.y++;
-        break;
-      case Directions.Down:
-        coords.y--;
         break;
     }
 
