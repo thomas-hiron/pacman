@@ -59,7 +59,7 @@ class LevelManager
         this.drawTile(canvas, tile);
         if (tile.hasPacDot())
         {
-          //this.drawPacDot(canvas, tile);
+          this.drawPacDot(canvas, tile);
 
           /* Incrémentation du nombre de points */
           this.pacDotNumber++;

@@ -117,7 +117,7 @@ class Jeu
     this.powerPelletTiles = this.levelManager.getPowerPellet();
 
     /* Date de début pour le fruit manager */
-    //this.fruitsManager.start();
+    this.fruitsManager.start();
 
     /* RequestAnimationFrame pour le pacman, les fantomes */
     requestAnimFrame(this.draw.bind(this));
@@ -139,13 +139,13 @@ class Jeu
       this.drawCurrentPacDot();
 
       /* Clignotement des points */
-      //this.flashPowerPellet();
+      this.flashPowerPellet();
 
       /* Dessin de la porte de sortie des fantomes */
       this.drawEscapeDoor();
 
       /* Animation de pacman */
-      //this.animatePacman();
+      this.animatePacman();
 
       /* Animation des fantômes */
       this.animateGhosts();
@@ -204,9 +204,8 @@ class Jeu
     var margin: number = (Tile.TILE_WIDTH - Ghost.SIZE.w) / 2;
     var coordsAndCanvas: Array<CanvasAndCoords> = this.ghostsManager.getGhostsCoordsAndCanvas();
 
-    // Suppression des fantômes
-
-    for (var i = 0, l = coordsAndCanvas.length; i < l; ++i)
+    /* Suppression des fantômes */
+    for (var i = 0, l = coordsAndCanvas.length ; i < l ; ++i)
     {
       var obj: CanvasAndCoords = coordsAndCanvas[i];
       context.clearRect(obj.coords.x + margin, obj.coords.y + margin + Jeu.TOP_HEIGHT, Ghost.SIZE.w, Ghost.SIZE.h);
@@ -221,8 +220,7 @@ class Jeu
     // TODO : Animer les fantômes
 
     /* Dessin des fantômes */
-
-    for (i = 0, l = coordsAndCanvas.length; i < l; ++i)
+    for (i = 0, l = coordsAndCanvas.length ; i < l ; ++i)
     {
       var obj: CanvasAndCoords = coordsAndCanvas[i];
       context.drawImage(obj.canvas.getElement(), obj.coords.x + margin, obj.coords.y + margin + Jeu.TOP_HEIGHT);
@@ -376,7 +374,7 @@ class Jeu
     var margin: number = 10;
 
     /* Suppression dans les deux cas */
-    for (var i = 0, l = this.powerPelletTiles.length; i < l; ++i)
+    for (var i = 0, l = this.powerPelletTiles.length ; i < l ; ++i)
     {
       context.clearRect(
         this.powerPelletTiles[i].getCoordinates().x * Tile.TILE_WIDTH + margin,
@@ -393,7 +391,7 @@ class Jeu
       canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
 
       /* Dessin */
-      for (var i = 0, l = this.powerPelletTiles.length; i < l; ++i)
+      for (var i = 0, l = this.powerPelletTiles.length ; i < l ; ++i)
         this.levelManager.drawPacDot(canvas, this.powerPelletTiles[i]);
 
       /* Dessin du point  */

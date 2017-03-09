@@ -816,7 +816,7 @@ class Jeu {
         /* Récupération de toutes les power pellet pour les faire clignoter */
         this.powerPelletTiles = this.levelManager.getPowerPellet();
         /* Date de début pour le fruit manager */
-        //this.fruitsManager.start();
+        this.fruitsManager.start();
         /* RequestAnimationFrame pour le pacman, les fantomes */
         requestAnimFrame(this.draw.bind(this));
         return this;
@@ -832,11 +832,11 @@ class Jeu {
             /* Dessine la case courante si le point a pas été mangé pour pas le couper */
             this.drawCurrentPacDot();
             /* Clignotement des points */
-            //this.flashPowerPellet();
+            this.flashPowerPellet();
             /* Dessin de la porte de sortie des fantomes */
             this.drawEscapeDoor();
             /* Animation de pacman */
-            //this.animatePacman();
+            this.animatePacman();
             /* Animation des fantômes */
             this.animateGhosts();
             /* Mise à jour du score */
@@ -879,7 +879,7 @@ class Jeu {
         var context = this.canvas.getContext();
         var margin = (Tile.TILE_WIDTH - Ghost.SIZE.w) / 2;
         var coordsAndCanvas = this.ghostsManager.getGhostsCoordsAndCanvas();
-        // Suppression des fantômes
+        /* Suppression des fantômes */
         for (var i = 0, l = coordsAndCanvas.length; i < l; ++i) {
             var obj = coordsAndCanvas[i];
             context.clearRect(obj.coords.x + margin, obj.coords.y + margin + Jeu.TOP_HEIGHT, Ghost.SIZE.w, Ghost.SIZE.h);
@@ -1243,7 +1243,7 @@ class LevelManager {
                 /* Dessine la case courante et le point */
                 this.drawTile(canvas, tile);
                 if (tile.hasPacDot()) {
-                    //this.drawPacDot(canvas, tile);
+                    this.drawPacDot(canvas, tile);
                     /* Incrémentation du nombre de points */
                     this.pacDotNumber++;
                 }
