@@ -9,10 +9,6 @@ class Score
 {
   private score: number = 0;
 
-  /* Constantes de score */
-  private static PAC_DOT = 10;
-  private static POWER_PELLET = 50;
-
   /**
    * @returns {string}
    */
