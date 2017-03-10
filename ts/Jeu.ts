@@ -233,10 +233,10 @@ class Jeu
       /* Tile ok */
       if (currentTile != null && currentTile.hasPacDot())
       {
-        /* Si c'est un fruit, c'est Jeu qui redessine */
-        if (currentTile.getPacDot() instanceof Fruit);
-        else
+        /* Dessin que si pacdot */
+        if (!(currentTile.getPacDot() instanceof Fruit) && !(currentTile.getPacDot() instanceof PowerPellet))
         {
+          /* Suppression */
           context.clearRect(coords.x * Tile.TILE_WIDTH + margin, coords.y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
 
           /* Dessin */
@@ -269,19 +269,14 @@ class Jeu
     /* Tile ok */
     if (currentTile != null && currentTile.hasPacDot())
     {
-      /* Si c'est un fruit, c'est Jeu qui redessine */
-      if (currentTile.getPacDot() instanceof Fruit);
-      else
+      /* Dessin que si pacdot */
+      if (!(currentTile.getPacDot() instanceof Fruit) && !(currentTile.getPacDot() instanceof PowerPellet))
       {
-        var canvas: Canvas = new Canvas();
-        canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
+        /* Suppression du point */
+        this.canvas.getContext().clearRect(coords.x * Tile.TILE_WIDTH + margin, coords.y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
 
         /* Dessin */
-        this.levelManager.drawPacDot(canvas, currentTile);
-
-        /* Dessin du point et suppression de l'ancien */
-        this.canvas.getContext().clearRect(coords.x * Tile.TILE_WIDTH + margin, coords.y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
-        this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
+        this.levelManager.drawPacDot(this.canvas, currentTile);
       }
     }
 

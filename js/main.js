@@ -911,10 +911,9 @@ class Jeu {
             var currentTile = tiles[coords.y] != void 0 ? tiles[coords.y][coords.x] : null;
             /* Tile ok */
             if (currentTile != null && currentTile.hasPacDot()) {
-                /* Si c'est un fruit, c'est Jeu qui redessine */
-                if (currentTile.getPacDot() instanceof Fruit)
-                    ;
-                else {
+                /* Dessin que si pacdot */
+                if (!(currentTile.getPacDot() instanceof Fruit) && !(currentTile.getPacDot() instanceof PowerPellet)) {
+                    /* Suppression */
                     context.clearRect(coords.x * Tile.TILE_WIDTH + margin, coords.y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
                     /* Dessin */
                     this.levelManager.drawPacDot(this.canvas, currentTile);
@@ -939,17 +938,12 @@ class Jeu {
         var currentTile = tiles[coords.y] != void 0 ? tiles[coords.y][coords.x] : null;
         /* Tile ok */
         if (currentTile != null && currentTile.hasPacDot()) {
-            /* Si c'est un fruit, c'est Jeu qui redessine */
-            if (currentTile.getPacDot() instanceof Fruit)
-                ;
-            else {
-                var canvas = new Canvas();
-                canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
-                /* Dessin */
-                this.levelManager.drawPacDot(canvas, currentTile);
-                /* Dessin du point et suppression de l'ancien */
+            /* Dessin que si pacdot */
+            if (!(currentTile.getPacDot() instanceof Fruit) && !(currentTile.getPacDot() instanceof PowerPellet)) {
+                /* Suppression du point */
                 this.canvas.getContext().clearRect(coords.x * Tile.TILE_WIDTH + margin, coords.y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
-                this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
+                /* Dessin */
+                this.levelManager.drawPacDot(this.canvas, currentTile);
             }
         }
         return this;
