@@ -14,7 +14,7 @@ class Jeu
   /* Interval du request animation frame */
   private static INTERVAL: number = 10;
   /* Hauteur du panneau supérieur */
-  private static TOP_HEIGHT: number = 40;
+  public static TOP_HEIGHT: number = 40;
 
   private canvas: Canvas;
   private pacman: Pacman;
@@ -50,16 +50,9 @@ class Jeu
       return this;
     }
 
-    /* Le canvas pour dessiner les niveau */
-    var canvasLevel: Canvas = new Canvas();
-    canvasLevel.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
-
     /* Les niveaux */
     this.levelManager = new LevelManager();
-    this.levelManager.draw(canvasLevel);
-
-    /* Dessin du niveau */
-    this.canvas.getContext().drawImage(canvasLevel.getElement(), 0, Jeu.TOP_HEIGHT);
+    this.levelManager.draw(this.canvas);
 
     /* Le manager des fruits */
     this.fruitsManager = new FruitsManager();
@@ -204,6 +197,9 @@ class Jeu
     var margin: number = (Tile.TILE_WIDTH - Ghost.SIZE.w) / 2;
     var coordsAndCanvas: Array<CanvasAndCoords> = this.ghostsManager.getGhostsCoordsAndCanvas();
 
+    /* Pour les points */
+    var tiles: Array<Array<Tile>> = this.levelManager.getTiles();
+
     /* Suppression des fantômes */
     for (var i = 0, l = coordsAndCanvas.length ; i < l ; ++i)
     {
@@ -219,10 +215,29 @@ class Jeu
 
     // TODO : Animer les fantômes
 
-    /* Dessin des fantômes */
+    /* Redessiner la case derrière le fantome */
     for (i = 0, l = coordsAndCanvas.length ; i < l ; ++i)
     {
       var obj: CanvasAndCoords = coordsAndCanvas[i];
+
+      /* Récupération de la tuile */
+      var coords: Point = TileFunctions.getTileCoordinates({
+        x: obj.coords.x + Tile.TILE_WIDTH / 2,
+        y: obj.coords.y + Tile.TILE_WIDTH / 2
+      });
+      var currentTile: Tile = tiles[coords.y] != void 0 ? tiles[coords.y][coords.x] : null;
+
+      /* Tile ok */
+      if (currentTile != null && currentTile.hasPacDot())
+      {
+        /* Dessin du point et suppression de l'ancien */
+        context.clearRect(coords.x * Tile.TILE_WIDTH + margin, coords.y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
+
+        /* Dessin */
+        this.levelManager.drawPacDot(this.canvas, currentTile);
+      }
+
+      /* Dessin des fantômes */
       context.drawImage(obj.canvas.getElement(), obj.coords.x + margin, obj.coords.y + margin + Jeu.TOP_HEIGHT);
     }
 
@@ -387,15 +402,9 @@ class Jeu
     /* Redessin */
     if (date.getMilliseconds() >= 500)
     {
-      var canvas: Canvas = new Canvas();
-      canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
-
       /* Dessin */
       for (var i = 0, l = this.powerPelletTiles.length ; i < l ; ++i)
-        this.levelManager.drawPacDot(canvas, this.powerPelletTiles[i]);
-
-      /* Dessin du point  */
-      this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
+        this.levelManager.drawPacDot(this.canvas, this.powerPelletTiles[i]);
     }
 
     return this;

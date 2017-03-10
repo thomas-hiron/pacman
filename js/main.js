@@ -779,14 +779,9 @@ class Jeu {
             /* Retour de l'instance pour ne pas continuer le temps de la redirection */
             return this;
         }
-        /* Le canvas pour dessiner les niveau */
-        var canvasLevel = new Canvas();
-        canvasLevel.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
         /* Les niveaux */
         this.levelManager = new LevelManager();
-        this.levelManager.draw(canvasLevel);
-        /* Dessin du niveau */
-        this.canvas.getContext().drawImage(canvasLevel.getElement(), 0, Jeu.TOP_HEIGHT);
+        this.levelManager.draw(this.canvas);
         /* Le manager des fruits */
         this.fruitsManager = new FruitsManager();
         /* Le ghosts manager */
@@ -890,6 +885,8 @@ class Jeu {
         var context = this.canvas.getContext();
         var margin = (Tile.TILE_WIDTH - Ghost.SIZE.w) / 2;
         var coordsAndCanvas = this.ghostsManager.getGhostsCoordsAndCanvas();
+        /* Pour les points */
+        var tiles = this.levelManager.getTiles();
         /* Suppression des fantômes */
         for (var i = 0, l = coordsAndCanvas.length; i < l; ++i) {
             var obj = coordsAndCanvas[i];
@@ -901,9 +898,23 @@ class Jeu {
             y: this.pacman.getY() + Tile.TILE_WIDTH / 2
         });
         // TODO : Animer les fantômes
-        /* Dessin des fantômes */
+        /* Redessiner la case derrière le fantome */
         for (i = 0, l = coordsAndCanvas.length; i < l; ++i) {
             var obj = coordsAndCanvas[i];
+            /* Récupération de la tuile */
+            var coords = TileFunctions.getTileCoordinates({
+                x: obj.coords.x + Tile.TILE_WIDTH / 2,
+                y: obj.coords.y + Tile.TILE_WIDTH / 2
+            });
+            var currentTile = tiles[coords.y] != void 0 ? tiles[coords.y][coords.x] : null;
+            /* Tile ok */
+            if (currentTile != null && currentTile.hasPacDot()) {
+                /* Dessin du point et suppression de l'ancien */
+                context.clearRect(coords.x * Tile.TILE_WIDTH + margin, coords.y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
+                /* Dessin */
+                this.levelManager.drawPacDot(this.canvas, currentTile);
+            }
+            /* Dessin des fantômes */
             context.drawImage(obj.canvas.getElement(), obj.coords.x + margin, obj.coords.y + margin + Jeu.TOP_HEIGHT);
         }
         return this;
@@ -1024,13 +1035,9 @@ class Jeu {
         }
         /* Redessin */
         if (date.getMilliseconds() >= 500) {
-            var canvas = new Canvas();
-            canvas.setSize(this.canvas.getElement().width, this.canvas.getElement().height);
             /* Dessin */
             for (var i = 0, l = this.powerPelletTiles.length; i < l; ++i)
-                this.levelManager.drawPacDot(canvas, this.powerPelletTiles[i]);
-            /* Dessin du point  */
-            this.canvas.getContext().drawImage(canvas.getElement(), 0, Jeu.TOP_HEIGHT);
+                this.levelManager.drawPacDot(this.canvas, this.powerPelletTiles[i]);
         }
         return this;
     }
@@ -1273,25 +1280,26 @@ class LevelManager {
         context.beginPath();
         context.strokeStyle = "#012EB6";
         context.lineWidth = 4;
+        var j = Jeu.TOP_HEIGHT;
         var coordinates = tile.getCoordinates();
         if (tile.hasBorderLeft()) {
-            context.moveTo(coordinates.x * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH);
-            context.lineTo(coordinates.x * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH);
+            context.moveTo(coordinates.x * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH + j);
+            context.lineTo(coordinates.x * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH + j);
         }
         /* Bordure droite */
         if (tile.hasBorderRight()) {
-            context.moveTo((coordinates.x + 1) * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH);
-            context.lineTo((coordinates.x + 1) * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH);
+            context.moveTo((coordinates.x + 1) * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH + j);
+            context.lineTo((coordinates.x + 1) * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH + j);
         }
         /* Bordure haut */
         if (tile.hasBorderTop()) {
-            context.moveTo(coordinates.x * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH);
-            context.lineTo((coordinates.x + 1) * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH);
+            context.moveTo(coordinates.x * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH + j);
+            context.lineTo((coordinates.x + 1) * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH + j);
         }
         /* Bordure bas */
         if (tile.hasBorderBottom()) {
-            context.moveTo(coordinates.x * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH);
-            context.lineTo((coordinates.x + 1) * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH);
+            context.moveTo(coordinates.x * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH + j);
+            context.lineTo((coordinates.x + 1) * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH + j);
         }
         /* Bordure */
         context.stroke();
@@ -1320,7 +1328,7 @@ class LevelManager {
             var radius = tile.getPacDot() instanceof PowerPellet ? 6 : 3;
             var margin = Tile.TILE_WIDTH / 2;
             context.beginPath();
-            context.arc(coordinates.x * Tile.TILE_WIDTH + margin, coordinates.y * Tile.TILE_WIDTH + margin, radius, 0, 2 * Math.PI, false);
+            context.arc(coordinates.x * Tile.TILE_WIDTH + margin, coordinates.y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT, radius, 0, 2 * Math.PI, false);
             context.fillStyle = 'white';
             context.strokeStyle = 'white';
             context.lineWidth = 0;
