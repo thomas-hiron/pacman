@@ -131,6 +131,9 @@ class Jeu
       /* Dessine la case courante si le point a pas été mangé pour pas le couper */
       this.drawCurrentPacDot();
 
+      /* Dessin du fruit */
+      this.onNewFruit(null);
+
       /* Clignotement des points */
       this.flashPowerPellet();
 
@@ -230,11 +233,15 @@ class Jeu
       /* Tile ok */
       if (currentTile != null && currentTile.hasPacDot())
       {
-        /* Dessin du point et suppression de l'ancien */
-        context.clearRect(coords.x * Tile.TILE_WIDTH + margin, coords.y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
+        /* Si c'est un fruit, c'est Jeu qui redessine */
+        if (currentTile.getPacDot() instanceof Fruit);
+        else
+        {
+          context.clearRect(coords.x * Tile.TILE_WIDTH + margin, coords.y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
 
-        /* Dessin */
-        this.levelManager.drawPacDot(this.canvas, currentTile);
+          /* Dessin */
+          this.levelManager.drawPacDot(this.canvas, currentTile);
+        }
       }
 
       /* Dessin des fantômes */
@@ -263,8 +270,7 @@ class Jeu
     if (currentTile != null && currentTile.hasPacDot())
     {
       /* Si c'est un fruit, c'est Jeu qui redessine */
-      if (currentTile.getPacDot() instanceof Fruit)
-        this.onNewFruit(null);
+      if (currentTile.getPacDot() instanceof Fruit);
       else
       {
         var canvas: Canvas = new Canvas();
@@ -473,49 +479,54 @@ class Jeu
    */
   private onNewFruit(e: CustomEvent): Jeu
   {
-    /* Nettoyage de la case au cas où */
-    this.onRemoveFruit(false);
-
     /* Récupération de la case du milieu */
     var tiles: Array<Array<Tile>> = this.levelManager.getTiles();
     var middleTile: Tile = tiles[Pacman.BASE_Y][Pacman.BASE_X];
 
+    /* Le fruit */
     var fruit: Fruit = e === null ? middleTile.getPacDot() : e.detail;
-    var fruitWidth: number = Fruit.WIDTH;
-    var margin: number = (Tile.TILE_WIDTH - fruitWidth) / 2;
-    var index: number = 0;
 
     /* Ajout du fruit */
-    middleTile.setPacDot(fruit);
+    if (e !== null || fruit !== null)
+    {
+      /* Nettoyage de la case au cas où */
+      this.onRemoveFruit(false);
 
-    if (fruit instanceof Strawberry)
-      index = 1;
-    else if (fruit instanceof Orange)
-      index = 2;
-    else if (fruit instanceof Apple)
-      index = 3;
-    else if (fruit instanceof Melon)
-      index = 4;
-    else if (fruit instanceof Galaxian)
-      index = 5;
-    else if (fruit instanceof Bell)
-      index = 6;
-    else if (fruit instanceof Key)
-      index = 7;
+      var fruitWidth: number = Fruit.WIDTH;
+      var margin: number = (Tile.TILE_WIDTH - fruitWidth) / 2;
+      var index: number = 0;
 
-    var img: HTMLImageElement = <HTMLImageElement>document.querySelector('img');
-    this.canvas.getContext().drawImage(
-      /* L'image */
-      img,
-      /* Où commencer le clip de l'image, dépend donc du fruit */
-      index * fruitWidth, 0,
-      /* La taille du fruit */
-      fruitWidth, fruitWidth,
-      /* La position dans le canvas */
-      middleTile.getCoordinates().x * Tile.TILE_WIDTH + margin, middleTile.getCoordinates().y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT,
-      /*  La taille du fruit */
-      fruitWidth, fruitWidth
-    );
+      middleTile.setPacDot(fruit);
+
+      if (fruit instanceof Strawberry)
+        index = 1;
+      else if (fruit instanceof Orange)
+        index = 2;
+      else if (fruit instanceof Apple)
+        index = 3;
+      else if (fruit instanceof Melon)
+        index = 4;
+      else if (fruit instanceof Galaxian)
+        index = 5;
+      else if (fruit instanceof Bell)
+        index = 6;
+      else if (fruit instanceof Key)
+        index = 7;
+
+      var img: HTMLImageElement = <HTMLImageElement>document.querySelector('img');
+      this.canvas.getContext().drawImage(
+        /* L'image */
+        img,
+        /* Où commencer le clip de l'image, dépend donc du fruit */
+        index * fruitWidth, 0,
+        /* La taille du fruit */
+        fruitWidth, fruitWidth,
+        /* La position dans le canvas */
+        middleTile.getCoordinates().x * Tile.TILE_WIDTH + margin, middleTile.getCoordinates().y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT,
+        /*  La taille du fruit */
+        fruitWidth, fruitWidth
+      );
+    }
 
     return this;
   }
