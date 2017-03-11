@@ -60,10 +60,48 @@ abstract class Ghost
     this.canvas.setSize(Ghost.SIZE.w, Ghost.SIZE.h);
 
     /* TMP, dessin d'un rectangle */
+    this.draw();
+
+    return this;
+  }
+
+  /**
+   * Dessine le fantôme
+   *
+   * @returns {Ghost}
+   */
+  private draw(): Ghost
+  {
     var context: CanvasRenderingContext2D = this.canvas.getContext();
+    context.globalCompositeOperation = 'source-over';
+
+    /* La tête */
+    context.arc(Ghost.SIZE.w / 2, Ghost.SIZE.h / 2, Ghost.SIZE.w / 2, 0, 2 * Math.PI, false);
+
+    /* Le corps */
+    context.rect(0, Ghost.SIZE.h / 2, Ghost.SIZE.w, Ghost.SIZE.h / 2);
+
+    /* Remplissage */
     context.fillStyle = this.color;
-    context.rect(0, 0, Ghost.SIZE.w, Ghost.SIZE.h);
     context.fill();
+
+    /* Changement de mode et ajout des pates */
+    context.globalCompositeOperation = 'destination-out';
+
+    /* TMP, le nombre de pates */
+    var legsNumber: number = 4;
+    var legWidth: number = Ghost.SIZE.w / legsNumber;
+    var legHeight: number = 3;
+
+    for (var i = 0 ; i < legsNumber ; ++i)
+    {
+      context.beginPath();
+      context.moveTo(i * Ghost.SIZE.w / legsNumber, Ghost.SIZE.h);
+      context.lineTo(i * Ghost.SIZE.w / legsNumber + legWidth / 2, Ghost.SIZE.h - legHeight);
+      context.lineTo(i * Ghost.SIZE.w / legsNumber + legWidth, Ghost.SIZE.h);
+      context.closePath();
+      context.fill();
+    }
 
     return this;
   }
