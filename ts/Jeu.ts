@@ -111,6 +111,7 @@ class Jeu
 
     /* Date de début pour le fruit manager */
     this.fruitsManager.start();
+    this.ghostsManager.start();
 
     /* RequestAnimationFrame pour le pacman, les fantomes */
     requestAnimFrame(this.draw.bind(this));

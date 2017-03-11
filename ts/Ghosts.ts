@@ -411,6 +411,26 @@ abstract class Ghost
   {
     this.mode = mode;
 
+    /* Si scatter, changement de direction */
+    if(this.mode == Modes.Scatter)
+    {
+      switch (this.direction)
+      {
+        case Directions.Left:
+          this.direction = Directions.Right;
+          break;
+        case Directions.Right:
+          this.direction = Directions.Left;
+          break;
+        case Directions.Up:
+          this.direction = Directions.Down;
+          break;
+        case Directions.Down:
+          this.direction = Directions.Up;
+          break;
+      }
+    }
+
     return this;
   }
 

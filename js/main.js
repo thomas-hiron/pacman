@@ -555,6 +555,23 @@ class Ghost {
      */
     changeMode(mode) {
         this.mode = mode;
+        /* Si scatter, changement de direction */
+        if (this.mode == Modes.Scatter) {
+            switch (this.direction) {
+                case Directions.Left:
+                    this.direction = Directions.Right;
+                    break;
+                case Directions.Right:
+                    this.direction = Directions.Left;
+                    break;
+                case Directions.Up:
+                    this.direction = Directions.Down;
+                    break;
+                case Directions.Down:
+                    this.direction = Directions.Up;
+                    break;
+            }
+        }
         return this;
     }
     /**
@@ -712,9 +729,9 @@ class Clyde extends Ghost {
 class GhostsManager {
     constructor() {
         /* Initialisation des intervalles et autres */
-        this.chaseInterval = 20;
-        this.scatterInterval = 7;
-        this.frightenInterval = 7;
+        this.chaseInterval = 20000;
+        this.scatterInterval = 7000;
+        this.frightenInterval = 7000;
         this.waveNumber = 1;
         this.mode = Modes.Scatter;
         /* Instanciation des fantômes */
@@ -754,6 +771,14 @@ class GhostsManager {
         return this;
     }
     /**
+     * Démarrage du chrono
+     * @returns {GhostsManager}
+     */
+    start() {
+        this.time = +new Date();
+        return this;
+    }
+    /**
      * Change de mode si besoin et déplace les fantômes
      *
      * @param pacmanCenter
@@ -761,6 +786,17 @@ class GhostsManager {
      * @returns {GhostsManager}
      */
     moveGhosts(pacmanCenter) {
+        /* Vérification du chrono */
+        switch (this.mode) {
+            case Modes.Chase:
+                if (+new Date() - this.time > this.chaseInterval)
+                    this.changeMode(Modes.Scatter);
+                break;
+            case Modes.Scatter:
+                if (+new Date() - this.time > this.scatterInterval)
+                    this.changeMode(Modes.Chase);
+                break;
+        }
         this.blinky.move(pacmanCenter);
         return this;
     }
@@ -770,6 +806,7 @@ class GhostsManager {
      * @returns {GhostsManager}
      */
     animateGhosts() {
+        /* Changement de mode si intervalle dépassé */
         this.blinky.animate();
         return this;
     }
@@ -778,7 +815,15 @@ class GhostsManager {
      *
      * @returns {GhostsManager}
      */
-    changeMode() {
+    changeMode(mode) {
+        this.mode = mode;
+        /* Changement pour les fantômes */
+        this.pinky.changeMode(this.mode);
+        this.blinky.changeMode(this.mode);
+        this.inky.changeMode(this.mode);
+        this.clyde.changeMode(this.mode);
+        /* Réinitialisation du chrono */
+        this.time = +new Date();
         return this;
     }
     /**
@@ -894,6 +939,7 @@ class Jeu {
         this.powerPelletTiles = this.levelManager.getPowerPellet();
         /* Date de début pour le fruit manager */
         this.fruitsManager.start();
+        this.ghostsManager.start();
         /* RequestAnimationFrame pour le pacman, les fantomes */
         requestAnimFrame(this.draw.bind(this));
         return this;

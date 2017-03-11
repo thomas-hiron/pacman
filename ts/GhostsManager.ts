@@ -27,9 +27,9 @@ class GhostsManager
   constructor()
   {
     /* Initialisation des intervalles et autres */
-    this.chaseInterval = 20;
-    this.scatterInterval = 7;
-    this.frightenInterval = 7;
+    this.chaseInterval = 20000;
+    this.scatterInterval = 7000;
+    this.frightenInterval = 7000;
     this.waveNumber = 1;
     this.mode = Modes.Scatter;
 
@@ -78,6 +78,17 @@ class GhostsManager
   }
 
   /**
+   * Démarrage du chrono
+   * @returns {GhostsManager}
+   */
+  public start(): GhostsManager
+  {
+    this.time = +new Date();
+
+    return this;
+  }
+
+  /**
    * Change de mode si besoin et déplace les fantômes
    *
    * @param pacmanCenter
@@ -86,6 +97,24 @@ class GhostsManager
    */
   public moveGhosts(pacmanCenter: Point): GhostsManager
   {
+    /* Vérification du chrono */
+    switch (this.mode)
+    {
+      case Modes.Chase:
+
+        if (+new Date() - this.time > this.chaseInterval)
+          this.changeMode(Modes.Scatter);
+
+        break;
+
+      case Modes.Scatter:
+
+        if (+new Date() - this.time > this.scatterInterval)
+          this.changeMode(Modes.Chase);
+
+        break;
+    }
+
     this.blinky.move(pacmanCenter);
 
     return this;
@@ -98,6 +127,7 @@ class GhostsManager
    */
   public animateGhosts(): GhostsManager
   {
+    /* Changement de mode si intervalle dépassé */
     this.blinky.animate();
 
     return this;
@@ -108,8 +138,19 @@ class GhostsManager
    *
    * @returns {GhostsManager}
    */
-  private changeMode(): GhostsManager
+  private changeMode(mode: number): GhostsManager
   {
+    this.mode = mode;
+
+    /* Changement pour les fantômes */
+    this.pinky.changeMode(this.mode);
+    this.blinky.changeMode(this.mode);
+    this.inky.changeMode(this.mode);
+    this.clyde.changeMode(this.mode);
+
+    /* Réinitialisation du chrono */
+    this.time = +new Date();
+
     return this;
   }
 
