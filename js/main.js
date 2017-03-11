@@ -786,8 +786,15 @@ class GhostsManager {
         /* Vérification du chrono */
         switch (this.mode) {
             case Modes.Chase:
-                if (+new Date() - this.time > this.chaseInterval)
+                /* Si intervalle atteint et 4e vague pas dépassée */
+                if (+new Date() - this.time > this.chaseInterval && this.waveNumber < 4) {
                     this.changeMode(Modes.Scatter);
+                    /* Modification de la vague */
+                    this.waveNumber++;
+                    /* Diminution des intervalles */
+                    if (this.waveNumber > 2)
+                        this.scatterInterval = 5000;
+                }
                 break;
             case Modes.Scatter:
                 if (+new Date() - this.time > this.scatterInterval)
