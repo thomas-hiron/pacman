@@ -289,6 +289,7 @@ class Ghost {
     draw() {
         var context = this.canvas.getContext();
         context.globalCompositeOperation = 'source-over';
+        context.beginPath();
         /* La tête */
         context.arc(Ghost.SIZE.w / 2, Ghost.SIZE.h / 2, Ghost.SIZE.w / 2, 0, 2 * Math.PI, false);
         /* Le corps */
@@ -296,6 +297,38 @@ class Ghost {
         /* Remplissage */
         context.fillStyle = this.color;
         context.fill();
+        context.closePath();
+        /* Les yeux */
+        var x = 0;
+        var y = 0;
+        switch (this.direction) {
+            case Directions.Left:
+                x = -2;
+                break;
+            case Directions.Right:
+                x = 2;
+                break;
+            case Directions.Up:
+                y = -2;
+                break;
+            case Directions.Down:
+                y = 2;
+                break;
+        }
+        context.beginPath();
+        context.ellipse(Ghost.SIZE.w / 2 - 5 + x, Ghost.SIZE.h / 2 + y, 3, 4, 0, 2 * Math.PI, false);
+        context.ellipse(Ghost.SIZE.w / 2 + 5 + x, Ghost.SIZE.h / 2 + y, 3, 4, 0, 2 * Math.PI, false);
+        /* Remplissage du blanc */
+        context.fillStyle = 'white';
+        context.fill();
+        context.closePath();
+        context.beginPath();
+        context.ellipse(Ghost.SIZE.w / 2 - 5 + x * 2, Ghost.SIZE.h / 2 + y * 2, 1, 2, 0, 2 * Math.PI, false);
+        context.ellipse(Ghost.SIZE.w / 2 + 5 + x * 2, Ghost.SIZE.h / 2 + y * 2, 1, 2, 0, 2 * Math.PI, false);
+        /* Remplissage de la pupille*/
+        context.fillStyle = 'black';
+        context.fill();
+        context.closePath();
         /* Changement de mode et ajout des pates */
         context.globalCompositeOperation = 'destination-out';
         /* Le nombre de pates */
