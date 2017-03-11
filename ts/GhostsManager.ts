@@ -68,12 +68,6 @@ class GhostsManager
     this.inky.init();
     this.clyde.init();
 
-    /* Changement des modes */
-    this.pinky.changeMode(this.mode);
-    this.blinky.changeMode(this.mode);
-    this.inky.changeMode(this.mode);
-    this.clyde.changeMode(this.mode);
-
     return this;
   }
 

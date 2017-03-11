@@ -277,8 +277,10 @@ class Ghost {
     init() {
         this.canvas = new Canvas();
         this.canvas.setSize(Ghost.SIZE.w, Ghost.SIZE.h);
-        /* TMP, dessin d'un rectangle */
+        /* Dessin */
         this.draw();
+        /* Mode par défaut */
+        this.mode = Modes.Scatter;
         return this;
     }
     /**
@@ -763,11 +765,6 @@ class GhostsManager {
         this.blinky.init();
         this.inky.init();
         this.clyde.init();
-        /* Changement des modes */
-        this.pinky.changeMode(this.mode);
-        this.blinky.changeMode(this.mode);
-        this.inky.changeMode(this.mode);
-        this.clyde.changeMode(this.mode);
         return this;
     }
     /**
