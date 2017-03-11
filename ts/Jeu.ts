@@ -216,7 +216,8 @@ class Jeu
       y: this.pacman.getY() + Tile.TILE_WIDTH / 2
     });
 
-    // TODO : Animer les fantômes
+    /* Anime les fantômes */
+    this.ghostsManager.animateGhosts();
 
     /* Redessiner la case derrière le fantome */
     for (i = 0, l = coordsAndCanvas.length ; i < l ; ++i)

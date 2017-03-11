@@ -28,6 +28,7 @@ abstract class Ghost
   /* Le décalage en px pour le mouvement */
   private stepPx: number = 2;
   /* L'étape courante d'animation */
+  private stepNumber: number = 10;
   private currentStep: number = 0;
 
   /* La méthode de détection de collison */
@@ -88,8 +89,8 @@ abstract class Ghost
     /* Changement de mode et ajout des pates */
     context.globalCompositeOperation = 'destination-out';
 
-    /* TMP, le nombre de pates */
-    var legsNumber: number = 4;
+    /* Le nombre de pates */
+    var legsNumber: number = this.currentStep >= this.stepNumber / 2 ? 3 : 4;
     var legWidth: number = Ghost.SIZE.w / legsNumber;
     var legHeight: number = 3;
 
@@ -100,6 +101,8 @@ abstract class Ghost
       context.lineTo(i * Ghost.SIZE.w / legsNumber + legWidth / 2, Ghost.SIZE.h - legHeight);
       context.lineTo(i * Ghost.SIZE.w / legsNumber + legWidth, Ghost.SIZE.h);
       context.closePath();
+
+      /* Remplissage */
       context.fill();
     }
 
@@ -326,6 +329,16 @@ abstract class Ghost
    */
   public animate(): Ghost
   {
+    /* Augmentation de l'étape */
+    this.currentStep++;
+
+    /* Réinitialisation de l'étape si besoin */
+    if (this.currentStep % this.stepNumber == 0)
+      this.currentStep = 0;
+
+    /* Dessin dans le canvas */
+    this.draw();
+
     return this;
   }
 

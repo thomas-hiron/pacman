@@ -258,6 +258,7 @@ class Ghost {
         /* Le décalage en px pour le mouvement */
         this.stepPx = 2;
         /* L'étape courante d'animation */
+        this.stepNumber = 10;
         this.currentStep = 0;
     }
     /**
@@ -277,10 +278,39 @@ class Ghost {
         this.canvas = new Canvas();
         this.canvas.setSize(Ghost.SIZE.w, Ghost.SIZE.h);
         /* TMP, dessin d'un rectangle */
+        this.draw();
+        return this;
+    }
+    /**
+     * Dessine le fantôme
+     *
+     * @returns {Ghost}
+     */
+    draw() {
         var context = this.canvas.getContext();
+        context.globalCompositeOperation = 'source-over';
+        /* La tête */
+        context.arc(Ghost.SIZE.w / 2, Ghost.SIZE.h / 2, Ghost.SIZE.w / 2, 0, 2 * Math.PI, false);
+        /* Le corps */
+        context.rect(0, Ghost.SIZE.h / 2, Ghost.SIZE.w, Ghost.SIZE.h / 2);
+        /* Remplissage */
         context.fillStyle = this.color;
-        context.rect(0, 0, Ghost.SIZE.w, Ghost.SIZE.h);
         context.fill();
+        /* Changement de mode et ajout des pates */
+        context.globalCompositeOperation = 'destination-out';
+        /* Le nombre de pates */
+        var legsNumber = this.currentStep >= this.stepNumber / 2 ? 3 : 4;
+        var legWidth = Ghost.SIZE.w / legsNumber;
+        var legHeight = 3;
+        for (var i = 0; i < legsNumber; ++i) {
+            context.beginPath();
+            context.moveTo(i * Ghost.SIZE.w / legsNumber, Ghost.SIZE.h);
+            context.lineTo(i * Ghost.SIZE.w / legsNumber + legWidth / 2, Ghost.SIZE.h - legHeight);
+            context.lineTo(i * Ghost.SIZE.w / legsNumber + legWidth, Ghost.SIZE.h);
+            context.closePath();
+            /* Remplissage */
+            context.fill();
+        }
         return this;
     }
     /**
@@ -458,6 +488,13 @@ class Ghost {
      * @returns {Ghost}
      */
     animate() {
+        /* Augmentation de l'étape */
+        this.currentStep++;
+        /* Réinitialisation de l'étape si besoin */
+        if (this.currentStep % this.stepNumber == 0)
+            this.currentStep = 0;
+        /* Dessin dans le canvas */
+        this.draw();
         return this;
     }
     /**
@@ -700,6 +737,7 @@ class GhostsManager {
      * @returns {GhostsManager}
      */
     animateGhosts() {
+        this.blinky.animate();
         return this;
     }
     /**
@@ -899,7 +937,8 @@ class Jeu {
             x: this.pacman.getX() + Tile.TILE_WIDTH / 2,
             y: this.pacman.getY() + Tile.TILE_WIDTH / 2
         });
-        // TODO : Animer les fantômes
+        /* Anime les fantômes */
+        this.ghostsManager.animateGhosts();
         /* Redessiner la case derrière le fantome */
         for (i = 0, l = coordsAndCanvas.length; i < l; ++i) {
             var obj = coordsAndCanvas[i];

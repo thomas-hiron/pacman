@@ -98,6 +98,8 @@ class GhostsManager
    */
   public animateGhosts(): GhostsManager
   {
+    this.blinky.animate();
+
     return this;
   }
 
