@@ -68,6 +68,9 @@ class GhostsManager
     this.inky.init();
     this.clyde.init();
 
+    /* Listener sorti de la maison */
+    window.addEventListener('OutFromHome', this.ghostGotOut.bind(this), false);
+
     return this;
   }
 
@@ -81,6 +84,9 @@ class GhostsManager
 
     /* Blinky doit bouger directement */
     this.blinky.changeMode(this.mode, true);
+
+    /* Pinky doit sortir immédiatement */
+    this.pinky.getOutFromHome();
 
     return this;
   }
@@ -208,5 +214,17 @@ class GhostsManager
         'coords': this.clyde.getCoordinates()
       },
     ];
+  }
+
+  /**
+   * Un fantôme est sorti
+   *
+   * @returns {GhostsManager}
+   */
+  private ghostGotOut(e:CustomEvent): GhostsManager
+  {
+    e.detail.changeMode(this.mode);
+
+    return this;
   }
 }

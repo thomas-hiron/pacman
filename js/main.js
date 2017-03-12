@@ -68,6 +68,7 @@ var Modes;
     Modes[Modes["Scatter"] = 1] = "Scatter";
     Modes[Modes["Frightened"] = 2] = "Frightened";
     Modes[Modes["Idle"] = 3] = "Idle";
+    Modes[Modes["OutFromHome"] = 4] = "OutFromHome";
 })(Modes || (Modes = {}));
 /**
  * Created by mac pro on 04/03/2017.
@@ -257,7 +258,7 @@ FruitsManager.APPEARANCE_DURATION = 10000;
 class Ghost {
     constructor() {
         /* Le décalage en px pour le mouvement */
-        this.stepPx = 2;
+        this.stepPx = Ghost.NORMAL;
         /* L'étape courante d'animation */
         this.stepNumber = 10;
         this.currentStep = 0;
@@ -282,6 +283,7 @@ class Ghost {
         this.draw();
         /* Mode par défaut */
         this.mode = Modes.Idle;
+        this.direction = null;
         return this;
     }
     /**
@@ -502,6 +504,26 @@ class Ghost {
                     break;
                 case Modes.Frightened:
                     break;
+                /* Sort de la maison */
+                case Modes.OutFromHome:
+                    /* Si case sur les côtés, il doit aller au milieu */
+                    var coords = {
+                        x: this.coordinates.x / Tile.TILE_WIDTH,
+                        y: this.coordinates.y / Tile.TILE_WIDTH
+                    };
+                    /* Case du milieu, sortie vers le haut */
+                    if (coords.x == 7 && coords.y == 9)
+                        this.direction = Directions.Up;
+                    else if (coords.x == 7 && coords.y == 8) {
+                        /* Signaler au manager qu'il est sorti */
+                        var event = new CustomEvent('OutFromHome', { 'detail': this });
+                        window.dispatchEvent(event);
+                        /* Vitesse normale */
+                        this.stepPx = Ghost.NORMAL;
+                    }
+                    else {
+                    }
+                    break;
             }
         }
         /* Déplacement */
@@ -542,6 +564,8 @@ class Ghost {
      * @returns {Ghost}
      */
     getOutFromHome() {
+        this.mode = Modes.OutFromHome;
+        this.stepPx = Ghost.OUT_FROM_HOME;
         return this;
     }
     /**
@@ -560,6 +584,11 @@ class Ghost {
      * @returns {Ghost}
      */
     changeMode(mode, force = false) {
+        /* S'il vient de sortir de la maison */
+        if (this.mode == Modes.OutFromHome && mode == Modes.Scatter)
+            this.direction = Directions.Right;
+        else if (this.mode == Modes.OutFromHome && mode == Modes.Chase)
+            this.direction = Directions.Left;
         if (this.mode != Modes.Idle || force)
             this.mode = mode;
         /* Si scatter, changement de direction */
@@ -603,6 +632,11 @@ Ghost.SIZE = {
     w: 24,
     h: 24
 };
+/* Les différentes vitesses */
+Ghost.OUT_FROM_HOME = 1;
+Ghost.NORMAL = 2;
+Ghost.FRIGHTENED = 1;
+Ghost.GOING_HOME = 4;
 /**
  * Fantôme rose
  *  Prend pacman en ambuscade (vise 4 cases devant pacman)
@@ -631,7 +665,8 @@ class Pinky extends Ghost {
      * @returns {null}
      */
     targetTile(pacmanCenter) {
-        return null;
+        // TODO : Faire le bon calcul
+        return TileFunctions.getTileCoordinates(pacmanCenter);
     }
 }
 /**
@@ -767,6 +802,8 @@ class GhostsManager {
         this.blinky.init();
         this.inky.init();
         this.clyde.init();
+        /* Listener sorti de la maison */
+        window.addEventListener('OutFromHome', this.ghostGotOut.bind(this), false);
         return this;
     }
     /**
@@ -777,6 +814,8 @@ class GhostsManager {
         this.time = +new Date();
         /* Blinky doit bouger directement */
         this.blinky.changeMode(this.mode, true);
+        /* Pinky doit sortir immédiatement */
+        this.pinky.getOutFromHome();
         return this;
     }
     /**
@@ -878,6 +917,15 @@ class GhostsManager {
                 'coords': this.clyde.getCoordinates()
             },
         ];
+    }
+    /**
+     * Un fantôme est sorti
+     *
+     * @returns {GhostsManager}
+     */
+    ghostGotOut(e) {
+        e.detail.changeMode(this.mode);
+        return this;
     }
 }
 /**

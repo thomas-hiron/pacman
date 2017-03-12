@@ -12,6 +12,12 @@ abstract class Ghost
     h: 24
   };
 
+  /* Les différentes vitesses */
+  private static OUT_FROM_HOME = 1;
+  private static NORMAL = 2;
+  private static FRIGHTENED = 1;
+  private static GOING_HOME = 4;
+
   /* La direction */
   protected direction: number;
   /* Le mode courant */
@@ -26,7 +32,7 @@ abstract class Ghost
   /* Le canvas de chaque fantôme */
   private canvas: Canvas;
   /* Le décalage en px pour le mouvement */
-  private stepPx: number = 2;
+  private stepPx: number = Ghost.NORMAL;
   /* L'étape courante d'animation */
   private stepNumber: number = 10;
   private currentStep: number = 0;
@@ -65,6 +71,7 @@ abstract class Ghost
 
     /* Mode par défaut */
     this.mode = Modes.Idle;
+    this.direction = null;
 
     return this;
   }
@@ -344,6 +351,36 @@ abstract class Ghost
         case Modes.Frightened :
 
           break;
+
+        /* Sort de la maison */
+        case Modes.OutFromHome :
+
+          /* Si case sur les côtés, il doit aller au milieu */
+          var coords: Point = {
+            x: this.coordinates.x / Tile.TILE_WIDTH,
+            y: this.coordinates.y / Tile.TILE_WIDTH
+          };
+
+          /* Case du milieu, sortie vers le haut */
+          if (coords.x == 7 && coords.y == 9)
+            this.direction = Directions.Up;
+          /* Il est sorti */
+          else if (coords.x == 7 && coords.y == 8)
+          {
+            /* Signaler au manager qu'il est sorti */
+            var event = new CustomEvent('OutFromHome', {'detail': this});
+            window.dispatchEvent(event);
+
+            /* Vitesse normale */
+            this.stepPx = Ghost.NORMAL;
+          }
+          /* Aller au milieu */
+          else
+          {
+
+          }
+
+          break;
       }
     }
 
@@ -394,6 +431,10 @@ abstract class Ghost
    */
   public getOutFromHome(): Ghost
   {
+    this.mode = Modes.OutFromHome;
+
+    this.stepPx = Ghost.OUT_FROM_HOME;
+
     return this;
   }
 
@@ -416,6 +457,11 @@ abstract class Ghost
    */
   public changeMode(mode: number, force: boolean = false): Ghost
   {
+    /* S'il vient de sortir de la maison */
+    if (this.mode == Modes.OutFromHome && mode == Modes.Scatter)
+      this.direction = Directions.Right;
+    else if(this.mode == Modes.OutFromHome && mode == Modes.Chase)
+      this.direction = Directions.Left;
     if (this.mode != Modes.Idle || force)
       this.mode = mode;
 
@@ -497,7 +543,8 @@ class Pinky extends Ghost
    */
   protected targetTile(pacmanCenter: Point): Point
   {
-    return null;
+    // TODO : Faire le bon calcul
+    return TileFunctions.getTileCoordinates(pacmanCenter);
   }
 }
 

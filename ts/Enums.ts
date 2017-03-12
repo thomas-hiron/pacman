@@ -13,5 +13,6 @@ enum Modes {
   Chase,
   Scatter,
   Frightened,
-  Idle
+  Idle,
+  OutFromHome
 }
