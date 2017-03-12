@@ -1045,8 +1045,8 @@ class Jeu {
     draw() {
         /* Si l'interval a été atteint */
         if (+new Date() - this.time > Jeu.INTERVAL) {
-            /* Dessine la case courante si le point a pas été mangé pour pas le couper */
-            this.drawCurrentPacDot();
+            /* Nettoyage des éléments pour pas avoir de carrés qui trainent */
+            this.clearAll();
             /* Dessin du fruit */
             this.onNewFruit(null);
             /* Clignotement des points */
@@ -1069,6 +1069,32 @@ class Jeu {
         return this;
     }
     /**
+     * Nettoie tous les éléments avant de les redessiner (pacman et fantômes)
+     *
+     * @returns {Jeu}
+     */
+    clearAll() {
+        var context = this.canvas.getContext();
+        var mPacman = (Tile.TILE_WIDTH - Ghost.SIZE.w) / 2;
+        var mGhost = (Tile.TILE_WIDTH - Ghost.SIZE.w) / 2;
+        /* Suppression de pacman */
+        context.clearRect(this.pacman.getX() + mPacman, this.pacman.getY() + mPacman + Jeu.TOP_HEIGHT, Pacman.SIZE.w, Pacman.SIZE.h);
+        /* Suppression des fantômes */
+        var coordsAndCanvas = this.ghostsManager.getGhostsCoordsAndCanvas();
+        for (var i = 0, l = coordsAndCanvas.length; i < l; ++i) {
+            var obj = coordsAndCanvas[i];
+            context.clearRect(obj.coords.x + mGhost, obj.coords.y + mGhost + Jeu.TOP_HEIGHT, Ghost.SIZE.w, Ghost.SIZE.h);
+            /* Suppression de la case derrière */
+            this.drawCurrentPacDot(TileFunctions.getTileCoordinates({
+                x: obj.coords.x + Tile.TILE_WIDTH / 2,
+                y: obj.coords.y + Tile.TILE_WIDTH / 2
+            }), true);
+        }
+        /* Suppression de la case derrière pacman */
+        this.drawCurrentPacDot(this.pacman.getPreviousTileCoords(), true);
+        return this;
+    }
+    /**
      * Anime pacman et donne les instructions
      *
      * @returns {Jeu}
@@ -1078,12 +1104,12 @@ class Jeu {
         /* Pour centrer dans la case */
         var margin = (Tile.TILE_WIDTH - Pacman.SIZE.w) / 2;
         var context = this.canvas.getContext();
-        /* Suppression du pacman courant */
-        context.clearRect(pacman.getX() + margin, pacman.getY() + margin + Jeu.TOP_HEIGHT, Pacman.SIZE.w, Pacman.SIZE.h);
         /* Instruction de modification des coordonées */
         pacman.move();
         /* Instruction d'animation */
         pacman.animate();
+        /* Dessine la case courante si le point a pas été mangé pour pas le couper */
+        this.drawCurrentPacDot(pacman.getPreviousTileCoords());
         /* Dessin dans le canvas principal */
         context.drawImage(pacman.getCanvasElem(), pacman.getX() + margin, pacman.getY() + margin + Jeu.TOP_HEIGHT);
         return this;
@@ -1097,13 +1123,6 @@ class Jeu {
         var context = this.canvas.getContext();
         var margin = (Tile.TILE_WIDTH - Ghost.SIZE.w) / 2;
         var coordsAndCanvas = this.ghostsManager.getGhostsCoordsAndCanvas();
-        /* Pour les points */
-        var tiles = this.levelManager.getTiles();
-        /* Suppression des fantômes */
-        for (var i = 0, l = coordsAndCanvas.length; i < l; ++i) {
-            var obj = coordsAndCanvas[i];
-            context.clearRect(obj.coords.x + margin, obj.coords.y + margin + Jeu.TOP_HEIGHT, Ghost.SIZE.w, Ghost.SIZE.h);
-        }
         /* Déplacement des fantômes en passant le centre de pacman en paramètre */
         this.ghostsManager.moveGhosts({
             x: this.pacman.getX() + Tile.TILE_WIDTH / 2,
@@ -1111,29 +1130,14 @@ class Jeu {
         });
         /* Anime les fantômes */
         this.ghostsManager.animateGhosts();
-        /* Redessiner la case derrière le fantome */
-        for (i = 0, l = coordsAndCanvas.length; i < l; ++i) {
+        /* Redessiner les fantômes, après pour pas faire disparaître un fantome qui en suit un autre */
+        for (var i = 0, l = coordsAndCanvas.length; i < l; ++i) {
             var obj = coordsAndCanvas[i];
-            /* Récupération de la tuile */
-            var coords = TileFunctions.getTileCoordinates({
+            /* Redessiner la case derrière */
+            this.drawCurrentPacDot(TileFunctions.getTileCoordinates({
                 x: obj.coords.x + Tile.TILE_WIDTH / 2,
                 y: obj.coords.y + Tile.TILE_WIDTH / 2
-            });
-            var currentTile = tiles[coords.y] != void 0 ? tiles[coords.y][coords.x] : null;
-            /* Tile ok */
-            if (currentTile != null && currentTile.hasPacDot()) {
-                /* Dessin que si pacdot */
-                if (!(currentTile.getPacDot() instanceof Fruit) && !(currentTile.getPacDot() instanceof PowerPellet)) {
-                    /* Suppression */
-                    context.clearRect(coords.x * Tile.TILE_WIDTH + margin, coords.y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
-                    /* Dessin */
-                    this.levelManager.drawPacDot(this.canvas, currentTile);
-                }
-            }
-        }
-        /* Redessiner les fantômes, après pour pas faire disparaître un fantome qui en suit un autre */
-        for (i = 0, l = coordsAndCanvas.length; i < l; ++i) {
-            var obj = coordsAndCanvas[i];
+            }));
             /* Dessin des fantômes */
             context.drawImage(obj.canvas.getElement(), obj.coords.x + margin, obj.coords.y + margin + Jeu.TOP_HEIGHT);
         }
@@ -1144,9 +1148,8 @@ class Jeu {
      *
      * @returns {Jeu}
      */
-    drawCurrentPacDot() {
+    drawCurrentPacDot(coords, removeOnly = false) {
         /* La case de pacman */
-        var coords = this.pacman.getPreviousTileCoords();
         var margin = 5;
         /* Récupération de la case courante */
         var tiles = this.levelManager.getTiles();
@@ -1156,7 +1159,8 @@ class Jeu {
             /* Dessin que si pacdot */
             if (!(currentTile.getPacDot() instanceof Fruit) && !(currentTile.getPacDot() instanceof PowerPellet)) {
                 /* Suppression du point */
-                this.canvas.getContext().clearRect(coords.x * Tile.TILE_WIDTH + margin, coords.y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
+                if (removeOnly)
+                    this.canvas.getContext().clearRect(coords.x * Tile.TILE_WIDTH + margin, coords.y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT, 30, 30);
                 /* Dessin */
                 this.levelManager.drawPacDot(this.canvas, currentTile);
             }
