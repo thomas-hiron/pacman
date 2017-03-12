@@ -522,6 +522,10 @@ class Ghost {
                         this.stepPx = Ghost.NORMAL;
                     }
                     else {
+                        this.direction = this.findBestPath({
+                            x: 7,
+                            y: 9
+                        });
                     }
                     break;
             }
@@ -939,7 +943,7 @@ class GhostsManager {
     }
 }
 /* Le nombre de point que pacman doit manger pour que certains fantômes sortent */
-GhostsManager.INKY_DOT_TO_GO = 2;
+GhostsManager.INKY_DOT_TO_GO = 5;
 /**
  * Created by thiron on 03/07/2015.
  */

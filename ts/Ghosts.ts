@@ -377,7 +377,10 @@ abstract class Ghost
           /* Aller au milieu */
           else
           {
-
+            this.direction = this.findBestPath({
+              x: 7,
+              y: 9
+            });
           }
 
           break;
@@ -460,7 +463,7 @@ abstract class Ghost
     /* S'il vient de sortir de la maison */
     if (this.mode == Modes.OutFromHome && mode == Modes.Scatter)
       this.direction = Directions.Right;
-    else if(this.mode == Modes.OutFromHome && mode == Modes.Chase)
+    else if (this.mode == Modes.OutFromHome && mode == Modes.Chase)
       this.direction = Directions.Left;
     if (this.mode != Modes.Idle || force)
       this.mode = mode;
