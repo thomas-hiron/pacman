@@ -211,7 +211,7 @@ class Jeu
       context.clearRect(obj.coords.x + margin, obj.coords.y + margin + Jeu.TOP_HEIGHT, Ghost.SIZE.w, Ghost.SIZE.h);
     }
 
-    // Déplacement des fantômes en passant le centre de pacman en paramètre
+    /* Déplacement des fantômes en passant le centre de pacman en paramètre */
     this.ghostsManager.moveGhosts({
       x: this.pacman.getX() + Tile.TILE_WIDTH / 2,
       y: this.pacman.getY() + Tile.TILE_WIDTH / 2
@@ -245,6 +245,12 @@ class Jeu
           this.levelManager.drawPacDot(this.canvas, currentTile);
         }
       }
+    }
+
+    /* Redessiner les fantômes, après pour pas faire disparaître un fantome qui en suit un autre */
+    for (i = 0, l = coordsAndCanvas.length ; i < l ; ++i)
+    {
+      var obj: CanvasAndCoords = coordsAndCanvas[i];
 
       /* Dessin des fantômes */
       context.drawImage(obj.canvas.getElement(), obj.coords.x + margin, obj.coords.y + margin + Jeu.TOP_HEIGHT);
