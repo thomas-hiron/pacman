@@ -26,3 +26,7 @@ interface CanvasAndCoords
   canvas: Canvas;
   coords: Point;
 }
+
+interface CanvasRenderingContext2D {
+  ellipse: any
+}
