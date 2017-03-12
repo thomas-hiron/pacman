@@ -950,7 +950,6 @@ class GhostsManager {
      * @returns {GhostsManager}
      */
     clydeCanGo() {
-        console.log('clyde can go');
         this.clyde.getOutFromHome();
         return this;
     }

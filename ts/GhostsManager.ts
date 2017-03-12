@@ -252,7 +252,6 @@ class GhostsManager
    */
   private clydeCanGo(): GhostsManager
   {
-    console.log('clyde can go');
     this.clyde.getOutFromHome();
 
     return this;
