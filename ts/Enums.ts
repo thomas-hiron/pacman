@@ -12,5 +12,6 @@ enum Directions {
 enum Modes {
   Chase,
   Scatter,
-  Frightened
+  Frightened,
+  Idle
 }

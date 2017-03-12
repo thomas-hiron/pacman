@@ -64,7 +64,7 @@ abstract class Ghost
     this.draw();
 
     /* Mode par défaut */
-    this.mode = Modes.Scatter;
+    this.mode = Modes.Idle;
 
     return this;
   }
@@ -319,6 +319,10 @@ abstract class Ghost
    */
   public move(pacmanCenter: Point): Ghost
   {
+    /* Pas de déplacement si à l'arrêt */
+    if (this.mode == Modes.Idle)
+      return this;
+
     /* Si dans une case */
     if (this.coordinates.x % Tile.TILE_WIDTH == 0 && this.coordinates.y % Tile.TILE_WIDTH == 0)
     {
@@ -407,12 +411,13 @@ abstract class Ghost
    * Modifie le mode
    *
    * @param mode
-   *
+   * @param force Si le mode doit être changé de force (pour quitter le mode iddle)
    * @returns {Ghost}
    */
-  public changeMode(mode: number): Ghost
+  public changeMode(mode: number, force: boolean = false): Ghost
   {
-    this.mode = mode;
+    if (this.mode != Modes.Idle || force)
+      this.mode = mode;
 
     /* Si scatter, changement de direction */
     if (this.mode == Modes.Scatter)
@@ -423,6 +428,7 @@ abstract class Ghost
           this.direction = Directions.Right;
           break;
         case Directions.Right:
+        default:
           this.direction = Directions.Left;
           break;
         case Directions.Up:
@@ -470,7 +476,6 @@ class Pinky extends Ghost
   {
     super();
 
-    this.direction = Directions.Left;
     this.mode = null;
     this.coordinates = {
       x: 7 * Tile.TILE_WIDTH,
@@ -508,7 +513,6 @@ class Blinky extends Ghost
   {
     super();
 
-    this.direction = Directions.Left;
     this.mode = null;
     this.coordinates = {
       x: 7 * Tile.TILE_WIDTH,
@@ -546,7 +550,6 @@ class Inky extends Ghost
   {
     super();
 
-    this.direction = Directions.Left;
     this.mode = null;
     this.coordinates = {
       x: 6 * Tile.TILE_WIDTH,
@@ -584,7 +587,6 @@ class Clyde extends Ghost
   {
     super();
 
-    this.direction = Directions.Left;
     this.mode = null;
     this.coordinates = {
       x: 8 * Tile.TILE_WIDTH,

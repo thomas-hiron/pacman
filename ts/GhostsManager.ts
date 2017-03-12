@@ -79,6 +79,9 @@ class GhostsManager
   {
     this.time = +new Date();
 
+    /* Blinky doit bouger directement */
+    this.blinky.changeMode(this.mode, true);
+
     return this;
   }
 
@@ -119,7 +122,11 @@ class GhostsManager
         break;
     }
 
+    /* Déplacements */
+    this.pinky.move(pacmanCenter);
     this.blinky.move(pacmanCenter);
+    this.inky.move(pacmanCenter);
+    this.clyde.move(pacmanCenter);
 
     return this;
   }
@@ -132,13 +139,18 @@ class GhostsManager
   public animateGhosts(): GhostsManager
   {
     /* Changement de mode si intervalle dépassé */
+    this.pinky.animate();
     this.blinky.animate();
+    this.inky.animate();
+    this.clyde.animate();
 
     return this;
   }
 
   /**
    * Change le mode et le numéro de la vague si besoin lorsque l'intervalle est atteint
+   *
+   * @param mode
    *
    * @returns {GhostsManager}
    */

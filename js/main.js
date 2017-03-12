@@ -67,6 +67,7 @@ var Modes;
     Modes[Modes["Chase"] = 0] = "Chase";
     Modes[Modes["Scatter"] = 1] = "Scatter";
     Modes[Modes["Frightened"] = 2] = "Frightened";
+    Modes[Modes["Idle"] = 3] = "Idle";
 })(Modes || (Modes = {}));
 /**
  * Created by mac pro on 04/03/2017.
@@ -280,7 +281,7 @@ class Ghost {
         /* Dessin */
         this.draw();
         /* Mode par défaut */
-        this.mode = Modes.Scatter;
+        this.mode = Modes.Idle;
         return this;
     }
     /**
@@ -484,6 +485,9 @@ class Ghost {
      * @returns {Ghost}
      */
     move(pacmanCenter) {
+        /* Pas de déplacement si à l'arrêt */
+        if (this.mode == Modes.Idle)
+            return this;
         /* Si dans une case */
         if (this.coordinates.x % Tile.TILE_WIDTH == 0 && this.coordinates.y % Tile.TILE_WIDTH == 0) {
             switch (this.mode) {
@@ -552,11 +556,12 @@ class Ghost {
      * Modifie le mode
      *
      * @param mode
-     *
+     * @param force Si le mode doit être changé de force (pour quitter le mode iddle)
      * @returns {Ghost}
      */
-    changeMode(mode) {
-        this.mode = mode;
+    changeMode(mode, force = false) {
+        if (this.mode != Modes.Idle || force)
+            this.mode = mode;
         /* Si scatter, changement de direction */
         if (this.mode == Modes.Scatter) {
             switch (this.direction) {
@@ -564,6 +569,7 @@ class Ghost {
                     this.direction = Directions.Right;
                     break;
                 case Directions.Right:
+                default:
                     this.direction = Directions.Left;
                     break;
                 case Directions.Up:
@@ -606,7 +612,6 @@ Ghost.SIZE = {
 class Pinky extends Ghost {
     constructor() {
         super();
-        this.direction = Directions.Left;
         this.mode = null;
         this.coordinates = {
             x: 7 * Tile.TILE_WIDTH,
@@ -638,7 +643,6 @@ class Pinky extends Ghost {
 class Blinky extends Ghost {
     constructor() {
         super();
-        this.direction = Directions.Left;
         this.mode = null;
         this.coordinates = {
             x: 7 * Tile.TILE_WIDTH,
@@ -670,7 +674,6 @@ class Blinky extends Ghost {
 class Inky extends Ghost {
     constructor() {
         super();
-        this.direction = Directions.Left;
         this.mode = null;
         this.coordinates = {
             x: 6 * Tile.TILE_WIDTH,
@@ -702,7 +705,6 @@ class Inky extends Ghost {
 class Clyde extends Ghost {
     constructor() {
         super();
-        this.direction = Directions.Left;
         this.mode = null;
         this.coordinates = {
             x: 8 * Tile.TILE_WIDTH,
@@ -773,6 +775,8 @@ class GhostsManager {
      */
     start() {
         this.time = +new Date();
+        /* Blinky doit bouger directement */
+        this.blinky.changeMode(this.mode, true);
         return this;
     }
     /**
@@ -801,7 +805,11 @@ class GhostsManager {
                     this.changeMode(Modes.Chase);
                 break;
         }
+        /* Déplacements */
+        this.pinky.move(pacmanCenter);
         this.blinky.move(pacmanCenter);
+        this.inky.move(pacmanCenter);
+        this.clyde.move(pacmanCenter);
         return this;
     }
     /**
@@ -811,11 +819,16 @@ class GhostsManager {
      */
     animateGhosts() {
         /* Changement de mode si intervalle dépassé */
+        this.pinky.animate();
         this.blinky.animate();
+        this.inky.animate();
+        this.clyde.animate();
         return this;
     }
     /**
      * Change le mode et le numéro de la vague si besoin lorsque l'intervalle est atteint
+     *
+     * @param mode
      *
      * @returns {GhostsManager}
      */
