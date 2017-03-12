@@ -202,6 +202,12 @@ class LevelManager
         var event = new CustomEvent('InkyCanGo');
         window.dispatchEvent(event);
       }
+      /* Si un tier des points mangés, Clyde sort */
+      if (this.pacDotNumberTotal - this.pacDotNumber == Math.round(this.pacDotNumberTotal / 3))
+      {
+        var event = new CustomEvent('ClydeCanGo');
+        window.dispatchEvent(event);
+      }
     }
 
     /* Niveau terminé */

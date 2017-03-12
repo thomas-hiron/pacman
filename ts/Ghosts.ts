@@ -621,7 +621,8 @@ class Inky extends Ghost
    */
   protected targetTile(pacmanCenter: Point): Point
   {
-    return null;
+    // TODO : Faire le bon calcul
+    return TileFunctions.getTileCoordinates(pacmanCenter);
   }
 }
 
@@ -658,6 +659,7 @@ class Clyde extends Ghost
    */
   protected targetTile(pacmanCenter: Point): Point
   {
-    return null;
+    // TODO : Faire le bon calcul
+    return TileFunctions.getTileCoordinates(pacmanCenter);
   }
 }

@@ -732,7 +732,8 @@ class Inky extends Ghost {
      * @returns {null}
      */
     targetTile(pacmanCenter) {
-        return null;
+        // TODO : Faire le bon calcul
+        return TileFunctions.getTileCoordinates(pacmanCenter);
     }
 }
 /**
@@ -763,7 +764,8 @@ class Clyde extends Ghost {
      * @returns {null}
      */
     targetTile(pacmanCenter) {
-        return null;
+        // TODO : Faire le bon calcul
+        return TileFunctions.getTileCoordinates(pacmanCenter);
     }
 }
 /**
@@ -809,6 +811,7 @@ class GhostsManager {
         /* Listener sorti de la maison */
         window.addEventListener('OutFromHome', this.ghostGotOut.bind(this), false);
         window.addEventListener('InkyCanGo', this.inkyCanGo.bind(this), false);
+        window.addEventListener('ClydeCanGo', this.clydeCanGo.bind(this), false);
         return this;
     }
     /**
@@ -941,9 +944,19 @@ class GhostsManager {
         this.inky.getOutFromHome();
         return this;
     }
+    /**
+     * Clyde peut sortir de la maison
+     *
+     * @returns {GhostsManager}
+     */
+    clydeCanGo() {
+        console.log('clyde can go');
+        this.clyde.getOutFromHome();
+        return this;
+    }
 }
 /* Le nombre de point que pacman doit manger pour que certains fantômes sortent */
-GhostsManager.INKY_DOT_TO_GO = 5;
+GhostsManager.INKY_DOT_TO_GO = 30;
 /**
  * Created by thiron on 03/07/2015.
  */
@@ -1568,6 +1581,11 @@ class LevelManager {
             /* Si 30 points mangés, Inky sort */
             if (this.pacDotNumberTotal - this.pacDotNumber == GhostsManager.INKY_DOT_TO_GO) {
                 var event = new CustomEvent('InkyCanGo');
+                window.dispatchEvent(event);
+            }
+            /* Si un tier des points mangés, Clyde sort */
+            if (this.pacDotNumberTotal - this.pacDotNumber == Math.round(this.pacDotNumberTotal / 3)) {
+                var event = new CustomEvent('ClydeCanGo');
                 window.dispatchEvent(event);
             }
         }

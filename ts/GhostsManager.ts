@@ -74,6 +74,7 @@ class GhostsManager
     /* Listener sorti de la maison */
     window.addEventListener('OutFromHome', this.ghostGotOut.bind(this), false);
     window.addEventListener('InkyCanGo', this.inkyCanGo.bind(this), false);
+    window.addEventListener('ClydeCanGo', this.clydeCanGo.bind(this), false);
 
     return this;
   }
@@ -240,6 +241,19 @@ class GhostsManager
   private inkyCanGo(): GhostsManager
   {
     this.inky.getOutFromHome();
+
+    return this;
+  }
+
+  /**
+   * Clyde peut sortir de la maison
+   *
+   * @returns {GhostsManager}
+   */
+  private clydeCanGo(): GhostsManager
+  {
+    console.log('clyde can go');
+    this.clyde.getOutFromHome();
 
     return this;
   }
