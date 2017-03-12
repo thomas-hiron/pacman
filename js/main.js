@@ -804,6 +804,7 @@ class GhostsManager {
         this.clyde.init();
         /* Listener sorti de la maison */
         window.addEventListener('OutFromHome', this.ghostGotOut.bind(this), false);
+        window.addEventListener('InkyCanGo', this.inkyCanGo.bind(this), false);
         return this;
     }
     /**
@@ -927,7 +928,18 @@ class GhostsManager {
         e.detail.changeMode(this.mode);
         return this;
     }
+    /**
+     * Inky peut sortir de la maison
+     *
+     * @returns {GhostsManager}
+     */
+    inkyCanGo() {
+        this.inky.getOutFromHome();
+        return this;
+    }
 }
+/* Le nombre de point que pacman doit manger pour que certains fantômes sortent */
+GhostsManager.INKY_DOT_TO_GO = 2;
 /**
  * Created by thiron on 03/07/2015.
  */
@@ -1453,6 +1465,8 @@ class LevelManager {
                 }
             }
         }
+        /* Pour faire sortir les fantômes */
+        this.pacDotNumberTotal = this.pacDotNumber;
         return this;
     }
     /**
@@ -1545,8 +1559,14 @@ class LevelManager {
         var tiles = this.getTiles();
         var tile = tiles[coords.y][coords.x];
         /* Décrémentation s'il y a un point */
-        if (tile.hasPacDot() && !(tile.getPacDot() instanceof Fruit))
+        if (tile.hasPacDot() && !(tile.getPacDot() instanceof Fruit)) {
             this.pacDotNumber--;
+            /* Si 30 points mangés, Inky sort */
+            if (this.pacDotNumberTotal - this.pacDotNumber == GhostsManager.INKY_DOT_TO_GO) {
+                var event = new CustomEvent('InkyCanGo');
+                window.dispatchEvent(event);
+            }
+        }
         /* Niveau terminé */
         if (this.pacDotNumber <= 0) {
             var event = new CustomEvent('LevelFinished');

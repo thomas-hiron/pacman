@@ -11,6 +11,7 @@ class LevelManager
 
   /* Nombre de points */
   private pacDotNumber: number;
+  private pacDotNumberTotal: number;
 
   constructor()
   {
@@ -66,6 +67,9 @@ class LevelManager
         }
       }
     }
+
+    /* Pour faire sortir les fantômes */
+    this.pacDotNumberTotal = this.pacDotNumber;
 
     return this;
   }
@@ -189,7 +193,16 @@ class LevelManager
 
     /* Décrémentation s'il y a un point */
     if (tile.hasPacDot() && !(tile.getPacDot() instanceof Fruit))
+    {
       this.pacDotNumber--;
+
+      /* Si 30 points mangés, Inky sort */
+      if (this.pacDotNumberTotal - this.pacDotNumber == GhostsManager.INKY_DOT_TO_GO)
+      {
+        var event = new CustomEvent('InkyCanGo');
+        window.dispatchEvent(event);
+      }
+    }
 
     /* Niveau terminé */
     if (this.pacDotNumber <= 0)

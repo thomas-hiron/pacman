@@ -4,6 +4,9 @@
 
 class GhostsManager
 {
+  /* Le nombre de point que pacman doit manger pour que certains fantômes sortent */
+  public static INKY_DOT_TO_GO = 30;
+
   /* Les intervalles */
   private chaseInterval: number;
   private scatterInterval: number;
@@ -70,6 +73,7 @@ class GhostsManager
 
     /* Listener sorti de la maison */
     window.addEventListener('OutFromHome', this.ghostGotOut.bind(this), false);
+    window.addEventListener('InkyCanGo', this.inkyCanGo.bind(this), false);
 
     return this;
   }
@@ -221,9 +225,21 @@ class GhostsManager
    *
    * @returns {GhostsManager}
    */
-  private ghostGotOut(e:CustomEvent): GhostsManager
+  private ghostGotOut(e: CustomEvent): GhostsManager
   {
     e.detail.changeMode(this.mode);
+
+    return this;
+  }
+
+  /**
+   * Inky peut sortir de la maison
+   *
+   * @returns {GhostsManager}
+   */
+  private inkyCanGo(): GhostsManager
+  {
+    this.inky.getOutFromHome();
 
     return this;
   }
