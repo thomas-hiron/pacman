@@ -38,12 +38,12 @@ abstract class Ghost
   private currentStep: number = 0;
 
   /* La méthode de détection de collison */
-  private checkCollision: any;
+  protected checkCollision: any;
 
   /**
    * Vise une case selon le caractère
    */
-  protected abstract targetTile(pacmanCenter: PointAndDirection, blinkCoords: Point = null): Point;
+  protected abstract targetTile(pacmanCenter: PointAndDirection, blinkCoords: Point): Point;
 
   /**
    * @param callback
@@ -739,7 +739,79 @@ class Clyde extends Ghost
    */
   protected targetTile(pacmanCenter: PointAndDirection): Point
   {
-    // TODO : Faire le bon calcul
-    return TileFunctions.getTileCoordinates(pacmanCenter);
+    /* Pacman */
+    var pacmanTileCoords: Point = TileFunctions.getTileCoordinates(pacmanCenter);
+
+    /* La case courante */
+    var currentTileCoords: Point = TileFunctions.getTileCoordinates({
+      x: this.coordinates.x + Tile.TILE_WIDTH / 2,
+      y: this.coordinates.y + Tile.TILE_WIDTH / 2
+    });
+
+    /* Calcul de l'écart */
+    var gap: number = 0;
+
+    /* La liste principale, initialisée avec la case, contient toutes les cases permettant de tracer le chemin */
+    var mainList: Array<PointIndexed> = [{
+      x: pacmanTileCoords.x,
+      y: pacmanTileCoords.y,
+      i: 0,
+      parent: null
+    }];
+
+    /* Pour chaque élément de la liste principale, on part des cases où il est possible d'aller directement */
+    for (var i = 0 ; i < mainList.length ; ++i)
+    {
+      /* Récupération des 4 cases autour */
+      var adjacentTiles: Array<Point> = TileFunctions.getAdjacentTiles({
+        x: mainList[i].x,
+        y: mainList[i].y
+      });
+
+      /* Parcourt des 4 cases trouvées */
+      for (var j = 0 ; j < 4 ; ++j)
+      {
+        /* Collision */
+        var collisionDetected: boolean = this.checkCollision(adjacentTiles[j].x, adjacentTiles[j].y);
+        /* La case a déjà été ajoutée */
+        var alreadyAdded: boolean = false;
+
+        /* Vérification si case a déjà été ajoutée (même coords et index inférieur ou égal) */
+        for (var k = 0, l = mainList.length ; k < l ; ++k)
+        {
+          /* Si la case a les mêmes coordonées et le même parent et index inférieur */
+          if (mainList[k].x == adjacentTiles[j].x && mainList[k].y == adjacentTiles[j].y && mainList[k].i < i)
+          {
+            alreadyAdded = true;
+            break;
+          }
+        }
+
+        /* Pas de collision et pas déjà ajoutée, ajout dans la liste principale */
+        if (!collisionDetected && !alreadyAdded)
+        {
+          mainList.push({
+            x: adjacentTiles[j].x,
+            y: adjacentTiles[j].y,
+            i: mainList[i].i + 1,
+            parent: null
+          });
+        }
+
+        /* Arrêt de la boucle si la case de destination a été trouvée et qu'il faut pas faire demi-tour, i > 2 si jamais le fantôme est sur la case de destination */
+        if (adjacentTiles[j].x == currentTileCoords.x && adjacentTiles[j].y == currentTileCoords.y)
+        {
+          gap = mainList[i].i + 1;
+          break;
+        }
+      }
+
+      /* Stop boucle, chemin trouvé */
+      if (gap != 0)
+        break;
+    }
+
+    /* Si supérieur à 8, il vise pacman, sinon retour au coin */
+    return gap > 8 ? pacmanTileCoords : this.cornerCoordinates;
   }
 }
