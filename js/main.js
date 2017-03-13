@@ -259,8 +259,9 @@ class Functions {
      * @param a
      */
     static shuffle(a) {
-        var j, x, i;
-        for (i = a.length; i; i--) {
+        var j;
+        var x;
+        for (var i = a.length; i; i--) {
             j = Math.floor(Math.random() * i);
             x = a[i - 1];
             a[i - 1] = a[j];
@@ -529,7 +530,6 @@ class Ghost {
                     break;
                 /* Sort de la maison */
                 case Modes.OutFromHome:
-                    /* Si case sur les côtés, il doit aller au milieu */
                     var coords = {
                         x: this.coordinates.x / Tile.TILE_WIDTH,
                         y: this.coordinates.y / Tile.TILE_WIDTH
@@ -545,10 +545,10 @@ class Ghost {
                         this.stepPx = Ghost.NORMAL;
                     }
                     else {
-                        this.direction = this.findBestPath({
-                            x: 7,
-                            y: 9
-                        });
+                        if (coords.x == 6)
+                            this.direction = Directions.Right;
+                        else if (coords.x == 8)
+                            this.direction = Directions.Left;
                     }
                     break;
             }
@@ -844,9 +844,9 @@ class GhostsManager {
     start() {
         this.time = +new Date();
         /* Blinky doit bouger directement */
-        this.blinky.changeMode(this.mode, true);
+        // this.blinky.changeMode(this.mode, true);
         /* Pinky doit sortir immédiatement */
-        this.pinky.getOutFromHome();
+        // this.pinky.getOutFromHome();
         return this;
     }
     /**
@@ -978,7 +978,7 @@ class GhostsManager {
     }
 }
 /* Le nombre de point que pacman doit manger pour que certains fantômes sortent */
-GhostsManager.INKY_DOT_TO_GO = 30;
+GhostsManager.INKY_DOT_TO_GO = 5;
 /**
  * Created by thiron on 03/07/2015.
  */

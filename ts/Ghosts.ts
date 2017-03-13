@@ -360,7 +360,6 @@ abstract class Ghost
         /* Sort de la maison */
         case Modes.OutFromHome :
 
-          /* Si case sur les côtés, il doit aller au milieu */
           var coords: Point = {
             x: this.coordinates.x / Tile.TILE_WIDTH,
             y: this.coordinates.y / Tile.TILE_WIDTH
@@ -382,10 +381,10 @@ abstract class Ghost
           /* Aller au milieu */
           else
           {
-            this.direction = this.findBestPath({
-              x: 7,
-              y: 9
-            });
+            if(coords.x == 6)
+              this.direction = Directions.Right;
+            else if(coords.x == 8)
+              this.direction = Directions.Left;
           }
 
           break;
