@@ -213,7 +213,7 @@ class LevelManager
     /* Niveau terminé */
     if (this.pacDotNumber <= 0)
     {
-      var event: Event = new CustomEvent('LevelFinished');
+      var event: CustomEvent = new CustomEvent('LevelFinished');
       window.dispatchEvent(event);
     }
 

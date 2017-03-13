@@ -9,10 +9,11 @@ class Functions
    *
    * @param a
    */
-  public static shuffle(a: Array)
+  public static shuffle(a: Array<any>)
   {
-    var j, x, i;
-    for (i = a.length ; i ; i--)
+    var j: number;
+    var x: number;
+    for (var i = a.length ; i ; i--)
     {
       j = Math.floor(Math.random() * i);
       x = a[i - 1];
