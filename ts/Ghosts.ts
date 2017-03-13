@@ -173,107 +173,16 @@ abstract class Ghost
       y: this.coordinates.y / Tile.TILE_WIDTH
     };
 
-    /* La liste principale, initialisée avec la case, contient toutes les cases permettant de tracer le chemin */
-    var mainList: Array<PointIndexed> = [{
-      x: currentTileCoords.x,
-      y: currentTileCoords.y,
-      i: 0,
-      parent: null
-    }];
-
-    /* La prochaine case où le fantôme ira */
-    var nextTile: Point = null;
-
-    /* Récupération des cases où il peut aller */
-    var currentAdjacentTiles: Array<Point> = TileFunctions.getAdjacentTiles(currentTileCoords);
-    /* Mélange des cases pour faire un chemin aléatoire quand il y aura plusieurs possibilités */
-    Functions.shuffle(currentAdjacentTiles);
-    for (var i = 0 ; i < currentAdjacentTiles.length ; ++i)
-    {
-      var collisionDetected: boolean = this.checkCollision(currentAdjacentTiles[i].x, currentAdjacentTiles[i].y);
-      if (!collisionDetected && !this.hasToGoBackwards(currentTileCoords, currentAdjacentTiles[i]))
-      {
-        /* Si case juste à côté, pas besoin de faire des calculs pour rien */
-        if (currentAdjacentTiles[i].x == destinationTileCoords.x && currentAdjacentTiles[i].y == destinationTileCoords.y)
-        {
-          if (!this.hasToGoBackwards(currentTileCoords, currentAdjacentTiles[i]))
-          {
-            nextTile = currentAdjacentTiles[i];
-            mainList = [];
-            break;
-          }
-        }
-
-        /* Ajoute à la liste si trop loin */
-        mainList.push({
-          x: currentAdjacentTiles[i].x,
-          y: currentAdjacentTiles[i].y,
-          i: 1,
-          parent: currentAdjacentTiles[i]
-        });
-      }
-    }
-
-    /* Pour chaque élément de la liste principale, on part des cases où il est possible d'aller directement */
-    for (i = 1 ; i < mainList.length ; ++i)
-    {
-      /* Récupération des 4 cases autour */
-      var adjacentTiles: Array<Point> = TileFunctions.getAdjacentTiles({
-        x: mainList[i].x,
-        y: mainList[i].y
-      });
-
-      /* Parcourt des 4 cases trouvées */
-      for (var j = 0 ; j < 4 ; ++j)
-      {
-        /* Collision */
-        var collisionDetected: boolean = this.checkCollision(adjacentTiles[j].x, adjacentTiles[j].y);
-        /* La case a déjà été ajoutée */
-        var alreadyAdded: boolean = false;
-
-        /* Vérification si case a déjà été ajoutée (même coords et index inférieur ou égal) */
-        for (var k = 0, l = mainList.length ; k < l ; ++k)
-        {
-          /* Si la case a les mêmes coordonées et le même parent et index inférieur */
-          if (
-            mainList[k].x == adjacentTiles[j].x && mainList[k].y == adjacentTiles[j].y && mainList[k].i <= i &&
-            (
-              mainList[k].parent == null ||
-              mainList[k].parent.x == mainList[i].parent.x && mainList[k].parent.y == mainList[i].parent.y
-            )
-          )
-          {
-            alreadyAdded = true;
-            break;
-          }
-        }
-
-        /* Pas de collision et pas déjà ajoutée, ajout dans la liste principale */
-        if (!collisionDetected && !alreadyAdded)
-        {
-          mainList.push({
-            x: adjacentTiles[j].x,
-            y: adjacentTiles[j].y,
-            i: mainList[i].i + 1,
-            parent: mainList[i].parent
-          });
-        }
-
-        /* Arrêt de la boucle si la case de destination a été trouvée et qu'il faut pas faire demi-tour, i > 2 si jamais le fantôme est sur la case de destination */
-        if (adjacentTiles[j].x == destinationTileCoords.x && adjacentTiles[j].y == destinationTileCoords.y && i > 2)
-        {
-          nextTile = mainList[i].parent;
-          break;
-        }
-      }
-
-      /* Stop boucle, chemin trouvé */
-      if (nextTile != null)
-        break;
-    }
+    /* Récupération du meilleur chemin */
+    var pathFinder: PathFinder = new PathFinder();
+    pathFinder.findPath(
+      currentTileCoords, destinationTileCoords,
+      this.checkCollision.bind(this), this.hasToGoBackwards.bind(this)
+    );
 
     /* Récupération de la bonne direction, par défaut la courante */
     var direction: number = this.direction;
+    var nextTile: Point = pathFinder.getNextTile();
     if (nextTile != null)
     {
       /* Gauche */
@@ -314,7 +223,7 @@ abstract class Ghost
    *
    * @returns {boolean}
    */
-  private hasToGoBackwards(fromTile: Point, toTile: Point): boolean
+  protected hasToGoBackwards(fromTile: Point, toTile: Point): boolean
   {
     /* Gauche */
     if (fromTile.x == toTile.x + 1)
@@ -748,70 +657,17 @@ class Clyde extends Ghost
       y: this.coordinates.y + Tile.TILE_WIDTH / 2
     });
 
-    /* Calcul de l'écart */
-    var gap: number = 0;
+    /* Le chemin */
+    var pathFinder: PathFinder = new PathFinder();
+    pathFinder.findPath(
+      currentTileCoords, pacmanTileCoords,
+      this.checkCollision.bind(this), this.hasToGoBackwards.bind(this)
+    );
 
-    /* La liste principale, initialisée avec la case, contient toutes les cases permettant de tracer le chemin */
-    var mainList: Array<PointIndexed> = [{
-      x: pacmanTileCoords.x,
-      y: pacmanTileCoords.y,
-      i: 0,
-      parent: null
-    }];
-
-    /* Pour chaque élément de la liste principale, on part des cases où il est possible d'aller directement */
-    for (var i = 0 ; i < mainList.length ; ++i)
-    {
-      /* Récupération des 4 cases autour */
-      var adjacentTiles: Array<Point> = TileFunctions.getAdjacentTiles({
-        x: mainList[i].x,
-        y: mainList[i].y
-      });
-
-      /* Parcourt des 4 cases trouvées */
-      for (var j = 0 ; j < 4 ; ++j)
-      {
-        /* Collision */
-        var collisionDetected: boolean = this.checkCollision(adjacentTiles[j].x, adjacentTiles[j].y);
-        /* La case a déjà été ajoutée */
-        var alreadyAdded: boolean = false;
-
-        /* Vérification si case a déjà été ajoutée (même coords et index inférieur ou égal) */
-        for (var k = 0, l = mainList.length ; k < l ; ++k)
-        {
-          /* Si la case a les mêmes coordonées et le même parent et index inférieur */
-          if (mainList[k].x == adjacentTiles[j].x && mainList[k].y == adjacentTiles[j].y && mainList[k].i < i)
-          {
-            alreadyAdded = true;
-            break;
-          }
-        }
-
-        /* Pas de collision et pas déjà ajoutée, ajout dans la liste principale */
-        if (!collisionDetected && !alreadyAdded)
-        {
-          mainList.push({
-            x: adjacentTiles[j].x,
-            y: adjacentTiles[j].y,
-            i: mainList[i].i + 1,
-            parent: null
-          });
-        }
-
-        /* Arrêt de la boucle si la case de destination a été trouvée et qu'il faut pas faire demi-tour, i > 2 si jamais le fantôme est sur la case de destination */
-        if (adjacentTiles[j].x == currentTileCoords.x && adjacentTiles[j].y == currentTileCoords.y)
-        {
-          gap = mainList[i].i + 1;
-          break;
-        }
-      }
-
-      /* Stop boucle, chemin trouvé */
-      if (gap != 0)
-        break;
-    }
+    /* Récupération de la distance */
+    var distance: number = pathFinder.getDistance();
 
     /* Si supérieur à 8, il vise pacman, sinon retour au coin */
-    return gap > 8 ? pacmanTileCoords : this.cornerCoordinates;
+    return distance > 8 ? pacmanTileCoords : this.cornerCoordinates;
   }
 }
