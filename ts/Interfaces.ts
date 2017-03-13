@@ -13,6 +13,7 @@ interface PointIndexed
   x:number;
   y:number;
   i:number;
+  parent: Point;
 }
 
 interface Size

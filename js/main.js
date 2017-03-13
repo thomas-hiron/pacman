@@ -250,6 +250,25 @@ class FruitsManager {
 FruitsManager.APPEARANCE_INTEVERVAL = 30000;
 FruitsManager.APPEARANCE_DURATION = 10000;
 /**
+ * Created by thiron on 13/03/2017.
+ */
+class Functions {
+    /**
+     * Tri un tableau
+     *
+     * @param a
+     */
+    static shuffle(a) {
+        var j, x, i;
+        for (i = a.length; i; i--) {
+            j = Math.floor(Math.random() * i);
+            x = a[i - 1];
+            a[i - 1] = a[j];
+            a[j] = x;
+        }
+    }
+}
+/**
  * Created by mac pro on 06/03/2017.
  */
 /**
@@ -354,12 +373,12 @@ class Ghost {
     /**
      * Renvoie la direction à prendre pour arriver le plus rapidement à la case ciblée
      *
-     * @param tileCoords La case à aller
+     * @param destinationTileCoords La case à aller
      * @see https://en.wikipedia.org/wiki/Pathfinding
      *
      * @returns {number}
      */
-    findBestPath(tileCoords) {
+    findBestPath(destinationTileCoords) {
         /* Les coordonnées de la case courante */
         var currentTileCoords = {
             x: this.coordinates.x / Tile.TILE_WIDTH,
@@ -367,13 +386,30 @@ class Ghost {
         };
         /* La liste principale, initialisée avec la case, contient toutes les cases permettant de tracer le chemin */
         var mainList = [{
-                x: tileCoords.x,
-                y: tileCoords.y,
-                i: 0
+                x: currentTileCoords.x,
+                y: currentTileCoords.y,
+                i: 0,
+                parent: null
             }];
-        /* Pour chaque élément de la liste principale */
-        var destinationTile = null;
-        for (var i = 0; i < mainList.length; ++i) {
+        /* Récupération des cases où il peut aller */
+        var currentAdjacentTiles = TileFunctions.getAdjacentTiles(currentTileCoords);
+        /* Mélange des cases pour faire un chemin aléatoire quand il y aura plusieurs possibilités */
+        Functions.shuffle(currentAdjacentTiles);
+        for (var i = 0; i < currentAdjacentTiles.length; ++i) {
+            var collisionDetected = this.checkCollision(currentAdjacentTiles[i].x, currentAdjacentTiles[i].y);
+            if (!collisionDetected && !this.hasToGoBackwards(currentTileCoords, currentAdjacentTiles[i])) {
+                mainList.push({
+                    x: currentAdjacentTiles[i].x,
+                    y: currentAdjacentTiles[i].y,
+                    i: 1,
+                    parent: currentAdjacentTiles[i]
+                });
+            }
+        }
+        /* La prochaine case où le fantôme ira */
+        var nextTile = null;
+        /* Pour chaque élément de la liste principale, on part des cases où il est possible d'aller directement */
+        for (i = 1; i < mainList.length; ++i) {
             /* Récupération des 4 cases autour */
             var adjacentTiles = TileFunctions.getAdjacentTiles({
                 x: mainList[i].x,
@@ -387,62 +423,47 @@ class Ghost {
                 var alreadyAdded = false;
                 /* Vérification si case a déjà été ajoutée (même coords et index inférieur ou égal) */
                 for (var k = 0, l = mainList.length; k < l; ++k) {
-                    if (mainList[k].x == adjacentTiles[j].x && mainList[k].y == adjacentTiles[j].y && mainList[k].i <= i) {
+                    /* Si la case a les mêmes coordonées et le même parent et index inférieur */
+                    if (mainList[k].x == adjacentTiles[j].x && mainList[k].y == adjacentTiles[j].y && mainList[k].i <= i &&
+                        (mainList[k].parent == null ||
+                            mainList[k].parent.x == mainList[i].parent.x && mainList[k].parent.y == mainList[i].parent.y)) {
                         alreadyAdded = true;
                         break;
                     }
                 }
-                /* Arrêt de la boucle si la case de destination a été trouvée et qu'il faut pas faire demi-tour */
-                if (adjacentTiles[j].x == currentTileCoords.x && adjacentTiles[j].y == currentTileCoords.y) {
-                    /* Toutes les cases qui représentent un chemin possible */
-                    var nextCases = [];
-                    /* On vérifie qu'il faut pas faire demi-tour */
-                    for (k = mainList.length - 1; k >= 0; --k) {
-                        /* Le compteur précédent */
-                        if (mainList[k].i == mainList[i].i) {
-                            /* Si c'est bien collé */
-                            if (this.isNextTo(currentTileCoords, mainList[k])) {
-                                /* Et pas de demi-tour, alors ajout */
-                                if (!this.hasToGoBackwards(currentTileCoords, mainList[k]))
-                                    nextCases.push(mainList[k]);
-                            }
-                        }
-                        else if (mainList[k].i < mainList[i].i)
-                            break;
-                    }
-                    /* Récupération d'une des cases possibles */
-                    if (nextCases.length > 0) {
-                        var random = Math.floor(Math.random() * nextCases.length);
-                        destinationTile = nextCases[random];
-                        break;
-                    }
-                }
-                else if (!collisionDetected && !alreadyAdded) {
+                /* Pas de collision et pas déjà ajoutée, ajout dans la liste principale */
+                if (!collisionDetected && !alreadyAdded) {
                     mainList.push({
                         x: adjacentTiles[j].x,
                         y: adjacentTiles[j].y,
-                        i: mainList[i].i + 1
+                        i: mainList[i].i + 1,
+                        parent: mainList[i].parent
                     });
+                }
+                /* Arrêt de la boucle si la case de destination a été trouvée et qu'il faut pas faire demi-tour, i > 2 si jamais le fantôme est sur la case de destination */
+                if (adjacentTiles[j].x == destinationTileCoords.x && adjacentTiles[j].y == destinationTileCoords.y && i > 2) {
+                    nextTile = mainList[i].parent;
+                    break;
                 }
             }
             /* Stop boucle, chemin trouvé */
-            if (destinationTile != null)
+            if (nextTile != null)
                 break;
         }
         /* Récupération de la bonne direction, par défaut la courante */
         var direction = this.direction;
-        if (destinationTile != null) {
+        if (nextTile != null) {
             /* Gauche */
-            if (currentTileCoords.x == destinationTile.x + 1)
+            if (currentTileCoords.x == nextTile.x + 1)
                 direction = Directions.Left;
             /* Droite */
-            if (currentTileCoords.x == destinationTile.x - 1)
+            if (currentTileCoords.x == nextTile.x - 1)
                 direction = Directions.Right;
             /* Haut */
-            if (currentTileCoords.y == destinationTile.y + 1)
+            if (currentTileCoords.y == nextTile.y + 1)
                 direction = Directions.Up;
             /* Bas */
-            if (currentTileCoords.y == destinationTile.y - 1)
+            if (currentTileCoords.y == nextTile.y - 1)
                 direction = Directions.Down;
         }
         return direction;
