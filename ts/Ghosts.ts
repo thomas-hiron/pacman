@@ -234,10 +234,13 @@ abstract class Ghost
           }
 
           /* Récupération d'une des cases possibles */
-          var random: number = Math.floor(Math.random() * nextCases.length);
-          destinationTile = nextCases[random];
+          if (nextCases.length > 0)
+          {
+            var random: number = Math.floor(Math.random() * nextCases.length);
+            destinationTile = nextCases[random];
 
-          break;
+            break;
+          }
         }
         /* Pas de collision et pas déjà ajoutée, ajout dans la liste principale */
         else if (!collisionDetected && !alreadyAdded)

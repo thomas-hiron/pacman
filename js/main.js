@@ -411,9 +411,11 @@ class Ghost {
                             break;
                     }
                     /* Récupération d'une des cases possibles */
-                    var random = Math.floor(Math.random() * nextCases.length);
-                    destinationTile = nextCases[random];
-                    break;
+                    if (nextCases.length > 0) {
+                        var random = Math.floor(Math.random() * nextCases.length);
+                        destinationTile = nextCases[random];
+                        break;
+                    }
                 }
                 else if (!collisionDetected && !alreadyAdded) {
                     mainList.push({
