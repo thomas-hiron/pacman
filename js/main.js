@@ -402,7 +402,7 @@ class Ghost {
             var collisionDetected = this.checkCollision(currentAdjacentTiles[i].x, currentAdjacentTiles[i].y);
             if (!collisionDetected && !this.hasToGoBackwards(currentTileCoords, currentAdjacentTiles[i])) {
                 /* Si case juste à côté, pas besoin de faire des calculs pour rien */
-                if (currentAdjacentTiles[i].x && destinationTileCoords.x && currentAdjacentTiles[i].y == destinationTileCoords.y) {
+                if (currentAdjacentTiles[i].x == destinationTileCoords.x && currentAdjacentTiles[i].y == destinationTileCoords.y) {
                     if (!this.hasToGoBackwards(currentTileCoords, currentAdjacentTiles[i])) {
                         nextTile = currentAdjacentTiles[i];
                         mainList = [];
@@ -701,8 +701,24 @@ class Pinky extends Ghost {
      * @returns {null}
      */
     targetTile(pacmanCenter) {
-        // TODO : Faire le bon calcul
-        return TileFunctions.getTileCoordinates(pacmanCenter);
+        /* La case de pacman */
+        var pacmanTile = TileFunctions.getTileCoordinates(pacmanCenter);
+        /* Viser 4 cases devant */
+        switch (pacmanCenter.direction) {
+            case Directions.Left:
+                pacmanTile.x = Math.max(0, pacmanTile.x - 4);
+                break;
+            case Directions.Right:
+                pacmanTile.x = Math.min(14, pacmanTile.x + 4);
+                break;
+            case Directions.Up:
+                pacmanTile.y = Math.max(0, pacmanTile.y - 4);
+                break;
+            case Directions.Down:
+                pacmanTile.y = Math.min(19, pacmanTile.y + 4);
+                break;
+        }
+        return pacmanTile;
     }
 }
 /**
@@ -1158,7 +1174,8 @@ class Jeu {
         /* Déplacement des fantômes en passant le centre de pacman en paramètre */
         this.ghostsManager.moveGhosts({
             x: this.pacman.getX() + Tile.TILE_WIDTH / 2,
-            y: this.pacman.getY() + Tile.TILE_WIDTH / 2
+            y: this.pacman.getY() + Tile.TILE_WIDTH / 2,
+            direction: this.pacman.getDirection()
         });
         /* Anime les fantômes */
         this.ghostsManager.animateGhosts();
@@ -1723,6 +1740,14 @@ class Pacman {
      */
     getCanvasElem() {
         return this.canvas.getElement();
+    }
+    /**
+     * Renvoie la direction
+     *
+     * @returns {number}
+     */
+    getDirection() {
+        return this.direction;
     }
     /**
      * Initialisation

@@ -89,6 +89,16 @@ class Pacman
   }
 
   /**
+   * Renvoie la direction
+   *
+   * @returns {number}
+   */
+  public getDirection(): number
+  {
+    return this.direction;
+  }
+
+  /**
    * Le constructeur qui initialise les variables
    */
   public constructor()

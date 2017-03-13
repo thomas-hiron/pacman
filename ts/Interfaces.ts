@@ -8,6 +8,13 @@ interface Point
   y:number;
 }
 
+interface PointAndDirection
+{
+  x: number;
+  y:number;
+  direction: number;
+}
+
 interface PointIndexed
 {
   x:number;

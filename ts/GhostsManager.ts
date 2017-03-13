@@ -103,7 +103,7 @@ class GhostsManager
    *
    * @returns {GhostsManager}
    */
-  public moveGhosts(pacmanCenter: Point): GhostsManager
+  public moveGhosts(pacmanCenter: PointAndDirection): GhostsManager
   {
     /* Vérification du chrono */
     switch (this.mode)

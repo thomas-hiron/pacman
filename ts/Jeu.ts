@@ -238,7 +238,8 @@ class Jeu
     /* Déplacement des fantômes en passant le centre de pacman en paramètre */
     this.ghostsManager.moveGhosts({
       x: this.pacman.getX() + Tile.TILE_WIDTH / 2,
-      y: this.pacman.getY() + Tile.TILE_WIDTH / 2
+      y: this.pacman.getY() + Tile.TILE_WIDTH / 2,
+      direction: this.pacman.getDirection()
     });
 
     /* Anime les fantômes */

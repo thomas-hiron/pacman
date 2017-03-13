@@ -43,7 +43,7 @@ abstract class Ghost
   /**
    * Vise une case selon le caractère
    */
-  protected abstract targetTile(pacmanCenter: Point): Point;
+  protected abstract targetTile(pacmanCenter: PointAndDirection): Point;
 
   /**
    * @param callback
@@ -194,7 +194,7 @@ abstract class Ghost
       if (!collisionDetected && !this.hasToGoBackwards(currentTileCoords, currentAdjacentTiles[i]))
       {
         /* Si case juste à côté, pas besoin de faire des calculs pour rien */
-        if (currentAdjacentTiles[i].x && destinationTileCoords.x && currentAdjacentTiles[i].y == destinationTileCoords.y)
+        if (currentAdjacentTiles[i].x == destinationTileCoords.x && currentAdjacentTiles[i].y == destinationTileCoords.y)
         {
           if (!this.hasToGoBackwards(currentTileCoords, currentAdjacentTiles[i]))
           {
@@ -341,7 +341,7 @@ abstract class Ghost
    *
    * @returns {Ghost}
    */
-  public move(pacmanCenter: Point): Ghost
+  public move(pacmanCenter: PointAndDirection): Ghost
   {
     /* Pas de déplacement si à l'arrêt */
     if (this.mode == Modes.Idle)
@@ -560,10 +560,29 @@ class Pinky extends Ghost
    *
    * @returns {null}
    */
-  protected targetTile(pacmanCenter: Point): Point
+  protected targetTile(pacmanCenter: PointAndDirection): Point
   {
-    // TODO : Faire le bon calcul
-    return TileFunctions.getTileCoordinates(pacmanCenter);
+    /* La case de pacman */
+    var pacmanTile: Point = TileFunctions.getTileCoordinates(pacmanCenter);
+
+    /* Viser 4 cases devant */
+    switch(pacmanCenter.direction)
+    {
+      case Directions.Left:
+        pacmanTile.x = Math.max(0, pacmanTile.x - 4);
+        break;
+      case Directions.Right:
+        pacmanTile.x = Math.min(14, pacmanTile.x + 4);
+        break;
+      case Directions.Up:
+        pacmanTile.y = Math.max(0, pacmanTile.y - 4);
+        break;
+      case Directions.Down:
+        pacmanTile.y = Math.min(19, pacmanTile.y + 4);
+        break;
+    }
+
+    return pacmanTile;
   }
 }
 
@@ -598,7 +617,7 @@ class Blinky extends Ghost
    *
    * @returns {null}
    */
-  protected targetTile(pacmanCenter: Point): Point
+  protected targetTile(pacmanCenter: PointAndDirection): Point
   {
     return TileFunctions.getTileCoordinates(pacmanCenter);
   }
@@ -635,7 +654,7 @@ class Inky extends Ghost
    *
    * @returns {null}
    */
-  protected targetTile(pacmanCenter: Point): Point
+  protected targetTile(pacmanCenter: PointAndDirection): Point
   {
     // TODO : Faire le bon calcul
     return TileFunctions.getTileCoordinates(pacmanCenter);
@@ -673,7 +692,7 @@ class Clyde extends Ghost
    *
    * @returns {null}
    */
-  protected targetTile(pacmanCenter: Point): Point
+  protected targetTile(pacmanCenter: PointAndDirection): Point
   {
     // TODO : Faire le bon calcul
     return TileFunctions.getTileCoordinates(pacmanCenter);
