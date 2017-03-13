@@ -136,7 +136,7 @@ class GhostsManager
     /* Déplacements */
     this.pinky.move(pacmanCenter);
     this.blinky.move(pacmanCenter);
-    this.inky.move(pacmanCenter);
+    this.inky.move(pacmanCenter, this.blinky.getCoordinates());
     this.clyde.move(pacmanCenter);
 
     return this;

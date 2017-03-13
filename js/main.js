@@ -516,10 +516,11 @@ class Ghost {
      *  Appelle targetTile et findBestPath si c'est un croisement
      *
      * @param pacmanCenter
+     * @param blinkyCoords
      *
      * @returns {Ghost}
      */
-    move(pacmanCenter) {
+    move(pacmanCenter, blinkyCoords = null) {
         /* Pas de déplacement si à l'arrêt */
         if (this.mode == Modes.Idle)
             return this;
@@ -532,7 +533,7 @@ class Ghost {
                     break;
                 case Modes.Chase:
                     /* Récupération de la bonne case */
-                    var target = this.targetTile(pacmanCenter);
+                    var target = this.targetTile(pacmanCenter, blinkyCoords);
                     this.direction = this.findBestPath(target);
                     break;
                 case Modes.Frightened:
@@ -776,12 +777,49 @@ class Inky extends Ghost {
      * Détermine la case à laquelle se rendre
      *
      * @param pacmanCenter
+     * @param blinkyCoords
      *
      * @returns {null}
      */
-    targetTile(pacmanCenter) {
-        // TODO : Faire le bon calcul
-        return TileFunctions.getTileCoordinates(pacmanCenter);
+    targetTile(pacmanCenter, blinkyCoords) {
+        /* La case de blinky */
+        var a = TileFunctions.getTileCoordinates({
+            x: blinkyCoords.x + Tile.TILE_WIDTH / 2,
+            y: blinkyCoords.y + Tile.TILE_WIDTH / 2
+        });
+        /* La case de pacman */
+        var b = TileFunctions.getTileCoordinates(pacmanCenter);
+        /* Viser 2 cases devant */
+        switch (pacmanCenter.direction) {
+            case Directions.Left:
+                b.x = Math.max(0, b.x - 2);
+                break;
+            case Directions.Right:
+                b.x = Math.min(14, b.x + 2);
+                break;
+            case Directions.Up:
+                b.y = Math.max(0, b.y - 2);
+                break;
+            case Directions.Down:
+                b.y = Math.min(19, b.y + 2);
+                break;
+        }
+        /* Le vecteur */
+        var ab = {
+            x: b.x - a.x,
+            y: b.y - a.y
+        };
+        /* La nouvelle case */
+        var target = {
+            x: ab.x + b.x,
+            y: ab.y + b.y
+        };
+        /* Limitation des valeurs */
+        target.x = Math.max(0, target.x);
+        target.x = Math.min(14, target.x);
+        target.y = Math.max(0, target.y);
+        target.y = Math.min(19, target.y);
+        return target;
     }
 }
 /**
@@ -903,7 +941,7 @@ class GhostsManager {
         /* Déplacements */
         this.pinky.move(pacmanCenter);
         this.blinky.move(pacmanCenter);
-        this.inky.move(pacmanCenter);
+        this.inky.move(pacmanCenter, this.blinky.getCoordinates());
         this.clyde.move(pacmanCenter);
         return this;
     }

@@ -43,7 +43,7 @@ abstract class Ghost
   /**
    * Vise une case selon le caractère
    */
-  protected abstract targetTile(pacmanCenter: PointAndDirection): Point;
+  protected abstract targetTile(pacmanCenter: PointAndDirection, blinkCoords: Point = null): Point;
 
   /**
    * @param callback
@@ -338,10 +338,11 @@ abstract class Ghost
    *  Appelle targetTile et findBestPath si c'est un croisement
    *
    * @param pacmanCenter
+   * @param blinkyCoords
    *
    * @returns {Ghost}
    */
-  public move(pacmanCenter: PointAndDirection): Ghost
+  public move(pacmanCenter: PointAndDirection, blinkyCoords: Point = null): Ghost
   {
     /* Pas de déplacement si à l'arrêt */
     if (this.mode == Modes.Idle)
@@ -360,7 +361,7 @@ abstract class Ghost
         case Modes.Chase :
 
           /* Récupération de la bonne case */
-          var target: Point = this.targetTile(pacmanCenter);
+          var target: Point = this.targetTile(pacmanCenter, blinkyCoords);
           this.direction = this.findBestPath(target);
 
           break;
@@ -566,7 +567,7 @@ class Pinky extends Ghost
     var pacmanTile: Point = TileFunctions.getTileCoordinates(pacmanCenter);
 
     /* Viser 4 cases devant */
-    switch(pacmanCenter.direction)
+    switch (pacmanCenter.direction)
     {
       case Directions.Left:
         pacmanTile.x = Math.max(0, pacmanTile.x - 4);
@@ -651,13 +652,57 @@ class Inky extends Ghost
    * Détermine la case à laquelle se rendre
    *
    * @param pacmanCenter
+   * @param blinkyCoords
    *
    * @returns {null}
    */
-  protected targetTile(pacmanCenter: PointAndDirection): Point
+  protected targetTile(pacmanCenter: PointAndDirection, blinkyCoords: Point): Point
   {
-    // TODO : Faire le bon calcul
-    return TileFunctions.getTileCoordinates(pacmanCenter);
+    /* La case de blinky */
+    var a: Point = TileFunctions.getTileCoordinates({
+      x: blinkyCoords.x + Tile.TILE_WIDTH / 2,
+      y: blinkyCoords.y + Tile.TILE_WIDTH / 2
+    });
+
+    /* La case de pacman */
+    var b: Point = TileFunctions.getTileCoordinates(pacmanCenter);
+
+    /* Viser 2 cases devant */
+    switch (pacmanCenter.direction)
+    {
+      case Directions.Left:
+        b.x = Math.max(0, b.x - 2);
+        break;
+      case Directions.Right:
+        b.x = Math.min(14, b.x + 2);
+        break;
+      case Directions.Up:
+        b.y = Math.max(0, b.y - 2);
+        break;
+      case Directions.Down:
+        b.y = Math.min(19, b.y + 2);
+        break;
+    }
+
+    /* Le vecteur */
+    var ab: Point = {
+      x: b.x - a.x,
+      y: b.y - a.y
+    };
+
+    /* La nouvelle case */
+    var target: Point = {
+      x: ab.x + b.x,
+      y: ab.y + b.y
+    };
+
+    /* Limitation des valeurs */
+    target.x = Math.max(0, target.x);
+    target.x = Math.min(14, target.x);
+    target.y = Math.max(0, target.y);
+    target.y = Math.min(19, target.y);
+
+    return target;
   }
 }
 
