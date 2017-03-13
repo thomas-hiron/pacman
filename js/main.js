@@ -392,6 +392,8 @@ class Ghost {
                 i: 0,
                 parent: null
             }];
+        /* La prochaine case où le fantôme ira */
+        var nextTile = null;
         /* Récupération des cases où il peut aller */
         var currentAdjacentTiles = TileFunctions.getAdjacentTiles(currentTileCoords);
         /* Mélange des cases pour faire un chemin aléatoire quand il y aura plusieurs possibilités */
@@ -399,6 +401,15 @@ class Ghost {
         for (var i = 0; i < currentAdjacentTiles.length; ++i) {
             var collisionDetected = this.checkCollision(currentAdjacentTiles[i].x, currentAdjacentTiles[i].y);
             if (!collisionDetected && !this.hasToGoBackwards(currentTileCoords, currentAdjacentTiles[i])) {
+                /* Si case juste à côté, pas besoin de faire des calculs pour rien */
+                if (currentAdjacentTiles[i].x && destinationTileCoords.x && currentAdjacentTiles[i].y == destinationTileCoords.y) {
+                    if (!this.hasToGoBackwards(currentTileCoords, currentAdjacentTiles[i])) {
+                        nextTile = currentAdjacentTiles[i];
+                        mainList = [];
+                        break;
+                    }
+                }
+                /* Ajoute à la liste si trop loin */
                 mainList.push({
                     x: currentAdjacentTiles[i].x,
                     y: currentAdjacentTiles[i].y,
@@ -407,8 +418,6 @@ class Ghost {
                 });
             }
         }
-        /* La prochaine case où le fantôme ira */
-        var nextTile = null;
         /* Pour chaque élément de la liste principale, on part des cases où il est possible d'aller directement */
         for (i = 1; i < mainList.length; ++i) {
             /* Récupération des 4 cases autour */
@@ -844,9 +853,9 @@ class GhostsManager {
     start() {
         this.time = +new Date();
         /* Blinky doit bouger directement */
-        // this.blinky.changeMode(this.mode, true);
+        this.blinky.changeMode(this.mode, true);
         /* Pinky doit sortir immédiatement */
-        // this.pinky.getOutFromHome();
+        this.pinky.getOutFromHome();
         return this;
     }
     /**
@@ -978,7 +987,7 @@ class GhostsManager {
     }
 }
 /* Le nombre de point que pacman doit manger pour que certains fantômes sortent */
-GhostsManager.INKY_DOT_TO_GO = 5;
+GhostsManager.INKY_DOT_TO_GO = 30;
 /**
  * Created by thiron on 03/07/2015.
  */

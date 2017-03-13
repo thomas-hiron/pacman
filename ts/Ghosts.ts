@@ -181,6 +181,9 @@ abstract class Ghost
       parent: null
     }];
 
+    /* La prochaine case où le fantôme ira */
+    var nextTile: Point = null;
+
     /* Récupération des cases où il peut aller */
     var currentAdjacentTiles: Array<Point> = TileFunctions.getAdjacentTiles(currentTileCoords);
     /* Mélange des cases pour faire un chemin aléatoire quand il y aura plusieurs possibilités */
@@ -188,8 +191,20 @@ abstract class Ghost
     for (var i = 0 ; i < currentAdjacentTiles.length ; ++i)
     {
       var collisionDetected: boolean = this.checkCollision(currentAdjacentTiles[i].x, currentAdjacentTiles[i].y);
-      if(!collisionDetected && !this.hasToGoBackwards(currentTileCoords, currentAdjacentTiles[i]))
+      if (!collisionDetected && !this.hasToGoBackwards(currentTileCoords, currentAdjacentTiles[i]))
       {
+        /* Si case juste à côté, pas besoin de faire des calculs pour rien */
+        if (currentAdjacentTiles[i].x && destinationTileCoords.x && currentAdjacentTiles[i].y == destinationTileCoords.y)
+        {
+          if (!this.hasToGoBackwards(currentTileCoords, currentAdjacentTiles[i]))
+          {
+            nextTile = currentAdjacentTiles[i];
+            mainList = [];
+            break;
+          }
+        }
+
+        /* Ajoute à la liste si trop loin */
         mainList.push({
           x: currentAdjacentTiles[i].x,
           y: currentAdjacentTiles[i].y,
@@ -198,9 +213,6 @@ abstract class Ghost
         });
       }
     }
-
-    /* La prochaine case où le fantôme ira */
-    var nextTile: Point = null;
 
     /* Pour chaque élément de la liste principale, on part des cases où il est possible d'aller directement */
     for (i = 1 ; i < mainList.length ; ++i)
@@ -381,9 +393,9 @@ abstract class Ghost
           /* Aller au milieu */
           else
           {
-            if(coords.x == 6)
+            if (coords.x == 6)
               this.direction = Directions.Right;
-            else if(coords.x == 8)
+            else if (coords.x == 8)
               this.direction = Directions.Left;
           }
 
