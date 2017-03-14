@@ -304,6 +304,9 @@ class Ghost {
         /* Mode par défaut */
         this.mode = Modes.Idle;
         this.direction = null;
+        /* Pour que blinky aille à gauche obligatoirement */
+        if (this instanceof Blinky)
+            this.direction = Directions.Right;
         return this;
     }
     /**
