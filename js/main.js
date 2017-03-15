@@ -324,7 +324,7 @@ class Ghost {
         /* Le corps */
         context.rect(0, Ghost.SIZE.h / 2, Ghost.SIZE.w, Ghost.SIZE.h / 2);
         /* Remplissage */
-        context.fillStyle = this.color;
+        context.fillStyle = this.mode == Modes.Frightened ? this.frightenedColor : this.color;
         context.fill();
         context.closePath();
         /* Les yeux */
@@ -345,19 +345,45 @@ class Ghost {
                 break;
         }
         context.beginPath();
-        context.ellipse(Ghost.SIZE.w / 2 - 5 + x, Ghost.SIZE.h / 2 + y, 3, 4, 0, 2 * Math.PI, false);
-        context.ellipse(Ghost.SIZE.w / 2 + 5 + x, Ghost.SIZE.h / 2 + y, 3, 4, 0, 2 * Math.PI, false);
+        if (this.mode == Modes.Frightened) {
+            /* Petits yeux */
+            context.arc(Ghost.SIZE.w / 2 - 4, Ghost.SIZE.h / 2 - 2, 2, 0, 2 * Math.PI, false);
+            context.arc(Ghost.SIZE.w / 2 + 4, Ghost.SIZE.h / 2 - 2, 2, 0, 2 * Math.PI, false);
+        }
+        else {
+            /* Yeux normaux */
+            context.ellipse(Ghost.SIZE.w / 2 - 5 + x, Ghost.SIZE.h / 2 + y, 3, 4, 0, 2 * Math.PI, false);
+            context.ellipse(Ghost.SIZE.w / 2 + 5 + x, Ghost.SIZE.h / 2 + y, 3, 4, 0, 2 * Math.PI, false);
+        }
         /* Remplissage du blanc */
         context.fillStyle = 'white';
         context.fill();
         context.closePath();
-        context.beginPath();
-        context.ellipse(Ghost.SIZE.w / 2 - 5 + x * 2, Ghost.SIZE.h / 2 + y * 2, 1, 2, 0, 2 * Math.PI, false);
-        context.ellipse(Ghost.SIZE.w / 2 + 5 + x * 2, Ghost.SIZE.h / 2 + y * 2, 1, 2, 0, 2 * Math.PI, false);
-        /* Remplissage de la pupille*/
-        context.fillStyle = 'black';
-        context.fill();
-        context.closePath();
+        /* Les pupilles si pas apeuré */
+        if (this.mode != Modes.Frightened) {
+            context.beginPath();
+            context.ellipse(Ghost.SIZE.w / 2 - 5 + x * 2, Ghost.SIZE.h / 2 + y * 2, 1, 2, 0, 2 * Math.PI, false);
+            context.ellipse(Ghost.SIZE.w / 2 + 5 + x * 2, Ghost.SIZE.h / 2 + y * 2, 1, 2, 0, 2 * Math.PI, false);
+            /* Remplissage de la pupille */
+            context.fillStyle = 'black';
+            context.fill();
+            context.closePath();
+        }
+        else {
+            /* La bouche */
+            context.beginPath();
+            context.moveTo(6, Ghost.SIZE.h / 2 + 6);
+            context.lineTo(8, Ghost.SIZE.h / 2 + 4);
+            context.lineTo(10, Ghost.SIZE.h / 2 + 6);
+            context.lineTo(12, Ghost.SIZE.h / 2 + 4);
+            context.lineTo(14, Ghost.SIZE.h / 2 + 6);
+            context.lineTo(16, Ghost.SIZE.h / 2 + 4);
+            context.lineTo(18, Ghost.SIZE.h / 2 + 6);
+            /* Remplissage */
+            context.strokeStyle = 'white';
+            context.stroke();
+            context.closePath();
+        }
         /* Changement de mode et ajout des pates */
         context.globalCompositeOperation = 'destination-out';
         /* Le nombre de pates */
@@ -875,8 +901,7 @@ class GhostsManager {
         /* Blinky doit bouger directement */
         this.blinky.changeMode(this.mode, true);
         /* Pinky doit sortir immédiatement */
-        //this.pinky.getOutFromHome();
-        this.changeMode(Modes.Frightened);
+        this.pinky.getOutFromHome();
         return this;
     }
     /**
