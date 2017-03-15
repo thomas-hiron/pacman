@@ -28,6 +28,7 @@ abstract class Ghost
   protected cornerCoordinates: Point;
   /* La couleur du fantôme */
   protected color: string;
+  protected frightenedColor: string = "#2121ff";
 
   /* Le canvas de chaque fantôme */
   private canvas: Canvas;
@@ -281,6 +282,31 @@ abstract class Ghost
 
         case Modes.Frightened :
 
+          /* Une case aléatoire */
+          var coords: Point = TileFunctions.getTileCoordinates({
+            x: this.coordinates.x + Tile.TILE_WIDTH / 2,
+            y: this.coordinates.y + Tile.TILE_WIDTH / 2
+          });
+
+          /* Toutes les cases autour et la case finale */
+          var adjacentTiles: Array<Point> = TileFunctions.getAdjacentTiles(coords);
+          var target: Point;
+
+          /* Mélange des cases pour faire un chemin aléatoire quand il y aura plusieurs possibilités */
+          Functions.shuffle(adjacentTiles);
+          for (var i = 0 ; i < adjacentTiles.length ; ++i)
+          {
+            var collisionDetected: boolean = this.checkCollision(adjacentTiles[i].x, adjacentTiles[i].y);
+            if (!collisionDetected && !this.hasToGoBackwards(coords, adjacentTiles[i]))
+            {
+              target = adjacentTiles[i];
+              break;
+            }
+          }
+
+          /* Changement de direction */
+          this.direction = this.findBestPath(target);
+
           break;
 
         /* Sort de la maison */
@@ -418,6 +444,9 @@ abstract class Ghost
           break;
       }
     }
+    /* Si frightened, réduction de la vitesse */
+    else if (this.mode == Modes.Frightened)
+      this.stepPx = Ghost.FRIGHTENED;
 
     return this;
   }

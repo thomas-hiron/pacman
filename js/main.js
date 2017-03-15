@@ -277,6 +277,7 @@ class Functions {
  */
 class Ghost {
     constructor() {
+        this.frightenedColor = "#2121ff";
         /* Le décalage en px pour le mouvement */
         this.stepPx = Ghost.NORMAL;
         /* L'étape courante d'animation */
@@ -469,6 +470,25 @@ class Ghost {
                     this.direction = this.findBestPath(target);
                     break;
                 case Modes.Frightened:
+                    /* Une case aléatoire */
+                    var coords = TileFunctions.getTileCoordinates({
+                        x: this.coordinates.x + Tile.TILE_WIDTH / 2,
+                        y: this.coordinates.y + Tile.TILE_WIDTH / 2
+                    });
+                    /* Toutes les cases autour et la case finale */
+                    var adjacentTiles = TileFunctions.getAdjacentTiles(coords);
+                    var target;
+                    /* Mélange des cases pour faire un chemin aléatoire quand il y aura plusieurs possibilités */
+                    Functions.shuffle(adjacentTiles);
+                    for (var i = 0; i < adjacentTiles.length; ++i) {
+                        var collisionDetected = this.checkCollision(adjacentTiles[i].x, adjacentTiles[i].y);
+                        if (!collisionDetected && !this.hasToGoBackwards(coords, adjacentTiles[i])) {
+                            target = adjacentTiles[i];
+                            break;
+                        }
+                    }
+                    /* Changement de direction */
+                    this.direction = this.findBestPath(target);
                     break;
                 /* Sort de la maison */
                 case Modes.OutFromHome:
@@ -578,6 +598,8 @@ class Ghost {
                     break;
             }
         }
+        else if (this.mode == Modes.Frightened)
+            this.stepPx = Ghost.FRIGHTENED;
         return this;
     }
     /**
@@ -853,7 +875,8 @@ class GhostsManager {
         /* Blinky doit bouger directement */
         this.blinky.changeMode(this.mode, true);
         /* Pinky doit sortir immédiatement */
-        this.pinky.getOutFromHome();
+        //this.pinky.getOutFromHome();
+        this.changeMode(Modes.Frightened);
         return this;
     }
     /**
