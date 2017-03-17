@@ -599,6 +599,8 @@ class Ghost {
      * @returns {Ghost}
      */
     changeMode(mode, force = false) {
+        /* S'il était apeuré */
+        var wasFrightened = this.mode == Modes.Frightened;
         /* S'il vient de sortir de la maison */
         if (this.mode == Modes.OutFromHome && mode == Modes.Scatter)
             this.direction = Directions.Right;
@@ -606,8 +608,8 @@ class Ghost {
             this.direction = Directions.Left;
         if (this.mode != Modes.Idle || force)
             this.mode = mode;
-        /* Si scatter, changement de direction */
-        if (this.mode == Modes.Scatter) {
+        /* Si scatter, changement de direction (et si pas frightened juste avant) */
+        if (!wasFrightened && this.mode == Modes.Scatter) {
             switch (this.direction) {
                 case Directions.Left:
                     this.direction = Directions.Right;
@@ -626,6 +628,8 @@ class Ghost {
         }
         else if (this.mode == Modes.Frightened)
             this.stepPx = Ghost.FRIGHTENED;
+        else if (wasFrightened && this.mode != Modes.Frightened)
+            this.stepPx = Ghost.NORMAL;
         return this;
     }
     /**

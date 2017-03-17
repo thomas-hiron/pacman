@@ -75,7 +75,7 @@ abstract class Ghost
     this.direction = null;
 
     /* Pour que blinky aille à gauche obligatoirement */
-    if(this instanceof Blinky)
+    if (this instanceof Blinky)
       this.direction = Directions.Right;
 
     return this;
@@ -449,6 +449,9 @@ abstract class Ghost
    */
   public changeMode(mode: number, force: boolean = false): Ghost
   {
+    /* S'il était apeuré */
+    var wasFrightened: number = this.mode == Modes.Frightened;
+
     /* S'il vient de sortir de la maison */
     if (this.mode == Modes.OutFromHome && mode == Modes.Scatter)
       this.direction = Directions.Right;
@@ -457,8 +460,8 @@ abstract class Ghost
     if (this.mode != Modes.Idle || force)
       this.mode = mode;
 
-    /* Si scatter, changement de direction */
-    if (this.mode == Modes.Scatter)
+    /* Si scatter, changement de direction (et si pas frightened juste avant) */
+    if (!wasFrightened && this.mode == Modes.Scatter)
     {
       switch (this.direction)
       {
@@ -480,6 +483,9 @@ abstract class Ghost
     /* Si frightened, réduction de la vitesse */
     else if (this.mode == Modes.Frightened)
       this.stepPx = Ghost.FRIGHTENED;
+    /* Plus apeuré, vitesse normale */
+    else if (wasFrightened && this.mode != Modes.Frightened)
+      this.stepPx = Ghost.NORMAL;
 
     return this;
   }
