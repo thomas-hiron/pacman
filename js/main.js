@@ -628,8 +628,34 @@ class Ghost {
         }
         else if (this.mode == Modes.Frightened)
             this.stepPx = Ghost.FRIGHTENED;
-        else if (wasFrightened && this.mode != Modes.Frightened)
+        else if (wasFrightened && this.mode != Modes.Frightened) {
             this.stepPx = Ghost.NORMAL;
+            /* Vérification de l'intégrité des données (pas de pixels impairs) */
+            this.checkCoordsIntegrity();
+        }
+        return this;
+    }
+    /**
+     * Vérifie que les données sont correctes et que y'a pas de cases impaires (sinon il pourra pas tourner)
+     *
+     * @returns {Ghost}
+     */
+    checkCoordsIntegrity() {
+        switch (this.direction) {
+            case Directions.Left:
+                this.coordinates.x += this.coordinates.x % 2;
+                break;
+            case Directions.Right:
+            default:
+                this.coordinates.x -= this.coordinates.x % 2;
+                break;
+            case Directions.Up:
+                this.coordinates.y += this.coordinates.y % 2;
+                break;
+            case Directions.Down:
+                this.coordinates.y -= this.coordinates.y % 2;
+                break;
+        }
         return this;
     }
     /**

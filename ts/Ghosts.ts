@@ -450,7 +450,7 @@ abstract class Ghost
   public changeMode(mode: number, force: boolean = false): Ghost
   {
     /* S'il était apeuré */
-    var wasFrightened: number = this.mode == Modes.Frightened;
+    var wasFrightened: boolean = this.mode == Modes.Frightened;
 
     /* S'il vient de sortir de la maison */
     if (this.mode == Modes.OutFromHome && mode == Modes.Scatter)
@@ -485,7 +485,39 @@ abstract class Ghost
       this.stepPx = Ghost.FRIGHTENED;
     /* Plus apeuré, vitesse normale */
     else if (wasFrightened && this.mode != Modes.Frightened)
+    {
       this.stepPx = Ghost.NORMAL;
+
+      /* Vérification de l'intégrité des données (pas de pixels impairs) */
+      this.checkCoordsIntegrity();
+    }
+
+    return this;
+  }
+
+  /**
+   * Vérifie que les données sont correctes et que y'a pas de cases impaires (sinon il pourra pas tourner)
+   *
+   * @returns {Ghost}
+   */
+  private checkCoordsIntegrity(): Ghost
+  {
+    switch (this.direction)
+    {
+      case Directions.Left:
+        this.coordinates.x += this.coordinates.x % 2;
+        break;
+      case Directions.Right:
+      default:
+        this.coordinates.x -= this.coordinates.x % 2;
+        break;
+      case Directions.Up:
+        this.coordinates.y += this.coordinates.y % 2;
+        break;
+      case Directions.Down:
+        this.coordinates.y -= this.coordinates.y % 2;
+        break;
+    }
 
     return this;
   }
