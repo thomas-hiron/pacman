@@ -10,7 +10,7 @@ class GhostsManager
   /* Les intervalles */
   private chaseInterval: number;
   private scatterInterval: number;
-  private frightenInterval: number;
+  private frightenedInterval: number;
 
   /* Les fantômes */
   private pinky: Pinky;
@@ -20,19 +20,21 @@ class GhostsManager
 
   /* Pour gérer l'intervalle */
   private time: number;
+  private frightenedTime: number;
 
   /* Gère le numéro de la vague */
   private waveNumber: number;
 
   /* Le mode courant */
   private mode: number;
+  private previousMode: number;
 
   constructor()
   {
     /* Initialisation des intervalles et autres */
     this.chaseInterval = 20000;
     this.scatterInterval = 7000;
-    this.frightenInterval = 7000;
+    this.frightenedInterval = 7000;
     this.waveNumber = 1;
     this.mode = Modes.Scatter;
 
@@ -121,6 +123,9 @@ class GhostsManager
           /* Diminution des intervalles */
           if (this.waveNumber > 2)
             this.scatterInterval = 5000;
+
+          /* Réinitialisation du chrono */
+          this.time = +new Date();
         }
 
         break;
@@ -128,7 +133,25 @@ class GhostsManager
       case Modes.Scatter:
 
         if (+new Date() - this.time > this.scatterInterval)
+        {
           this.changeMode(Modes.Chase);
+
+          /* Réinitialisation du chrono */
+          this.time = +new Date();
+        }
+
+        break;
+
+      case Modes.Frightened:
+
+        if (+new Date() - this.frightenedTime > this.frightenedInterval)
+        {
+          /* Comme si on avait stoppé le timer précédent */
+          this.time += this.frightenedInterval;
+
+          /* Remise du mode */
+          this.changeMode(this.previousMode);
+        }
 
         break;
     }
@@ -174,9 +197,6 @@ class GhostsManager
     this.blinky.changeMode(this.mode);
     this.inky.changeMode(this.mode);
     this.clyde.changeMode(this.mode);
-
-    /* Réinitialisation du chrono */
-    this.time = +new Date();
 
     return this;
   }
@@ -264,6 +284,11 @@ class GhostsManager
    */
   public goToFrightenedMode(): GhostsManager
   {
+    /* Pour remettre le mode à la fin */
+    this.previousMode = this.mode;
+    this.frightenedTime = +new Date();
+
+    /* Changement */
     this.changeMode(Modes.Frightened);
 
     return this;
