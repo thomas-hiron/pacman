@@ -256,4 +256,16 @@ class GhostsManager
 
     return this;
   }
+
+  /**
+   * Change de mode
+   *
+   * @returns {GhostsManager}
+   */
+  public goToFrightenedMode(): GhostsManager
+  {
+    this.changeMode(Modes.Frightened);
+
+    return this;
+  }
 }

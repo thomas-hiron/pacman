@@ -1031,6 +1031,15 @@ class GhostsManager {
         this.clyde.getOutFromHome();
         return this;
     }
+    /**
+     * Change de mode
+     *
+     * @returns {GhostsManager}
+     */
+    goToFrightenedMode() {
+        this.changeMode(Modes.Frightened);
+        return this;
+    }
 }
 /* Le nombre de point que pacman doit manger pour que certains fantômes sortent */
 GhostsManager.INKY_DOT_TO_GO = 30;
@@ -1367,6 +1376,8 @@ class Jeu {
         /* Si c'est un fruit, on recommence le compteur */
         if (currentTile.getPacDot() instanceof Fruit)
             this.fruitsManager.start();
+        else if (currentTile.getPacDot() instanceof PowerPellet)
+            this.ghostsManager.goToFrightenedMode();
         /* Suppression du point */
         currentTile.setPacDot(null);
         return this;

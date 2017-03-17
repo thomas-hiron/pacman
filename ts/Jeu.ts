@@ -458,6 +458,9 @@ class Jeu
     /* Si c'est un fruit, on recommence le compteur */
     if (currentTile.getPacDot() instanceof Fruit)
       this.fruitsManager.start();
+    /* Si power pellet, on informe le ghostManager */
+    else if (currentTile.getPacDot() instanceof PowerPellet)
+      this.ghostsManager.goToFrightenedMode();
 
     /* Suppression du point */
     currentTile.setPacDot(null);
