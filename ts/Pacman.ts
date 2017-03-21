@@ -147,8 +147,6 @@ class Pacman
    */
   public rotate(e: KeyboardEvent): Pacman
   {
-    e.preventDefault();
-
     /* Le code de la flèche touchée */
     var code: number = e.keyCode;
 
@@ -156,15 +154,19 @@ class Pacman
     switch (code)
     {
       case 37 :
+        e.preventDefault();
         this.nextDirection = Directions.Left;
         break;
       case 38 :
+        e.preventDefault();
         this.nextDirection = Directions.Up;
         break;
       case 39 :
+        e.preventDefault();
         this.nextDirection = Directions.Right;
         break;
       case 40 :
+        e.preventDefault();
         this.nextDirection = Directions.Down;
         break;
     }

@@ -1839,21 +1839,24 @@ class Pacman {
      * @returns {Pacman}
      */
     rotate(e) {
-        e.preventDefault();
         /* Le code de la flèche touchée */
         var code = e.keyCode;
         /* Selon la flèche, on change le direction */
         switch (code) {
             case 37:
+                e.preventDefault();
                 this.nextDirection = Directions.Left;
                 break;
             case 38:
+                e.preventDefault();
                 this.nextDirection = Directions.Up;
                 break;
             case 39:
+                e.preventDefault();
                 this.nextDirection = Directions.Right;
                 break;
             case 40:
+                e.preventDefault();
                 this.nextDirection = Directions.Down;
                 break;
         }
