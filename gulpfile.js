@@ -31,7 +31,7 @@ gulp.task('typescript', function ()
       out: 'main.js',
       target: 'ES6'
     }));
-  return tsResult.js.pipe(gulp.dest('./js'));
+  return tsResult.js.pipe(gulp.dest('./docs'));
 });
 
 /**
@@ -39,8 +39,8 @@ gulp.task('typescript', function ()
  */
 gulp.task('minify', function ()
 {
-  return gulp.src('./js/main.js')
+  return gulp.src('./docs/main.js')
     .pipe(uglify())
     .pipe(rename('main.min.js'))
-    .pipe(gulp.dest('./js/'));
+    .pipe(gulp.dest('./docs'));
 });

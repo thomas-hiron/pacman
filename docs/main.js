@@ -1757,28 +1757,6 @@ class LevelManager {
     }
 }
 /**
- * Created by thiron on 03/07/2015.
- */
-window.addEventListener("load", init, false);
-/**
- * Chargement de la fenêtre, initialisation
- */
-function init() {
-    var jeu = new Jeu();
-    jeu.init();
-}
-/* RequestAnimationFrame */
-var requestAnimFrame = (function () {
-    return window.requestAnimationFrame ||
-        window.webkitRequestAnimationFrame ||
-        window.mozRequestAnimationFrame ||
-        window.oRequestAnimationFrame ||
-        window.msRequestAnimationFrame ||
-        function (callback) {
-            window.setTimeout(callback, 1000 / 60, new Date().getTime());
-        };
-})();
-/**
  * Created by thiron on 01/03/2017.
  */
 /**
@@ -2381,3 +2359,25 @@ class TileFunctions {
         };
     }
 }
+/**
+ * Created by thiron on 03/07/2015.
+ */
+window.addEventListener("load", init, false);
+/**
+ * Chargement de la fenêtre, initialisation
+ */
+function init() {
+    var jeu = new Jeu();
+    jeu.init();
+}
+/* RequestAnimationFrame */
+var requestAnimFrame = (function () {
+    return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+        function (callback) {
+            window.setTimeout(callback, 1000 / 60, new Date().getTime());
+        };
+})();
