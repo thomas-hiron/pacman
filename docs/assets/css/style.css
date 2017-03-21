@@ -1,0 +1,11 @@
+canvas {
+    display: block;
+    background-color: black;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    padding: 2px;
+}
+
+.hide {
+    display: none;
+}
