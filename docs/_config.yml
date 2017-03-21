@@ -2,6 +2,3 @@ theme: jekyll-theme-cayman
 title: "Pacman"
 description: "Developed with TypeScript and canvas"
 show_downloads: "true"
-
-page:
-    title: "Pacman JS - Thomas Hiron"
