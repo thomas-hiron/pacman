@@ -3,5 +3,5 @@ title: "Pacman"
 description: "Developed with TypeScript and canvas"
 show_downloads: "true"
 
-page :
+page:
     title: "Pacman JS - Thomas Hiron"
