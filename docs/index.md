@@ -2,4 +2,4 @@
     Ce jeu n'est pas compatible sur votre navigateur.
 </canvas>
 <img src="sprite.png" alt="Fruits">
-<script type="text/javascript" src="../js/main.js"></script>
+<script type="text/javascript" src="main.js"></script>
