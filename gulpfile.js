@@ -25,13 +25,12 @@ gulp.task('watch', function ()
  */
 gulp.task('typescript', function ()
 {
-  var tsResult = gulp.src('./ts/**/*.ts')
+  return gulp.src('./ts/**/*.ts')
     .pipe(ts({
       noImplicitAny: true,
       out: 'main.js',
       target: 'ES6'
-    }));
-  return tsResult.js.pipe(gulp.dest('./docs'));
+    })).pipe(gulp.dest('./docs/js'));
 });
 
 /**
@@ -39,8 +38,12 @@ gulp.task('typescript', function ()
  */
 gulp.task('minify', function ()
 {
-  return gulp.src('./docs/main.js')
+  return gulp.src('./ts/**/*.ts')
+    .pipe(ts({
+      noImplicitAny: true,
+      out: 'main.min.js',
+      target: 'ES5'
+    }))
     .pipe(uglify())
-    .pipe(rename('main.min.js'))
-    .pipe(gulp.dest('./docs'));
+    .pipe(gulp.dest('./docs/js'));
 });
