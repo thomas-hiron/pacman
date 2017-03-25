@@ -62,10 +62,22 @@ class Canvas
    *
    * @returns {Canvas}
    */
-  setSize(width: number, height: number)
+  public setSize(width: number, height: number): Canvas
   {
     this.element.width = width;
     this.element.height = height;
+
+    return this;
+  }
+
+  /**
+   * Nettoie le canvas
+   *
+   * @returns {Canvas}
+   */
+  public clear(): Canvas
+  {
+    this.context.clearRect(0, 0, this.element.width, this.element.height);
 
     return this;
   }

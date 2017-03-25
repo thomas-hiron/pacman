@@ -304,8 +304,8 @@ class Pacman
     /* Largeur de la case */
     var tileWidth: number = Tile.TILE_WIDTH;
 
-    /* Suppression du context */
-    ctx.clearRect(0, 0, size.w, size.h);
+    /* Nettoyage */
+    this.canvas.clear();
 
     /* Enregistrement du context */
     ctx.save();

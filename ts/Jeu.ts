@@ -46,7 +46,7 @@ class Jeu
       this.canvas = new Canvas(document.querySelector("canvas"));
 
       /* Nettoyage du canvas */
-      this.canvas.getContext().clearRect(0, 0, this.canvas.getElement().width, this.canvas.getElement().height);
+      this.canvas.clear();
     }
     catch (e)
     {
