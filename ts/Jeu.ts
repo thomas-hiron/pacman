@@ -116,6 +116,9 @@ class Jeu
     /* Pacman mort */
     window.addEventListener('PacmanDied', this.onPacmanDead.bind(this), false);
 
+    /* Fantôme(s) mangé */
+    window.addEventListener('UpdateScoreAfterGhostEaten', this.onGhostEaten.bind(this), false);
+
     return this;
   }
 
@@ -629,6 +632,20 @@ class Jeu
   {
     /* Suppression de tous les events */
     this.init();
+
+    return this;
+  }
+
+  /**
+   * Un fantôme a été mangé
+   *
+   * @param e Contient le nombre de fantômes mangés
+   *
+   * @returns {Jeu}
+   */
+  private onGhostEaten(e: CustomEvent): Jeu
+  {
+    this.score.updateWithGhost(e.detail);
 
     return this;
   }

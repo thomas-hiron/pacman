@@ -22,6 +22,7 @@ class GhostsManager
   private frames: number;
   private frightenedFrames: number;
   private areFrightened: boolean;
+  private numberEaten: number;
 
   /* Gère le numéro de la vague */
   private waveNumber: number;
@@ -91,6 +92,7 @@ class GhostsManager
   {
     this.frames = 0;
     this.frightenedFrames = 0;
+    this.numberEaten = 0;
 
     /* Changement du mode */
     this.changeMode(this.mode);
@@ -159,6 +161,7 @@ class GhostsManager
         {
           /* Comme si on avait stoppé le timer précédent */
           this.areFrightened = false;
+          this.numberEaten = 0;
 
           /* Suppression du mode alternatif */
           this.changeAlternativeMode(null);
@@ -317,7 +320,12 @@ class GhostsManager
    */
   private ghostEaten(): GhostsManager
   {
-    console.log('eaten');
+    this.numberEaten++;
+
+    /* Information de jeu pour augmenter le score */
+    var event: CustomEvent = new CustomEvent('UpdateScoreAfterGhostEaten', {'detail': this.numberEaten})
+    window.dispatchEvent(event);
+
     return this;
   }
 }

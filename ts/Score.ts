@@ -31,4 +31,32 @@ class Score
 
     return this;
   }
+
+  /**
+   * Met à jour le score
+   *
+   * @param ghostEatenNumber
+   *
+   * @returns {Score}
+   */
+  public updateWithGhost(ghostEatenNumber: number): Score
+  {
+    switch (ghostEatenNumber)
+    {
+      case 1:
+        this.score += 200;
+        break;
+      case 2:
+        this.score += 400;
+        break;
+      case 3:
+        this.score += 800;
+        break;
+      case 4:
+        this.score += 1600;
+        break;
+    }
+
+    return this;
+  }
 }

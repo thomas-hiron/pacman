@@ -1001,6 +1001,7 @@ class GhostsManager {
     start() {
         this.frames = 0;
         this.frightenedFrames = 0;
+        this.numberEaten = 0;
         /* Changement du mode */
         this.changeMode(this.mode);
         /* Pinky doit sortir immédiatement */
@@ -1047,6 +1048,7 @@ class GhostsManager {
                 if (this.frightenedFrames > this.frightenedInterval) {
                     /* Comme si on avait stoppé le timer précédent */
                     this.areFrightened = false;
+                    this.numberEaten = 0;
                     /* Suppression du mode alternatif */
                     this.changeAlternativeMode(null);
                 }
@@ -1174,7 +1176,10 @@ class GhostsManager {
      * @returns {GhostsManager}
      */
     ghostEaten() {
-        console.log('eaten');
+        this.numberEaten++;
+        /* Information de jeu pour augmenter le score */
+        var event = new CustomEvent('UpdateScoreAfterGhostEaten', { 'detail': this.numberEaten });
+        window.dispatchEvent(event);
         return this;
     }
 }
@@ -1258,6 +1263,8 @@ class Jeu {
         window.addEventListener('PacmanEaten', this.onPacmanEaten.bind(this), false);
         /* Pacman mort */
         window.addEventListener('PacmanDied', this.onPacmanDead.bind(this), false);
+        /* Fantôme(s) mangé */
+        window.addEventListener('UpdateScoreAfterGhostEaten', this.onGhostEaten.bind(this), false);
         return this;
     }
     /**
@@ -1640,6 +1647,17 @@ class Jeu {
     onPacmanDead() {
         /* Suppression de tous les events */
         this.init();
+        return this;
+    }
+    /**
+     * Un fantôme a été mangé
+     *
+     * @param e Contient le nombre de fantômes mangés
+     *
+     * @returns {Jeu}
+     */
+    onGhostEaten(e) {
+        this.score.updateWithGhost(e.detail);
         return this;
     }
 }
@@ -2368,6 +2386,30 @@ class Score {
     update(tile) {
         if (tile.getPacDot() instanceof PacDot)
             this.score += tile.getPacDot().getScoreValue();
+        return this;
+    }
+    /**
+     * Met à jour le score
+     *
+     * @param ghostEatenNumber
+     *
+     * @returns {Score}
+     */
+    updateWithGhost(ghostEatenNumber) {
+        switch (ghostEatenNumber) {
+            case 1:
+                this.score += 200;
+                break;
+            case 2:
+                this.score += 400;
+                break;
+            case 3:
+                this.score += 800;
+                break;
+            case 4:
+                this.score += 1600;
+                break;
+        }
         return this;
     }
 }
