@@ -6,19 +6,23 @@ class Tunnel
 {
   /**
    * Gère l'entrée dans le tunnel
+   *
    * @returns {Tunnel}
    */
-  public static checkEntry(coords, context, margin, pacman): Tunnel
+  public static checkEntry(object, context, margin): Tunnel
   {
+    var canvas: HTMLCanvasElement = object instanceof Pacman ? object.getCanvasElem() : object.canvas.getElement();
+    var coords: Point = object.getCoordinates();
+
     /* Gestion du tunnel à droite */
     if (coords.x >= 14 * Tile.TILE_WIDTH && coords.y == 10 * Tile.TILE_WIDTH)
     {
       var x: number = coords.x - context.canvas.width;
       context.clearRect(x, coords.y + margin + Jeu.TOP_HEIGHT, Pacman.SIZE.w + margin + 2, Tile.TILE_WIDTH - margin * 2);
-      context.drawImage(pacman.getCanvasElem(), x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
+      context.drawImage(canvas, x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
 
       /* Terminé */
-      pacman.setX(x);
+      object.setX(x);
       if (x > -10)
       {
         /* Point mangé */
@@ -31,9 +35,9 @@ class Tunnel
     {
       var x: number = coords.x + context.canvas.width;
       context.clearRect(x + margin - 2, coords.y + margin + Jeu.TOP_HEIGHT, Pacman.SIZE.w + margin, Tile.TILE_WIDTH - margin * 2);
-      context.drawImage(pacman.getCanvasElem(), x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
+      context.drawImage(canvas, x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
 
-      pacman.setX(x);
+      object.setX(x);
 
       /* Point mangé */
       if (x > 14 * Tile.TILE_WIDTH + 10)

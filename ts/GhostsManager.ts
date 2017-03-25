@@ -73,7 +73,7 @@ class GhostsManager
   public init(): GhostsManager
   {
     this.waveNumber = 1;
-    this.mode = Modes.Scatter;
+    this.mode = Modes.Chase;
     this.areFrightened = false;
 
     /* Initialisation des fantômes et des canvas */
@@ -248,25 +248,13 @@ class GhostsManager
    *
    * @returns {{canvas: Canvas, coords: Point}[]}
    */
-  public getGhostsCoordsAndCanvas(): Array<CanvasAndCoords>
+  public getGhosts(): Array<Ghost>
   {
     return [
-      {
-        'canvas': this.pinky.getCanvas(),
-        'coords': this.pinky.getCoordinates()
-      },
-      {
-        'canvas': this.blinky.getCanvas(),
-        'coords': this.blinky.getCoordinates()
-      },
-      {
-        'canvas': this.inky.getCanvas(),
-        'coords': this.inky.getCoordinates()
-      },
-      {
-        'canvas': this.clyde.getCanvas(),
-        'coords': this.clyde.getCoordinates()
-      },
+      this.pinky,
+      this.blinky,
+      this.inky,
+      this.clyde
     ];
   }
 

@@ -192,16 +192,16 @@ class Jeu
     context.clearRect(coords.x + pacman, coords.y + pacman + Jeu.TOP_HEIGHT, Pacman.SIZE.w, Pacman.SIZE.h);
 
     /* Suppression des fantômes */
-    var coordsAndCanvas: Array<CanvasAndCoords> = this.ghostsManager.getGhostsCoordsAndCanvas();
-    for (var i = 0, l = coordsAndCanvas.length ; i < l ; ++i)
+    var ghosts: Array<Ghost> = this.ghostsManager.getGhosts();
+    for (var i = 0, l = ghosts.length ; i < l ; ++i)
     {
-      var obj: CanvasAndCoords = coordsAndCanvas[i];
-      context.clearRect(obj.coords.x + ghost, obj.coords.y + ghost + Jeu.TOP_HEIGHT, Ghost.SIZE.w, Ghost.SIZE.h);
+      var obj: Ghost = ghosts[i];
+      context.clearRect(obj.getCoordinates().x + ghost, obj.getCoordinates().y + ghost + Jeu.TOP_HEIGHT, Ghost.SIZE.w, Ghost.SIZE.h);
 
       /* Suppression de la case derrière */
       this.drawCurrentPacDot(TileFunctions.getTileCoordinates({
-        x: obj.coords.x + Tile.TILE_WIDTH / 2,
-        y: obj.coords.y + Tile.TILE_WIDTH / 2
+        x: obj.getCoordinates().x + Tile.TILE_WIDTH / 2,
+        y: obj.getCoordinates().y + Tile.TILE_WIDTH / 2
       }), true);
     }
 
@@ -243,7 +243,7 @@ class Jeu
     context.drawImage(pacman.getCanvasElem(), coords.x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
 
     /* Gestion du tunnel */
-    Tunnel.checkEntry(coords, context, margin, pacman);
+    Tunnel.checkEntry(pacman, context, margin);
 
     return this;
   }
@@ -257,7 +257,7 @@ class Jeu
   {
     var context: CanvasRenderingContext2D = this.canvas.getContext();
     var margin: number = (Tile.TILE_WIDTH - Ghost.SIZE.w) / 2;
-    var coordsAndCanvas: Array<CanvasAndCoords> = this.ghostsManager.getGhostsCoordsAndCanvas();
+    var ghosts: Array<Ghost> = this.ghostsManager.getGhosts();
     var coords = this.pacman.getCoordinates();
 
     /* Déplacement des fantômes en passant le centre de pacman en paramètre */
@@ -271,18 +271,21 @@ class Jeu
     this.ghostsManager.animateGhosts();
 
     /* Redessiner les fantômes, après pour pas faire disparaître un fantome qui en suit un autre */
-    for (var i = 0, l = coordsAndCanvas.length ; i < l ; ++i)
+    for (var i = 0, l = ghosts.length ; i < l ; ++i)
     {
-      var obj: CanvasAndCoords = coordsAndCanvas[i];
+      var obj: Ghost = ghosts[i];
 
       /* Redessiner la case derrière */
       this.drawCurrentPacDot(TileFunctions.getTileCoordinates({
-        x: obj.coords.x + Tile.TILE_WIDTH / 2,
-        y: obj.coords.y + Tile.TILE_WIDTH / 2
+        x: obj.getCoordinates().x + Tile.TILE_WIDTH / 2,
+        y: obj.getCoordinates().y + Tile.TILE_WIDTH / 2
       }));
 
       /* Dessin des fantômes */
-      context.drawImage(obj.canvas.getElement(), obj.coords.x + margin, obj.coords.y + margin + Jeu.TOP_HEIGHT);
+      context.drawImage(obj.getCanvas().getElement(), obj.getCoordinates().x + margin, obj.getCoordinates().y + margin + Jeu.TOP_HEIGHT);
+
+      /* Gestion du tunnel */
+      Tunnel.checkEntry(obj, context, margin);
     }
 
     return this;

@@ -297,6 +297,18 @@ abstract class Ghost
   }
 
   /**
+   * @param x
+   *
+   * @returns {Ghost}
+   */
+  public setX(x: number): Ghost
+  {
+    this.coordinates.x = x;
+
+    return this;
+  }
+
+  /**
    * Déplace le fantôme
    *  Tout droit si dans une case
    *  Appelle targetTile et findBestPath si c'est un croisement
