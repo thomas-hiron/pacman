@@ -646,7 +646,7 @@ class Ghost {
      */
     changeAlternativeMode(mode) {
         /* Que si pas dans un mode alternatif */
-        if (this.alternativeMode == null) {
+        if (this.alternativeMode == null || mode == Modes.GoingHome) {
             /* Si le mode alternatif est frightened, il faut qu'il soit sorti */
             if (mode == Modes.Frightened && this.outFromHome || mode != Modes.Frightened) {
                 this.alternativeMode = mode;
@@ -721,9 +721,12 @@ class Ghost {
         };
         /* Mangé */
         if (Math.abs(pacmanCenter.x - center.x) < 10 && Math.abs(pacmanCenter.y - center.y) < 10) {
-            var eventName = this.alternativeMode == Modes.Frightened ? 'GhostEaten' : 'PacmanEaten';
-            var event = new Event(eventName);
-            window.dispatchEvent(event);
+            /* Dispatch que s'il rentre pas */
+            if (this.alternativeMode != Modes.GoingHome) {
+                var eventName = this.alternativeMode == Modes.Frightened ? 'GhostEaten' : 'PacmanEaten';
+                var event = new Event(eventName);
+                window.dispatchEvent(event);
+            }
             /* Retour à la maison */
             if (this.alternativeMode == Modes.Frightened)
                 this.changeAlternativeMode(Modes.GoingHome);
