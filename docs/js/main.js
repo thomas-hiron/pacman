@@ -701,13 +701,12 @@ class Ghost {
      * @returns {Ghost}
      */
     checkEatOrEaten(pacmanCenter) {
-        var pacmanTile = TileFunctions.getTileCoordinates(pacmanCenter);
-        var currentTile = TileFunctions.getTileCoordinates({
+        var center = {
             x: this.coordinates.x + Tile.TILE_WIDTH / 2,
             y: this.coordinates.y + Tile.TILE_WIDTH / 2
-        });
+        };
         /* Mangé */
-        if (pacmanTile.x == currentTile.x && pacmanTile.y == currentTile.y) {
+        if (Math.abs(pacmanCenter.x - center.x) < 10 && Math.abs(pacmanCenter.y - center.y) < 10) {
             var eventName = this.alternativeMode == Modes.Frightened ? 'GhostEaten' : 'PacmanEaten';
             var event = new Event(eventName);
             window.dispatchEvent(event);
@@ -926,7 +925,7 @@ class GhostsManager {
         this.scatterInterval = 7000;
         this.frightenedInterval = 7000;
         this.waveNumber = 1;
-        this.mode = Modes.Scatter;
+        this.mode = Modes.Chase;
         /* Instanciation des fantômes */
         this.pinky = new Pinky();
         this.blinky = new Blinky();
@@ -1195,6 +1194,7 @@ class Jeu {
         this.pacman = new Pacman();
         this.pacman.setCollideFunction(this.checkCollision.bind(this));
         this.pacman.init();
+        this.pacmanEaten = false;
         /* Ajout des listeners */
         this.addListeners();
         /* Démarrage du jeu */
@@ -1210,6 +1210,8 @@ class Jeu {
         window.addEventListener('NewFruit', this.onNewFruit.bind(this), false);
         /* Listener pour un fruit supprimé (pas mangé) */
         window.addEventListener('RemoveFruit', this.onRemoveFruit.bind(this), false);
+        /* Pacman mangé */
+        window.addEventListener('PacmanEaten', this.onPacmanEaten.bind(this), false);
         return this;
     }
     /**
@@ -1233,24 +1235,33 @@ class Jeu {
      * @returns {Jeu}
      */
     draw() {
+        var interval = this.pacmanEaten ? Jeu.EATEN_INTERVAL : Jeu.INTERVAL;
         /* Si l'interval a été atteint */
-        if (+new Date() - this.time > Jeu.INTERVAL) {
-            /* Nettoyage des éléments pour pas avoir de carrés qui trainent */
-            this.clearAll();
-            /* Dessin du fruit */
-            this.onNewFruit(null);
-            /* Clignotement des points */
-            this.flashPowerPellet();
-            /* Dessin de la porte de sortie des fantomes */
-            this.drawEscapeDoor();
-            /* Animation de pacman */
-            this.animatePacman();
-            /* Animation des fantômes */
-            this.animateGhosts();
-            /* Mise à jour du score */
-            this.drawScore();
-            /* Notification de la nouvelle frame au fruitsManager */
-            this.fruitsManager.onRequestAnimFrame();
+        if (+new Date() - this.time > interval) {
+            if (!this.pacmanEaten) {
+                /* Nettoyage des éléments pour pas avoir de carrés qui trainent */
+                this.clearAll();
+                /* Dessin du fruit */
+                this.onNewFruit(null);
+                /* Clignotement des points */
+                this.flashPowerPellet();
+                /* Dessin de la porte de sortie des fantomes */
+                this.drawEscapeDoor();
+                /* Animation de pacman */
+                this.animatePacman();
+                /* Animation des fantômes */
+                this.animateGhosts();
+                /* Mise à jour du score */
+                this.drawScore();
+                /* Notification de la nouvelle frame au fruitsManager */
+                this.fruitsManager.onRequestAnimFrame();
+            }
+            else {
+                /* Nettoyage */
+                this.clearAll();
+                /* Animation de pacman */
+                this.animatePacman();
+            }
             /* Mise à jour du temps */
             this.time = +new Date();
         }
@@ -1295,11 +1306,15 @@ class Jeu {
         var margin = (Tile.TILE_WIDTH - Pacman.SIZE.w) / 2;
         var context = this.canvas.getContext();
         /* Instruction de modification des coordonées */
-        pacman.move();
-        /* Instruction d'animation */
-        pacman.animate();
-        /* Dessine la case courante si le point a pas été mangé pour pas le couper */
-        this.drawCurrentPacDot(pacman.getPreviousTileCoords());
+        if (!this.pacmanEaten) {
+            pacman.move();
+            /* Instruction d'animation */
+            pacman.animate();
+            /* Dessine la case courante si le point a pas été mangé pour pas le couper */
+            this.drawCurrentPacDot(pacman.getPreviousTileCoords());
+        }
+        else
+            this.pacman.die();
         /* Dessin dans le canvas principal */
         context.drawImage(pacman.getCanvasElem(), pacman.getX() + margin, pacman.getY() + margin + Jeu.TOP_HEIGHT);
         return this;
@@ -1562,9 +1577,19 @@ class Jeu {
         }
         return this;
     }
+    /**
+     * Pacman mangé !
+     *
+     * @returns {Jeu}
+     */
+    onPacmanEaten() {
+        this.pacmanEaten = true;
+        return this;
+    }
 }
 /* Interval du request animation frame */
 Jeu.INTERVAL = 10;
+Jeu.EATEN_INTERVAL = 200;
 /* Hauteur du panneau supérieur */
 Jeu.TOP_HEIGHT = 40;
 /**
@@ -2059,15 +2084,17 @@ class Pacman {
         /* Calcul pour le dessin */
         var inclinaison = this.currentStep * 0.25 / (this.stepNumber - 1);
         var inclinaison2 = 1 - inclinaison;
+        var startAngle = (inclinaison2 + 1) * Math.PI;
+        var endAngle = inclinaison * Math.PI;
+        if (startAngle < Math.PI) {
+            startAngle = 0;
+            endAngle = 0;
+        }
         /* Dessin */
         ctx.beginPath();
-        ctx.arc(size.w / 2, size.h / 2, size.w / 2, inclinaison * Math.PI, (inclinaison + 1) * Math.PI, false);
+        ctx.arc(size.w / 2, size.h / 2, size.w / 2, startAngle, endAngle, true);
+        ctx.lineTo(size.w / 2, size.h / 2);
         ctx.fill();
-        ctx.beginPath();
-        ctx.arc(size.w / 2, size.h / 2, size.w / 2, inclinaison2 * Math.PI, (inclinaison2 + 1) * Math.PI, false);
-        ctx.fill();
-        /* La marge */
-        var margin = (tileWidth - size.w) / 2;
         /* Restauration du context */
         ctx.restore();
         /* Retour de l'instance */
@@ -2128,6 +2155,17 @@ class Pacman {
                 break;
         }
         return coords;
+    }
+    /**
+     * Anime pacman pour mourir
+     *
+     * @returns {Pacman}
+     */
+    die() {
+        /* Augmentation de l'étape */
+        this.currentStep += 5;
+        this.draw();
+        return this;
     }
 }
 Pacman.BASE_X = 7;

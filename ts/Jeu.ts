@@ -13,6 +13,7 @@ class Jeu
 {
   /* Interval du request animation frame */
   private static INTERVAL: number = 10;
+  private static EATEN_INTERVAL: number = 200;
   /* Hauteur du panneau supérieur */
   public static TOP_HEIGHT: number = 40;
 
@@ -24,6 +25,7 @@ class Jeu
   private ghostsManager: GhostsManager;
   private score: Score;
   private powerPelletTiles: Array<Tile>;
+  private pacmanEaten: boolean;
 
   public constructor()
   {
@@ -72,6 +74,7 @@ class Jeu
     this.pacman = new Pacman();
     this.pacman.setCollideFunction(this.checkCollision.bind(this));
     this.pacman.init();
+    this.pacmanEaten = false;
 
     /* Ajout des listeners */
     this.addListeners();
@@ -95,6 +98,9 @@ class Jeu
 
     /* Listener pour un fruit supprimé (pas mangé) */
     window.addEventListener('RemoveFruit', this.onRemoveFruit.bind(this), false);
+
+    /* Pacman mangé */
+    window.addEventListener('PacmanEaten', this.onPacmanEaten.bind(this), false);
 
     return this;
   }
@@ -126,32 +132,46 @@ class Jeu
    */
   private draw(): Jeu
   {
+    var interval: number = this.pacmanEaten ? Jeu.EATEN_INTERVAL : Jeu.INTERVAL;
+
     /* Si l'interval a été atteint */
-    if (+new Date() - this.time > Jeu.INTERVAL)
+    if (+new Date() - this.time > interval)
     {
-      /* Nettoyage des éléments pour pas avoir de carrés qui trainent */
-      this.clearAll();
+      if (!this.pacmanEaten)
+      {
+        /* Nettoyage des éléments pour pas avoir de carrés qui trainent */
+        this.clearAll();
 
-      /* Dessin du fruit */
-      this.onNewFruit(null);
+        /* Dessin du fruit */
+        this.onNewFruit(null);
 
-      /* Clignotement des points */
-      this.flashPowerPellet();
+        /* Clignotement des points */
+        this.flashPowerPellet();
 
-      /* Dessin de la porte de sortie des fantomes */
-      this.drawEscapeDoor();
+        /* Dessin de la porte de sortie des fantomes */
+        this.drawEscapeDoor();
 
-      /* Animation de pacman */
-      this.animatePacman();
+        /* Animation de pacman */
+        this.animatePacman();
 
-      /* Animation des fantômes */
-      this.animateGhosts();
+        /* Animation des fantômes */
+        this.animateGhosts();
 
-      /* Mise à jour du score */
-      this.drawScore();
+        /* Mise à jour du score */
+        this.drawScore();
 
-      /* Notification de la nouvelle frame au fruitsManager */
-      this.fruitsManager.onRequestAnimFrame();
+        /* Notification de la nouvelle frame au fruitsManager */
+        this.fruitsManager.onRequestAnimFrame();
+      }
+      /* Mangé */
+      else
+      {
+        /* Nettoyage */
+        this.clearAll();
+
+        /* Animation de pacman */
+        this.animatePacman();
+      }
 
       /* Mise à jour du temps */
       this.time = +new Date();
@@ -210,13 +230,19 @@ class Jeu
     var context = this.canvas.getContext();
 
     /* Instruction de modification des coordonées */
-    pacman.move();
+    if (!this.pacmanEaten)
+    {
+      pacman.move();
 
-    /* Instruction d'animation */
-    pacman.animate();
+      /* Instruction d'animation */
+      pacman.animate();
 
-    /* Dessine la case courante si le point a pas été mangé pour pas le couper */
-    this.drawCurrentPacDot(pacman.getPreviousTileCoords());
+      /* Dessine la case courante si le point a pas été mangé pour pas le couper */
+      this.drawCurrentPacDot(pacman.getPreviousTileCoords());
+    }
+    /* Pacman meurt */
+    else
+      this.pacman.die();
 
     /* Dessin dans le canvas principal */
     context.drawImage(pacman.getCanvasElem(), pacman.getX() + margin, pacman.getY() + margin + Jeu.TOP_HEIGHT);
@@ -564,6 +590,18 @@ class Jeu
       var middleTile: Tile = tiles[Pacman.BASE_Y][Pacman.BASE_X];
       middleTile.setPacDot(null);
     }
+
+    return this;
+  }
+
+  /**
+   * Pacman mangé !
+   *
+   * @returns {Jeu}
+   */
+  private onPacmanEaten(): Jeu
+  {
+    this.pacmanEaten = true;
 
     return this;
   }

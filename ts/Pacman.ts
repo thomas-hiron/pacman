@@ -326,16 +326,20 @@ class Pacman
     var inclinaison: number = this.currentStep * 0.25 / (this.stepNumber - 1);
     var inclinaison2: number = 1 - inclinaison;
 
+    var startAngle: number = (inclinaison2 + 1) * Math.PI;
+    var endAngle: number = inclinaison * Math.PI;
+
+    if (startAngle < Math.PI)
+    {
+      startAngle = 0;
+      endAngle = 0;
+    }
+
     /* Dessin */
     ctx.beginPath();
-    ctx.arc(size.w / 2, size.h / 2, size.w / 2, inclinaison * Math.PI, (inclinaison + 1) * Math.PI, false);
+    ctx.arc(size.w / 2, size.h / 2, size.w / 2, startAngle, endAngle, true);
+    ctx.lineTo(size.w / 2, size.h / 2);
     ctx.fill();
-    ctx.beginPath();
-    ctx.arc(size.w / 2, size.h / 2, size.w / 2, inclinaison2 * Math.PI, (inclinaison2 + 1) * Math.PI, false);
-    ctx.fill();
-
-    /* La marge */
-    var margin: number = (tileWidth - size.w) / 2;
 
     /* Restauration du context */
     ctx.restore();
@@ -410,5 +414,20 @@ class Pacman
     }
 
     return coords;
+  }
+
+  /**
+   * Anime pacman pour mourir
+   *
+   * @returns {Pacman}
+   */
+  public die(): Pacman
+  {
+    /* Augmentation de l'étape */
+    this.currentStep += 5;
+
+    this.draw();
+
+    return this;
   }
 }
