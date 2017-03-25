@@ -568,6 +568,8 @@ class Ghost {
                 this.coordinates.y += this.stepPx;
                 break;
         }
+        /* Mangé ou a mangé */
+        this.checkEatOrEaten(pacmanCenter);
         return this;
     }
     /**
@@ -690,6 +692,27 @@ class Ghost {
      */
     getCanvas() {
         return this.canvas;
+    }
+    /**
+     * Vérifie que pacman est mangé ou a été mangé
+     *
+     * @param pacmanCenter
+     *
+     * @returns {Ghost}
+     */
+    checkEatOrEaten(pacmanCenter) {
+        var pacmanTile = TileFunctions.getTileCoordinates(pacmanCenter);
+        var currentTile = TileFunctions.getTileCoordinates({
+            x: this.coordinates.x + Tile.TILE_WIDTH / 2,
+            y: this.coordinates.y + Tile.TILE_WIDTH / 2
+        });
+        /* Mangé */
+        if (pacmanTile.x == currentTile.x && pacmanTile.y == currentTile.y) {
+            var eventName = this.alternativeMode == Modes.Frightened ? 'GhostEaten' : 'PacmanEaten';
+            var event = new Event(eventName);
+            window.dispatchEvent(event);
+        }
+        return this;
     }
 }
 Ghost.SIZE = {
