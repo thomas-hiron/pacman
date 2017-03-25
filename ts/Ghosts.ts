@@ -548,7 +548,7 @@ abstract class Ghost
       }
     }
     /* Pour sortir du mode frightened */
-    else if (this.alternativeMode == Modes.Frightened)
+    else if (this.alternativeMode == Modes.Frightened && mode == null)
     {
       this.alternativeMode = mode;
       /* Vitesse normale et pas de flash */
@@ -646,9 +646,9 @@ abstract class Ghost
    *
    * @returns {Ghost}
    */
-  public flash(): Ghost
+  public flash(state: boolean): Ghost
   {
-    this.isFlashing = true;
+    this.isFlashing = state;
 
     return this;
   }

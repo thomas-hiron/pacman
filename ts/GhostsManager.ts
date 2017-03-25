@@ -233,12 +233,12 @@ class GhostsManager
    *
    * @returns {GhostsManager}
    */
-  private flashGhosts(): GhostsManager
+  private flashGhosts(state: boolean = true): GhostsManager
   {
-    this.pinky.flash();
-    this.blinky.flash();
-    this.inky.flash();
-    this.clyde.flash();
+    this.pinky.flash(state);
+    this.blinky.flash(state);
+    this.inky.flash(state);
+    this.clyde.flash(state);
 
     return this;
   }
@@ -317,10 +317,12 @@ class GhostsManager
     this.frightenedFrames = 0;
 
     /* Changement si pas déjà dans le mode */
-    if (!this.areFrightened)
-      this.changeAlternativeMode(Modes.Frightened);
+    this.changeAlternativeMode(Modes.Frightened);
 
     this.areFrightened = true;
+
+    /* Ils ne clignottent plus */
+    this.flashGhosts(false);
 
     return this;
   }

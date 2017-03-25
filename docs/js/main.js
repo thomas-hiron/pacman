@@ -682,7 +682,7 @@ class Ghost {
                     this.stepPx = Ghost.GOING_HOME;
             }
         }
-        else if (this.alternativeMode == Modes.Frightened) {
+        else if (this.alternativeMode == Modes.Frightened && mode == null) {
             this.alternativeMode = mode;
             /* Vitesse normale et pas de flash */
             this.stepPx = Ghost.NORMAL;
@@ -760,8 +760,8 @@ class Ghost {
      *
      * @returns {Ghost}
      */
-    flash() {
-        this.isFlashing = true;
+    flash(state) {
+        this.isFlashing = state;
         return this;
     }
 }
@@ -1125,11 +1125,11 @@ class GhostsManager {
      *
      * @returns {GhostsManager}
      */
-    flashGhosts() {
-        this.pinky.flash();
-        this.blinky.flash();
-        this.inky.flash();
-        this.clyde.flash();
+    flashGhosts(state = true) {
+        this.pinky.flash(state);
+        this.blinky.flash(state);
+        this.inky.flash(state);
+        this.clyde.flash(state);
         return this;
     }
     /**
@@ -1193,9 +1193,10 @@ class GhostsManager {
         /* Réinit des frames */
         this.frightenedFrames = 0;
         /* Changement si pas déjà dans le mode */
-        if (!this.areFrightened)
-            this.changeAlternativeMode(Modes.Frightened);
+        this.changeAlternativeMode(Modes.Frightened);
         this.areFrightened = true;
+        /* Ils ne clignottent plus */
+        this.flashGhosts(false);
         return this;
     }
     /**
