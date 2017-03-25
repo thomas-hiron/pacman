@@ -427,6 +427,9 @@ class Pacman
         break;
     }
 
+    if (coords.x == 15)
+      coords.x = 0;
+
     return coords;
   }
 

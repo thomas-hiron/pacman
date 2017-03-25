@@ -1447,8 +1447,8 @@ class Jeu {
             context.clearRect(x, coords.y + margin + Jeu.TOP_HEIGHT, Pacman.SIZE.w + margin + 2, Tile.TILE_WIDTH - margin * 2);
             context.drawImage(pacman.getCanvasElem(), x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
             /* Terminé */
-            if (x == 0) {
-                this.pacman.setX(x);
+            this.pacman.setX(x);
+            if (x > -10) {
                 /* Point mangé */
                 var event = new CustomEvent('PacDotEaten', { detail: { x: 0, y: 10 } });
                 Jeu.ELEMENT.dispatchEvent(event);
@@ -1456,12 +1456,14 @@ class Jeu {
         }
         else if (coords.x <= 0 && coords.y == 10 * Tile.TILE_WIDTH) {
             var x = coords.x + context.canvas.width;
-            context.clearRect(x, coords.y + margin + Jeu.TOP_HEIGHT, Pacman.SIZE.w + margin + 2, Tile.TILE_WIDTH - margin * 2);
+            context.clearRect(x + margin - 2, coords.y + margin + Jeu.TOP_HEIGHT, Pacman.SIZE.w + margin, Tile.TILE_WIDTH - margin * 2);
             context.drawImage(pacman.getCanvasElem(), x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
             this.pacman.setX(x);
             /* Point mangé */
-            var event = new CustomEvent('PacDotEaten', { detail: { x: 14, y: 10 } });
-            Jeu.ELEMENT.dispatchEvent(event);
+            if (x > 14 * Tile.TILE_WIDTH + 10) {
+                var event = new CustomEvent('PacDotEaten', { detail: { x: 14, y: 10 } });
+                Jeu.ELEMENT.dispatchEvent(event);
+            }
         }
         return this;
     }
@@ -2184,6 +2186,8 @@ class Pacman {
                 coords.y++;
                 break;
         }
+        if (coords.x == 15)
+            coords.x = 0;
         return coords;
     }
     /**
