@@ -51,6 +51,15 @@ class Canvas {
         this.element.height = height;
         return this;
     }
+    /**
+     * Nettoie le canvas
+     *
+     * @returns {Canvas}
+     */
+    clear() {
+        this.context.clearRect(0, 0, this.element.width, this.element.height);
+        return this;
+    }
 }
 /**
  * Created by thiron on 03/07/2015.
@@ -319,17 +328,21 @@ class Ghost {
      * @returns {Ghost}
      */
     draw() {
+        this.canvas.clear();
         var context = this.canvas.getContext();
         context.globalCompositeOperation = 'source-over';
         context.beginPath();
-        /* La tête */
-        context.arc(Ghost.SIZE.w / 2, Ghost.SIZE.h / 2, Ghost.SIZE.w / 2, 0, 2 * Math.PI, false);
-        /* Le corps */
-        context.rect(0, Ghost.SIZE.h / 2, Ghost.SIZE.w, Ghost.SIZE.h / 2);
-        /* Remplissage */
-        context.fillStyle = this.alternativeMode == Modes.Frightened ? this.frightenedColor : this.color;
-        context.fill();
-        context.closePath();
+        /* Si retour à la maison, y'a juste les yeux */
+        if (this.alternativeMode != Modes.GoingHome) {
+            /* La tête */
+            context.arc(Ghost.SIZE.w / 2, Ghost.SIZE.h / 2, Ghost.SIZE.w / 2, 0, 2 * Math.PI, false);
+            /* Le corps */
+            context.rect(0, Ghost.SIZE.h / 2, Ghost.SIZE.w, Ghost.SIZE.h / 2);
+            /* Remplissage */
+            context.fillStyle = this.alternativeMode == Modes.Frightened ? this.frightenedColor : this.color;
+            context.fill();
+            context.closePath();
+        }
         /* Les yeux */
         var x = 0;
         var y = 0;
@@ -987,7 +1000,7 @@ class GhostsManager {
         /* Changement du mode */
         this.changeMode(this.mode);
         /* Pinky doit sortir immédiatement */
-        // this.pinky.getOutFromHome();
+        this.pinky.getOutFromHome();
         return this;
     }
     /**
@@ -1188,7 +1201,7 @@ class Jeu {
             /* Initialisation du canvas */
             this.canvas = new Canvas(document.querySelector("canvas"));
             /* Nettoyage du canvas */
-            this.canvas.getContext().clearRect(0, 0, this.canvas.getElement().width, this.canvas.getElement().height);
+            this.canvas.clear();
         }
         catch (e) {
             /* Une erreur s'est produite, alert puis redirection */
@@ -2104,8 +2117,8 @@ class Pacman {
         var size = Pacman.SIZE;
         /* Largeur de la case */
         var tileWidth = Tile.TILE_WIDTH;
-        /* Suppression du context */
-        ctx.clearRect(0, 0, size.w, size.h);
+        /* Nettoyage */
+        this.canvas.clear();
         /* Enregistrement du context */
         ctx.save();
         /* Translation */

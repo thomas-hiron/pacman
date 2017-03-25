@@ -95,20 +95,25 @@ abstract class Ghost
    */
   private draw(): Ghost
   {
+    this.canvas.clear();
     var context: CanvasRenderingContext2D = this.canvas.getContext();
     context.globalCompositeOperation = 'source-over';
     context.beginPath();
 
-    /* La tête */
-    context.arc(Ghost.SIZE.w / 2, Ghost.SIZE.h / 2, Ghost.SIZE.w / 2, 0, 2 * Math.PI, false);
+    /* Si retour à la maison, y'a juste les yeux */
+    if (this.alternativeMode != Modes.GoingHome)
+    {
+      /* La tête */
+      context.arc(Ghost.SIZE.w / 2, Ghost.SIZE.h / 2, Ghost.SIZE.w / 2, 0, 2 * Math.PI, false);
 
-    /* Le corps */
-    context.rect(0, Ghost.SIZE.h / 2, Ghost.SIZE.w, Ghost.SIZE.h / 2);
+      /* Le corps */
+      context.rect(0, Ghost.SIZE.h / 2, Ghost.SIZE.w, Ghost.SIZE.h / 2);
 
-    /* Remplissage */
-    context.fillStyle = this.alternativeMode == Modes.Frightened ? this.frightenedColor : this.color;
-    context.fill();
-    context.closePath();
+      /* Remplissage */
+      context.fillStyle = this.alternativeMode == Modes.Frightened ? this.frightenedColor : this.color;
+      context.fill();
+      context.closePath();
+    }
 
     /* Les yeux */
     var x: number = 0;
