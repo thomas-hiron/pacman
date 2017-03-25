@@ -1274,6 +1274,7 @@ class Score {
         return this;
     }
 }
+///<reference path='Score.ts' />
 /**
  * Created by thiron on 03/07/2015.
  */
@@ -1284,7 +1285,6 @@ class Score {
  *  http://gameinternals.com/post/2072558330/understanding-pac-man-ghost-behavior
  *  http://www.grospixels.com/site/trucpac.php
  */
-///<reference path='Score.ts' />
 class Jeu {
     constructor() {
         this.frames = 0;
