@@ -34,6 +34,14 @@ class Jeu
     /* Ajout des listeners */
     this.addListeners();
 
+    /* Init des elem */
+    this.canvas = new Canvas(document.querySelector("canvas"));
+    this.levelManager = new LevelManager();
+    this.fruitsManager = new FruitsManager();
+    this.ghostsManager = new GhostsManager();
+    this.score = new Score();
+    this.pacman = new Pacman();
+
     /* RequestAnimationFrame pour le pacman, les fantomes */
     requestAnimFrame(this.draw.bind(this));
   }
@@ -43,44 +51,20 @@ class Jeu
    */
   public init(): Jeu
   {
-    try
-    {
-      /* Initialisation du canvas */
-      this.canvas = new Canvas(document.querySelector("canvas"));
-
-      /* Nettoyage du canvas */
-      this.canvas.clear();
-    }
-    catch (e)
-    {
-      /* Une erreur s'est produite, alert puis redirection */
-      alert(e.message);
-      window.location.href = "http://www.thomas-hiron.com";
-
-      /* Retour de l'instance pour ne pas continuer le temps de la redirection */
-      return this;
-    }
+    /* Nettoyage du canvas */
+    this.canvas.clear();
 
     /* Les niveaux */
-    this.levelManager = new LevelManager();
     this.levelManager.draw(this.canvas);
 
-    /* Le manager des fruits */
-    this.fruitsManager = new FruitsManager();
-
     /* Le ghosts manager */
-    this.ghostsManager = new GhostsManager();
     this.ghostsManager.setCollideFunction(this.checkCollision.bind(this));
     this.ghostsManager.init();
-
-    /* Le score */
-    this.score = new Score();
 
     /* Dessin du haut */
     this.drawTop();
 
     /* Pacman */
-    this.pacman = new Pacman();
     this.pacman.setCollideFunction(this.checkCollision.bind(this));
     this.pacman.init();
     this.pacmanEaten = false;

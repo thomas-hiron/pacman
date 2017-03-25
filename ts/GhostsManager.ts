@@ -45,6 +45,12 @@ class GhostsManager
     this.blinky = new Blinky();
     this.inky = new Inky();
     this.clyde = new Clyde();
+
+    /* Listener sorti de la maison */
+    window.addEventListener('OutFromHome', this.ghostGotOut.bind(this), false);
+    window.addEventListener('InkyCanGo', this.inkyCanGo.bind(this), false);
+    window.addEventListener('ClydeCanGo', this.clydeCanGo.bind(this), false);
+    window.addEventListener('GhostEaten', this.ghostEaten.bind(this), false);
   }
 
   /**
@@ -74,12 +80,6 @@ class GhostsManager
     this.blinky.init();
     this.inky.init();
     this.clyde.init();
-
-    /* Listener sorti de la maison */
-    window.addEventListener('OutFromHome', this.ghostGotOut.bind(this), false);
-    window.addEventListener('InkyCanGo', this.inkyCanGo.bind(this), false);
-    window.addEventListener('ClydeCanGo', this.clydeCanGo.bind(this), false);
-    window.addEventListener('GhostEaten', this.ghostEaten.bind(this), false);
 
     return this;
   }

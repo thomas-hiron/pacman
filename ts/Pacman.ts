@@ -112,6 +112,9 @@ class Pacman
     this.stepNumber = 12;
     this.stepPx = 2;
     this.angle = 0;
+
+    /* Ajout de l'event des flèches */
+    window.addEventListener("keydown", this.rotate.bind(this), false);
   }
 
   /**
@@ -130,9 +133,6 @@ class Pacman
     /* Initialisation de la direction */
     this.direction = Directions.Right;
     this.nextDirection = this.direction;
-
-    /* Ajout de l'event des flèches */
-    window.addEventListener("keydown", this.rotate.bind(this), false);
 
     /* Retour de l'instance */
     return this;
