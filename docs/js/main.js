@@ -991,6 +991,7 @@ class GhostsManager {
         window.addEventListener('OutFromHome', this.ghostGotOut.bind(this), false);
         window.addEventListener('InkyCanGo', this.inkyCanGo.bind(this), false);
         window.addEventListener('ClydeCanGo', this.clydeCanGo.bind(this), false);
+        window.addEventListener('GhostEaten', this.ghostEaten.bind(this), false);
         return this;
     }
     /**
@@ -1019,7 +1020,7 @@ class GhostsManager {
         else
             this.frightenedFrames++;
         /* Gestion du mode frightened */
-        var mode = this.frightenedFrames != 0 ? Modes.Frightened : this.mode;
+        var mode = this.areFrightened ? Modes.Frightened : this.mode;
         /* Vérification du chrono */
         switch (mode) {
             case Modes.Chase:
@@ -1165,6 +1166,15 @@ class GhostsManager {
         this.areFrightened = true;
         /* Changement */
         this.changeAlternativeMode(Modes.Frightened);
+        return this;
+    }
+    /**
+     * Un fantôme a été mangé
+     *
+     * @returns {GhostsManager}
+     */
+    ghostEaten() {
+        console.log('eaten');
         return this;
     }
 }
