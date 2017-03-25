@@ -68,6 +68,7 @@ var Modes;
     Modes[Modes["Scatter"] = 1] = "Scatter";
     Modes[Modes["Frightened"] = 2] = "Frightened";
     Modes[Modes["OutFromHome"] = 3] = "OutFromHome";
+    Modes[Modes["GoingHome"] = 4] = "GoingHome";
 })(Modes || (Modes = {}));
 /**
  * Created by mac pro on 04/03/2017.
@@ -443,18 +444,6 @@ class Ghost {
         return direction;
     }
     /**
-     * Détermine si deux cases sont collées
-     *
-     * @param fromTile
-     * @param toTile
-     *
-     * @returns {boolean}
-     */
-    isNextTo(fromTile, toTile) {
-        return (Math.abs(fromTile.x - toTile.x) == 1 && fromTile.y == toTile.y ||
-            Math.abs(fromTile.y - toTile.y) == 1 && fromTile.x == toTile.x);
-    }
-    /**
      * S'il doit faire demi-tour pour atteindre la case de destination
      *
      * @returns {boolean}
@@ -551,6 +540,27 @@ class Ghost {
                             this.direction = Directions.Left;
                     }
                     break;
+                case Modes.GoingHome:
+                    /* La case */
+                    var coords = {
+                        x: this.coordinates.x / Tile.TILE_WIDTH,
+                        y: this.coordinates.y / Tile.TILE_WIDTH
+                    };
+                    /* Aller au milieu */
+                    this.direction = this.findBestPath({
+                        x: 7,
+                        y: 8
+                    });
+                    /* Case du milieu, il descend */
+                    if (coords.x == 7 && coords.y == 8)
+                        this.direction = Directions.Down;
+                    /* Rentré */
+                    if (coords.x == 7 && coords.y == 9) {
+                        this.direction = Directions.Up;
+                        this.changeAlternativeMode(null);
+                        this.getOutFromHome();
+                    }
+                    break;
             }
         }
         /* Déplacement */
@@ -643,15 +653,17 @@ class Ghost {
                 /* Si frightened, réduction de la vitesse */
                 if (mode == Modes.Frightened)
                     this.stepPx = Ghost.FRIGHTENED;
+                else if (mode == Modes.GoingHome)
+                    this.stepPx = Ghost.GOING_HOME;
             }
         }
         else if (this.alternativeMode == Modes.Frightened) {
             this.alternativeMode = mode;
             /* Vitesse normale */
             this.stepPx = Ghost.NORMAL;
-            /* Vérification de l'intégrité des données (pas de pixels impairs) */
-            this.checkCoordsIntegrity();
         }
+        /* Vérification de l'intégrité des données (pas de pixels impairs) */
+        this.checkCoordsIntegrity();
         return this;
     }
     /**
@@ -660,19 +672,21 @@ class Ghost {
      * @returns {Ghost}
      */
     checkCoordsIntegrity() {
+        /* Le reste à calculer */
+        var modulo = this.alternativeMode == Modes.GoingHome ? Ghost.GOING_HOME : Ghost.NORMAL;
         switch (this.direction) {
             case Directions.Left:
-                this.coordinates.x += this.coordinates.x % 2;
+                this.coordinates.x += this.coordinates.x % modulo;
                 break;
             case Directions.Right:
             default:
-                this.coordinates.x -= this.coordinates.x % 2;
+                this.coordinates.x -= this.coordinates.x % modulo;
                 break;
             case Directions.Up:
-                this.coordinates.y += this.coordinates.y % 2;
+                this.coordinates.y += this.coordinates.y % modulo;
                 break;
             case Directions.Down:
-                this.coordinates.y -= this.coordinates.y % 2;
+                this.coordinates.y -= this.coordinates.y % modulo;
                 break;
         }
         return this;
@@ -710,6 +724,9 @@ class Ghost {
             var eventName = this.alternativeMode == Modes.Frightened ? 'GhostEaten' : 'PacmanEaten';
             var event = new Event(eventName);
             window.dispatchEvent(event);
+            /* Retour à la maison */
+            if (this.alternativeMode == Modes.Frightened)
+                this.changeAlternativeMode(Modes.GoingHome);
         }
         return this;
     }
@@ -925,7 +942,7 @@ class GhostsManager {
         this.scatterInterval = 7000;
         this.frightenedInterval = 7000;
         this.waveNumber = 1;
-        this.mode = Modes.Scatter;
+        this.mode = Modes.Chase;
         /* Instanciation des fantômes */
         this.pinky = new Pinky();
         this.blinky = new Blinky();

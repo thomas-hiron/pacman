@@ -253,22 +253,6 @@ abstract class Ghost
   }
 
   /**
-   * Détermine si deux cases sont collées
-   *
-   * @param fromTile
-   * @param toTile
-   *
-   * @returns {boolean}
-   */
-  private isNextTo(fromTile: Point, toTile: Point): boolean
-  {
-    return (
-      Math.abs(fromTile.x - toTile.x) == 1 && fromTile.y == toTile.y ||
-      Math.abs(fromTile.y - toTile.y) == 1 && fromTile.x == toTile.x
-    );
-  }
-
-  /**
    * S'il doit faire demi-tour pour atteindre la case de destination
    *
    * @returns {boolean}
@@ -395,6 +379,33 @@ abstract class Ghost
           }
 
           break;
+
+        case Modes.GoingHome:
+
+          /* La case */
+          var coords: Point = {
+            x: this.coordinates.x / Tile.TILE_WIDTH,
+            y: this.coordinates.y / Tile.TILE_WIDTH
+          };
+
+          /* Aller au milieu */
+          this.direction = this.findBestPath({
+            x: 7,
+            y: 8
+          });
+
+          /* Case du milieu, il descend */
+          if (coords.x == 7 && coords.y == 8)
+            this.direction = Directions.Down;
+          /* Rentré */
+          if (coords.x == 7 && coords.y == 9)
+          {
+            this.direction = Directions.Up;
+            this.changeAlternativeMode(null);
+            this.getOutFromHome();
+          }
+
+          break;
       }
     }
 
@@ -511,6 +522,8 @@ abstract class Ghost
         /* Si frightened, réduction de la vitesse */
         if (mode == Modes.Frightened)
           this.stepPx = Ghost.FRIGHTENED;
+        else if (mode == Modes.GoingHome)
+          this.stepPx = Ghost.GOING_HOME;
       }
     }
     /* Pour sortir du mode frightened */
@@ -519,10 +532,10 @@ abstract class Ghost
       this.alternativeMode = mode;
       /* Vitesse normale */
       this.stepPx = Ghost.NORMAL;
-
-      /* Vérification de l'intégrité des données (pas de pixels impairs) */
-      this.checkCoordsIntegrity();
     }
+
+    /* Vérification de l'intégrité des données (pas de pixels impairs) */
+    this.checkCoordsIntegrity();
 
     return this;
   }
@@ -534,20 +547,23 @@ abstract class Ghost
    */
   private checkCoordsIntegrity(): Ghost
   {
+    /* Le reste à calculer */
+    var modulo: number = this.alternativeMode == Modes.GoingHome ? Ghost.GOING_HOME : Ghost.NORMAL;
+
     switch (this.direction)
     {
       case Directions.Left:
-        this.coordinates.x += this.coordinates.x % 2;
+        this.coordinates.x += this.coordinates.x % modulo;
         break;
       case Directions.Right:
       default:
-        this.coordinates.x -= this.coordinates.x % 2;
+        this.coordinates.x -= this.coordinates.x % modulo;
         break;
       case Directions.Up:
-        this.coordinates.y += this.coordinates.y % 2;
+        this.coordinates.y += this.coordinates.y % modulo;
         break;
       case Directions.Down:
-        this.coordinates.y -= this.coordinates.y % 2;
+        this.coordinates.y -= this.coordinates.y % modulo;
         break;
     }
 
@@ -594,6 +610,10 @@ abstract class Ghost
       var eventName: string = this.alternativeMode == Modes.Frightened ? 'GhostEaten' : 'PacmanEaten';
       var event: Event = new Event(eventName);
       window.dispatchEvent(event);
+
+      /* Retour à la maison */
+      if (this.alternativeMode == Modes.Frightened)
+        this.changeAlternativeMode(Modes.GoingHome);
     }
 
     return this;
