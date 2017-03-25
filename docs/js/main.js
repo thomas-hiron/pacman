@@ -2670,38 +2670,26 @@ class Tunnel {
         var isGhost = object instanceof Ghost;
         var canvas = object.getCanvasElem();
         var coords = object.getCoordinates();
-        /* Gestion du tunnel à droite */
-        if (coords.x >= 14 * Tile.TILE_WIDTH && coords.y == 10 * Tile.TILE_WIDTH) {
-            var x = coords.x - context.canvas.width;
-            context.clearRect(x, coords.y + margin + Jeu.TOP_HEIGHT, Pacman.SIZE.w + margin + 2, Tile.TILE_WIDTH - margin * 2);
+        /* Vers la droite */
+        var toTheRight = coords.x >= 14 * Tile.TILE_WIDTH && coords.y == 10 * Tile.TILE_WIDTH;
+        var toTheLeft = coords.x <= 0 && coords.y == 10 * Tile.TILE_WIDTH;
+        /* Si bien rentré */
+        if (toTheLeft || toTheRight) {
+            var x = toTheRight ? coords.x - context.canvas.width : coords.x + context.canvas.width;
+            /* Suppression puis dessin */
+            if (toTheRight)
+                context.clearRect(x, coords.y + margin + Jeu.TOP_HEIGHT, Pacman.SIZE.w + margin + 2, Tile.TILE_WIDTH - margin * 2);
+            else
+                context.clearRect(x + margin - 2, coords.y + margin + Jeu.TOP_HEIGHT, Pacman.SIZE.w + margin, Tile.TILE_WIDTH - margin * 2);
             context.drawImage(canvas, x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
             object.setX(x);
-            if (x > -10 && !isGhost) {
+            if (!isGhost && (toTheRight && x > -10 || toTheLeft && x <= 14 * Tile.TILE_WIDTH + 10)) {
                 /* Point mangé */
-                var event = new CustomEvent('PacDotEaten', { detail: { x: 0, y: 10 } });
+                var event = new CustomEvent('PacDotEaten', { detail: { x: toTheRight ? 0 : 14, y: 10 } });
                 Jeu.ELEMENT.dispatchEvent(event);
             }
-            /* Ralentissement si fantome */
-            if (isGhost) {
-                if (x == 0)
-                    object.speedUp();
-                else
-                    object.slow();
-            }
-        }
-        else if (coords.x <= 0 && coords.y == 10 * Tile.TILE_WIDTH) {
-            var x = coords.x + context.canvas.width;
-            context.clearRect(x + margin - 2, coords.y + margin + Jeu.TOP_HEIGHT, Pacman.SIZE.w + margin, Tile.TILE_WIDTH - margin * 2);
-            context.drawImage(canvas, x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
-            object.setX(x);
-            /* Point mangé */
-            if (x > 14 * Tile.TILE_WIDTH + 10 && !isGhost) {
-                var event = new CustomEvent('PacDotEaten', { detail: { x: 14, y: 10 } });
-                Jeu.ELEMENT.dispatchEvent(event);
-            }
-            /* Accélération si fantome */
-            if (isGhost) {
-                if (x == 14 * Tile.TILE_WIDTH)
+            else if (isGhost) {
+                if (toTheRight && x == 0 || toTheLeft && x == 14 * Tile.TILE_WIDTH)
                     object.speedUp();
                 else
                     object.slow();
