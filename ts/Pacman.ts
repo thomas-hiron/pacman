@@ -63,6 +63,18 @@ class Pacman
   }
 
   /**
+   * @param x
+   *
+   * @returns {Pacman}
+   */
+  public setX(x: number): Pacman
+  {
+    this.coordinates.x = x;
+
+    return this;
+  }
+
+  /**
    * @returns {Point}
    */
   public getCoordinates(): Point

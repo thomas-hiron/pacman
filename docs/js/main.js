@@ -1441,9 +1441,27 @@ class Jeu {
             this.pacman.die();
         /* Dessin dans le canvas principal */
         context.drawImage(pacman.getCanvasElem(), coords.x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
-        /* Gestion du tunnel */
+        /* Gestion du tunnel à droite */
         if (coords.x >= 14 * Tile.TILE_WIDTH && coords.y == 10 * Tile.TILE_WIDTH) {
-            console.log('going to the tunnel');
+            var x = coords.x - context.canvas.width;
+            context.clearRect(x, coords.y + margin + Jeu.TOP_HEIGHT, Pacman.SIZE.w + margin + 2, Tile.TILE_WIDTH - margin * 2);
+            context.drawImage(pacman.getCanvasElem(), x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
+            /* Terminé */
+            if (x == 0) {
+                this.pacman.setX(x);
+                /* Point mangé */
+                var event = new CustomEvent('PacDotEaten', { detail: { x: 0, y: 10 } });
+                Jeu.ELEMENT.dispatchEvent(event);
+            }
+        }
+        else if (coords.x <= 0 && coords.y == 10 * Tile.TILE_WIDTH) {
+            var x = coords.x + context.canvas.width;
+            context.clearRect(x, coords.y + margin + Jeu.TOP_HEIGHT, Pacman.SIZE.w + margin + 2, Tile.TILE_WIDTH - margin * 2);
+            context.drawImage(pacman.getCanvasElem(), x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
+            this.pacman.setX(x);
+            /* Point mangé */
+            var event = new CustomEvent('PacDotEaten', { detail: { x: 14, y: 10 } });
+            Jeu.ELEMENT.dispatchEvent(event);
         }
         return this;
     }
@@ -1883,6 +1901,15 @@ class Pacman {
      */
     setCollideFunction(callback) {
         this.checkCollision = callback;
+        return this;
+    }
+    /**
+     * @param x
+     *
+     * @returns {Pacman}
+     */
+    setX(x) {
+        this.coordinates.x = x;
         return this;
     }
     /**
