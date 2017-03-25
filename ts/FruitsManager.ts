@@ -8,13 +8,11 @@
 class FruitsManager
 {
   /* Chaque fois qu'un fruit apparait */
-  private static APPEARANCE_INTEVERVAL = 30000;
-  private static APPEARANCE_DURATION = 10000;
+  private static APPEARANCE_INTEVERVAL = 30 * 60;
+  private static APPEARANCE_DURATION = 10 * 60;
 
-  /* Démarrage du conteur d'ajout de fruit */
-  private startTime: number;
-  /* Démarrage du conteur de suppression de fruit */
-  private addTime: number;
+  private frames: number;
+  private hasFruit: boolean;
 
   /**
    * Démarrage
@@ -22,8 +20,8 @@ class FruitsManager
    */
   public start(): FruitsManager
   {
-    this.startTime = +new Date();
-    this.addTime = null;
+    this.hasFruit = false;
+    this.frames = 0;
 
     return this;
   }
@@ -35,10 +33,16 @@ class FruitsManager
    */
   public onRequestAnimFrame(): FruitsManager
   {
+    this.frames++;
+
+    /* Gestion des secondes */
+    var date: number = +new Date();
+
+
     /* Un nouveau fruit au bout de 30 secondes */
-    if (this.startTime != null && +new Date() - this.startTime > FruitsManager.APPEARANCE_INTEVERVAL)
+    if (!this.hasFruit && this.frames > FruitsManager.APPEARANCE_INTEVERVAL)
       this.newFruit();
-    else if (this.addTime != null && +new Date() - this.addTime > FruitsManager.APPEARANCE_DURATION)
+    else if (this.hasFruit && this.frames > FruitsManager.APPEARANCE_DURATION)
       this.removeFruit();
 
     return this;
@@ -51,11 +55,9 @@ class FruitsManager
    */
   private newFruit(): FruitsManager
   {
-    /* Suppression du startTime */
-    this.startTime = null;
-
-    /* Ajout du addTime */
-    this.addTime = +new Date();
+    /* Redémarrage du compteur */
+    this.frames = 0;
+    this.hasFruit = true;
 
     /* Les proba de chaque fruit, en se basant à 1 seule chance pour la clé */
     var keyProbability: number = 1;
