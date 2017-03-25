@@ -303,12 +303,14 @@ class GhostsManager
    */
   public goToFrightenedMode(): GhostsManager
   {
-    /* Pour remettre le mode à la fin */
+    /* Réinit des frames */
     this.frightenedFrames = 0;
-    this.areFrightened = true;
 
-    /* Changement */
-    this.changeAlternativeMode(Modes.Frightened);
+    /* Changement si pas déjà dans le mode */
+    if (!this.areFrightened)
+      this.changeAlternativeMode(Modes.Frightened);
+
+    this.areFrightened = true;
 
     return this;
   }
