@@ -583,14 +583,13 @@ abstract class Ghost
    */
   private checkEatOrEaten(pacmanCenter: PointAndDirection)
   {
-    var pacmanTile: Point = TileFunctions.getTileCoordinates(pacmanCenter);
-    var currentTile: Point = TileFunctions.getTileCoordinates({
+    var center: Point = {
       x: this.coordinates.x + Tile.TILE_WIDTH / 2,
       y: this.coordinates.y + Tile.TILE_WIDTH / 2
-    });
+    };
 
     /* Mangé */
-    if (pacmanTile.x == currentTile.x && pacmanTile.y == currentTile.y)
+    if (Math.abs(pacmanCenter.x - center.x) < 10 && Math.abs(pacmanCenter.y - center.y) < 10)
     {
       var eventName: string = this.alternativeMode == Modes.Frightened ? 'GhostEaten' : 'PacmanEaten';
       var event: Event = new Event(eventName);
