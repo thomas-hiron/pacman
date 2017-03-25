@@ -19,7 +19,7 @@ class LevelManager
     this.pacDotNumber = 0;
 
     /* Listener food eaten */
-    window.addEventListener('PacDotEaten', this.pacDotEaten.bind(this), false);
+    Jeu.ELEMENT.addEventListener('PacDotEaten', this.pacDotEaten.bind(this), false);
   }
 
   /**
@@ -200,13 +200,13 @@ class LevelManager
       if (this.pacDotNumberTotal - this.pacDotNumber == GhostsManager.INKY_DOT_TO_GO)
       {
         var event = new CustomEvent('InkyCanGo');
-        window.dispatchEvent(event);
+        Jeu.ELEMENT.dispatchEvent(event);
       }
       /* Si un tier des points mangés, Clyde sort */
       if (this.pacDotNumberTotal - this.pacDotNumber == Math.round(this.pacDotNumberTotal / 3))
       {
         var event = new CustomEvent('ClydeCanGo');
-        window.dispatchEvent(event);
+        Jeu.ELEMENT.dispatchEvent(event);
       }
     }
 
@@ -214,7 +214,7 @@ class LevelManager
     if (this.pacDotNumber <= 0)
     {
       var event: CustomEvent = new CustomEvent('LevelFinished');
-      window.dispatchEvent(event);
+      Jeu.ELEMENT.dispatchEvent(event);
     }
 
     return this;

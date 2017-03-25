@@ -281,7 +281,7 @@ class Pacman
       var currentTileCoords: Point = this.getCurrentTileCoords();
 
       var event: Event = new CustomEvent('PacDotEaten', {'detail': currentTileCoords});
-      window.dispatchEvent(event);
+      Jeu.ELEMENT.dispatchEvent(event);
     }
 
     /* Retour de l'instance */
@@ -336,7 +336,7 @@ class Pacman
 
       /* Event terminé */
       var event: Event = new Event('PacmanDied');
-      window.dispatchEvent(event);
+      Jeu.ELEMENT.dispatchEvent(event);
     }
 
     /* Dessin */

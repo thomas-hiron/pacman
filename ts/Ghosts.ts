@@ -374,7 +374,7 @@ abstract class Ghost
           {
             /* Signaler au manager qu'il est sorti */
             var event = new CustomEvent('OutFromHome', {'detail': this});
-            window.dispatchEvent(event);
+            Jeu.ELEMENT.dispatchEvent(event);
 
             /* Vitesse normale */
             this.stepPx = Ghost.NORMAL;
@@ -626,7 +626,7 @@ abstract class Ghost
       {
         var eventName: string = this.alternativeMode == Modes.Frightened ? 'GhostEaten' : 'PacmanEaten';
         var event: Event = new Event(eventName);
-        window.dispatchEvent(event);
+        Jeu.ELEMENT.dispatchEvent(event);
       }
 
       /* Retour à la maison */

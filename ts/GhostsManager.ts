@@ -47,10 +47,10 @@ class GhostsManager
     this.clyde = new Clyde();
 
     /* Listener sorti de la maison */
-    window.addEventListener('OutFromHome', this.ghostGotOut.bind(this), false);
-    window.addEventListener('InkyCanGo', this.inkyCanGo.bind(this), false);
-    window.addEventListener('ClydeCanGo', this.clydeCanGo.bind(this), false);
-    window.addEventListener('GhostEaten', this.ghostEaten.bind(this), false);
+    Jeu.ELEMENT.addEventListener('OutFromHome', this.ghostGotOut.bind(this), false);
+    Jeu.ELEMENT.addEventListener('InkyCanGo', this.inkyCanGo.bind(this), false);
+    Jeu.ELEMENT.addEventListener('ClydeCanGo', this.clydeCanGo.bind(this), false);
+    Jeu.ELEMENT.addEventListener('GhostEaten', this.ghostEaten.bind(this), false);
   }
 
   /**
@@ -344,7 +344,7 @@ class GhostsManager
 
     /* Information de jeu pour augmenter le score */
     var event: CustomEvent = new CustomEvent('UpdateScoreAfterGhostEaten', {'detail': this.numberEaten})
-    window.dispatchEvent(event);
+    Jeu.ELEMENT.dispatchEvent(event);
 
     return this;
   }

@@ -93,7 +93,7 @@ class FruitsManager
 
     /* Dispatch event pour que le jeu l'ajoute */
     var event: CustomEvent = new CustomEvent('NewFruit', {'detail': fruit});
-    window.dispatchEvent(event);
+    Jeu.ELEMENT.dispatchEvent(event);
 
     return this;
   }
@@ -110,7 +110,7 @@ class FruitsManager
 
     /* Dispatch event */
     var event: CustomEvent = new CustomEvent('RemoveFruit');
-    window.dispatchEvent(event);
+    Jeu.ELEMENT.dispatchEvent(event);
 
     return this;
   }

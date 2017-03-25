@@ -547,7 +547,7 @@ class Ghost {
                     else if (coords.x == 7 && coords.y == 8) {
                         /* Signaler au manager qu'il est sorti */
                         var event = new CustomEvent('OutFromHome', { 'detail': this });
-                        window.dispatchEvent(event);
+                        Jeu.ELEMENT.dispatchEvent(event);
                         /* Vitesse normale */
                         this.stepPx = Ghost.NORMAL;
                         /* Sorti */
@@ -745,7 +745,7 @@ class Ghost {
             if (this.alternativeMode != Modes.GoingHome) {
                 var eventName = this.alternativeMode == Modes.Frightened ? 'GhostEaten' : 'PacmanEaten';
                 var event = new Event(eventName);
-                window.dispatchEvent(event);
+                Jeu.ELEMENT.dispatchEvent(event);
             }
             /* Retour à la maison */
             if (this.alternativeMode == Modes.Frightened)
@@ -982,10 +982,10 @@ class GhostsManager {
         this.inky = new Inky();
         this.clyde = new Clyde();
         /* Listener sorti de la maison */
-        window.addEventListener('OutFromHome', this.ghostGotOut.bind(this), false);
-        window.addEventListener('InkyCanGo', this.inkyCanGo.bind(this), false);
-        window.addEventListener('ClydeCanGo', this.clydeCanGo.bind(this), false);
-        window.addEventListener('GhostEaten', this.ghostEaten.bind(this), false);
+        Jeu.ELEMENT.addEventListener('OutFromHome', this.ghostGotOut.bind(this), false);
+        Jeu.ELEMENT.addEventListener('InkyCanGo', this.inkyCanGo.bind(this), false);
+        Jeu.ELEMENT.addEventListener('ClydeCanGo', this.clydeCanGo.bind(this), false);
+        Jeu.ELEMENT.addEventListener('GhostEaten', this.ghostEaten.bind(this), false);
     }
     /**
      * @param callback
@@ -1328,19 +1328,19 @@ class Jeu {
      */
     addListeners() {
         /* Listener pour un point mangée */
-        window.addEventListener('PacDotEaten', this.onPacDotEaten.bind(this), false);
+        Jeu.ELEMENT.addEventListener('PacDotEaten', this.onPacDotEaten.bind(this), false);
         /* Listener pour niveau terminé */
-        window.addEventListener('LevelFinished', this.onLevelFinished.bind(this), false);
+        Jeu.ELEMENT.addEventListener('LevelFinished', this.onLevelFinished.bind(this), false);
         /* Listener pour un nouveau fruit */
-        window.addEventListener('NewFruit', this.onNewFruit.bind(this), false);
+        Jeu.ELEMENT.addEventListener('NewFruit', this.onNewFruit.bind(this), false);
         /* Listener pour un fruit supprimé (pas mangé) */
-        window.addEventListener('RemoveFruit', this.onRemoveFruit.bind(this), false);
+        Jeu.ELEMENT.addEventListener('RemoveFruit', this.onRemoveFruit.bind(this), false);
         /* Pacman mangé */
-        window.addEventListener('PacmanEaten', this.onPacmanEaten.bind(this), false);
+        Jeu.ELEMENT.addEventListener('PacmanEaten', this.onPacmanEaten.bind(this), false);
         /* Pacman mort */
-        window.addEventListener('PacmanDied', this.onPacmanDead.bind(this), false);
+        Jeu.ELEMENT.addEventListener('PacmanDied', this.onPacmanDead.bind(this), false);
         /* Fantôme(s) mangé */
-        window.addEventListener('UpdateScoreAfterGhostEaten', this.onGhostEaten.bind(this), false);
+        Jeu.ELEMENT.addEventListener('UpdateScoreAfterGhostEaten', this.onGhostEaten.bind(this), false);
         return this;
     }
     /**
@@ -1742,6 +1742,8 @@ Jeu.INTERVAL = 1;
 Jeu.EATEN_INTERVAL = 10;
 /* Hauteur du panneau supérieur */
 Jeu.TOP_HEIGHT = 40;
+/* L'élément pour les events */
+Jeu.ELEMENT = document.createElement('DIV');
 /**
  * Created by thiron on 03/07/2015.
  */
@@ -2046,7 +2048,7 @@ class Pacman {
             /* Les coordonées de la case */
             var currentTileCoords = this.getCurrentTileCoords();
             var event = new CustomEvent('PacDotEaten', { 'detail': currentTileCoords });
-            window.dispatchEvent(event);
+            Jeu.ELEMENT.dispatchEvent(event);
         }
         /* Retour de l'instance */
         return this;
@@ -2085,7 +2087,7 @@ class Pacman {
             endAngle = 0;
             /* Event terminé */
             var event = new Event('PacmanDied');
-            window.dispatchEvent(event);
+            Jeu.ELEMENT.dispatchEvent(event);
         }
         /* Dessin */
         ctx.beginPath();
@@ -2252,7 +2254,7 @@ class LevelManager {
         this.level = new Level();
         this.pacDotNumber = 0;
         /* Listener food eaten */
-        window.addEventListener('PacDotEaten', this.pacDotEaten.bind(this), false);
+        Jeu.ELEMENT.addEventListener('PacDotEaten', this.pacDotEaten.bind(this), false);
     }
     /**
      * Dessine le niveau dans le canvas
@@ -2387,18 +2389,18 @@ class LevelManager {
             /* Si 30 points mangés, Inky sort */
             if (this.pacDotNumberTotal - this.pacDotNumber == GhostsManager.INKY_DOT_TO_GO) {
                 var event = new CustomEvent('InkyCanGo');
-                window.dispatchEvent(event);
+                Jeu.ELEMENT.dispatchEvent(event);
             }
             /* Si un tier des points mangés, Clyde sort */
             if (this.pacDotNumberTotal - this.pacDotNumber == Math.round(this.pacDotNumberTotal / 3)) {
                 var event = new CustomEvent('ClydeCanGo');
-                window.dispatchEvent(event);
+                Jeu.ELEMENT.dispatchEvent(event);
             }
         }
         /* Niveau terminé */
         if (this.pacDotNumber <= 0) {
             var event = new CustomEvent('LevelFinished');
-            window.dispatchEvent(event);
+            Jeu.ELEMENT.dispatchEvent(event);
         }
         return this;
     }

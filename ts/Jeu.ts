@@ -18,6 +18,9 @@ class Jeu
   /* Hauteur du panneau supérieur */
   public static TOP_HEIGHT: number = 40;
 
+  /* L'élément pour les events */
+  public static ELEMENT: HTMLElement = document.createElement('DIV');
+
   private canvas: Canvas;
   private pacman: Pacman;
   private frames: number;
@@ -84,25 +87,25 @@ class Jeu
   private addListeners(): Jeu
   {
     /* Listener pour un point mangée */
-    window.addEventListener('PacDotEaten', this.onPacDotEaten.bind(this), false);
+    Jeu.ELEMENT.addEventListener('PacDotEaten', this.onPacDotEaten.bind(this), false);
 
     /* Listener pour niveau terminé */
-    window.addEventListener('LevelFinished', this.onLevelFinished.bind(this), false);
+    Jeu.ELEMENT.addEventListener('LevelFinished', this.onLevelFinished.bind(this), false);
 
     /* Listener pour un nouveau fruit */
-    window.addEventListener('NewFruit', this.onNewFruit.bind(this), false);
+    Jeu.ELEMENT.addEventListener('NewFruit', this.onNewFruit.bind(this), false);
 
     /* Listener pour un fruit supprimé (pas mangé) */
-    window.addEventListener('RemoveFruit', this.onRemoveFruit.bind(this), false);
+    Jeu.ELEMENT.addEventListener('RemoveFruit', this.onRemoveFruit.bind(this), false);
 
     /* Pacman mangé */
-    window.addEventListener('PacmanEaten', this.onPacmanEaten.bind(this), false);
+    Jeu.ELEMENT.addEventListener('PacmanEaten', this.onPacmanEaten.bind(this), false);
 
     /* Pacman mort */
-    window.addEventListener('PacmanDied', this.onPacmanDead.bind(this), false);
+    Jeu.ELEMENT.addEventListener('PacmanDied', this.onPacmanDead.bind(this), false);
 
     /* Fantôme(s) mangé */
-    window.addEventListener('UpdateScoreAfterGhostEaten', this.onGhostEaten.bind(this), false);
+    Jeu.ELEMENT.addEventListener('UpdateScoreAfterGhostEaten', this.onGhostEaten.bind(this), false);
 
     return this;
   }
