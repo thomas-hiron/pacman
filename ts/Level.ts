@@ -1,3 +1,5 @@
+///<reference path='Tile.ts' />
+///<reference path='Pacman.ts' />
 /**
  * Created by thiron on 03/07/2015.
  */

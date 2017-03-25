@@ -1,7 +1,7 @@
+///<reference path='PacDot.ts' />
 /**
  * Created by mac pro on 05/03/2017.
  */
-///<reference path='PacDot.ts' />
 abstract class Fruit extends PacDot
 {
   public static WIDTH = 20;

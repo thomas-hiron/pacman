@@ -104,10 +104,10 @@ class PowerPellet extends PacDot {
     }
 }
 PowerPellet.SCORE_VALUE = 50;
+///<reference path='PacDot.ts' />
 /**
  * Created by mac pro on 05/03/2017.
  */
-///<reference path='PacDot.ts' />
 class Fruit extends PacDot {
 }
 Fruit.WIDTH = 20;
@@ -1222,6 +1222,59 @@ GhostsManager.INKY_DOT_TO_GO = 30;
  * Created by thiron on 03/07/2015.
  */
 /**
+ * Created by mac pro on 05/03/2017.
+ */
+/**
+ * Gère le score
+ */
+class Score {
+    constructor() {
+        this.score = 0;
+    }
+    /**
+     * @returns {string}
+     */
+    toString() {
+        return 'Score : ' + this.score;
+    }
+    /**
+     * Augmente le score en fonction de la case
+     *
+     * @param tile
+     *
+     * @returns {Score}
+     */
+    update(tile) {
+        if (tile.getPacDot() instanceof PacDot)
+            this.score += tile.getPacDot().getScoreValue();
+        return this;
+    }
+    /**
+     * Met à jour le score
+     *
+     * @param ghostEatenNumber
+     *
+     * @returns {Score}
+     */
+    updateWithGhost(ghostEatenNumber) {
+        switch (ghostEatenNumber) {
+            case 1:
+                this.score += 200;
+                break;
+            case 2:
+                this.score += 400;
+                break;
+            case 3:
+                this.score += 800;
+                break;
+            case 4:
+                this.score += 1600;
+                break;
+        }
+        return this;
+    }
+}
+/**
  * Created by thiron on 03/07/2015.
  */
 /**
@@ -1231,6 +1284,7 @@ GhostsManager.INKY_DOT_TO_GO = 30;
  *  http://gameinternals.com/post/2072558330/understanding-pac-man-ghost-behavior
  *  http://www.grospixels.com/site/trucpac.php
  */
+///<reference path='Score.ts' />
 class Jeu {
     constructor() {
         this.frames = 0;
@@ -1691,272 +1745,116 @@ Jeu.TOP_HEIGHT = 40;
 /**
  * Created by thiron on 03/07/2015.
  */
-/**
- * Gère le design des niveaux
- */
-class Level {
+class Tile {
     constructor() {
-        /* Les blocs avec cases */
-        this.tiles = new Array(20);
-        for (var i = 0, l = this.tiles.length; i < l; ++i) {
-            this.tiles[i] = new Array(15);
-            for (var j = 0, k = this.tiles[i].length; j < k; ++j) {
-                this.tiles[i][j] = new Tile();
-                this.tiles[i][j].setCoordinates(j, i);
-            }
-        }
-        /* On rempli toutes les cases murs */
-        var wallsCoordinates = [
-            [0, 7],
-            [1, 1], [1, 2], [1, 4], [1, 5], [1, 7], [1, 9], [1, 10], [1, 12], [1, 13],
-            [3, 1], [3, 2], [3, 3], [3, 4], [3, 5], [3, 7], [3, 9], [3, 10], [3, 11], [3, 12], [3, 13],
-            [4, 5], [4, 7], [4, 9],
-            [5, 1], [5, 3], [5, 5], [5, 7], [5, 9], [5, 11], [5, 13],
-            [6, 1], [6, 13],
-            [7, 1], [7, 2], [7, 3], [7, 4], [7, 5], [7, 7], [7, 9], [7, 10], [7, 11], [7, 12], [7, 13],
-            [9, 0], [9, 1], [9, 2], [9, 3], [9, 4], [9, 10], [9, 11], [9, 12], [9, 13], [9, 14],
-            [11, 0], [11, 1], [11, 2], [11, 3], [11, 5], [11, 6], [11, 7], [11, 8], [11, 9], [11, 11], [11, 12], [11, 13], [11, 14],
-            [12, 3], [12, 7], [12, 11],
-            [13, 1], [13, 3], [13, 5], [13, 7], [13, 9], [13, 11], [13, 13],
-            [14, 3], [14, 5], [14, 7], [14, 9], [14, 11],
-            [15, 1], [15, 5], [15, 9], [15, 13],
-            [16, 1], [16, 2], [16, 3], [16, 4], [16, 5], [16, 7], [16, 9], [16, 10], [16, 11], [16, 12], [16, 13],
-            [17, 7],
-            [18, 1], [18, 2], [18, 3], [18, 4], [18, 5], [18, 6], [18, 7], [18, 8], [18, 9], [18, 10], [18, 11], [18, 12], [18, 13]
-        ];
-        /* Le conteneur des fantomes */
-        wallsCoordinates.push([9, 6]);
-        wallsCoordinates.push([9, 7]);
-        wallsCoordinates.push([9, 8]);
-        /* Déclaration de tous les murs */
-        for (i = 0, l = wallsCoordinates.length; i < l; ++i)
-            this.tiles[wallsCoordinates[i][0]][wallsCoordinates[i][1]].isAWall(true);
-        /* Sinon on met un point */
-        for (i = 0, l = this.tiles.length; i < l; ++i) {
-            for (j = 0, k = this.tiles[i].length; j < k; ++j) {
-                /* Ajout du point */
-                if (!this.tiles[i][j].isAWall())
-                    this.tiles[i][j].setPacDot(new PacDot());
-            }
-        }
-        /* Ajout des power pellet, y d'abord */
-        this.tiles[2][1].setPacDot(new PowerPellet());
-        this.tiles[2][13].setPacDot(new PowerPellet());
-        this.tiles[12][2].setPacDot(new PowerPellet());
-        this.tiles[12][12].setPacDot(new PowerPellet());
-        /* Suppression de la case où y'a pacman */
-        this.tiles[Pacman.BASE_Y][Pacman.BASE_X].setPacDot(null);
-    }
-    /**
-     * Retourne le tableau désiré
-     *
-     * @returns {Array<Array<Tile>>}
-     */
-    get() {
-        return this.tiles;
-    }
-}
-/**
- * Created by thiron on 03/07/2015.
- */
-/**
- * Gère et dessine les niveaux
- */
-class LevelManager {
-    constructor() {
-        this.level = new Level();
-        this.pacDotNumber = 0;
-        /* Listener food eaten */
-        window.addEventListener('PacDotEaten', this.pacDotEaten.bind(this), false);
-    }
-    /**
-     * Dessine le niveau dans le canvas
-     *
-     * @param canvas
-     */
-    draw(canvas) {
-        var tiles = this.getTiles();
-        /* Réinitialisation du nombre de points */
-        this.pacDotNumber = 0;
-        /* Parcourt de chaque ligne */
-        for (var i = 0, l = tiles.length; i < l; ++i) {
-            var row = tiles[i];
-            /* Parcourt de chaque case */
-            for (var j = 0, k = row.length; j < k; ++j) {
-                var tile = row[j];
-                /* Détermination des bordures à supprimer */
-                var leftTile = row[j - 1] || null;
-                var rightTile = row[j + 1] || null;
-                var upTile = tiles[i - 1] != null ? tiles[i - 1][j] : null;
-                var downTile = tiles[i + 1] != null ? tiles[i + 1][j] : null;
-                /* Suppression des bordures */
-                tile.hasBorderLeft(leftTile != null && tile.isAWall() && !leftTile.isAWall());
-                tile.hasBorderRight(rightTile != null && tile.isAWall() && !rightTile.isAWall());
-                tile.hasBorderTop(upTile != null && tile.isAWall() && !upTile.isAWall());
-                tile.hasBorderBottom(downTile != null && tile.isAWall() && !downTile.isAWall());
-                /* Dessine la case courante et le point */
-                this.drawTile(canvas, tile);
-                if (tile.hasPacDot()) {
-                    this.drawPacDot(canvas, tile);
-                    /* Incrémentation du nombre de points */
-                    this.pacDotNumber++;
-                }
-            }
-        }
-        /* Pour faire sortir les fantômes */
-        this.pacDotNumberTotal = this.pacDotNumber;
-        return this;
-    }
-    /**
-     * Dessine la case courante
-     *
-     * @param canvas
-     * @param tile
-     */
-    drawTile(canvas, tile) {
-        var context = canvas.getContext();
-        context.beginPath();
-        context.strokeStyle = "#012EB6";
-        context.lineWidth = 4;
-        var j = Jeu.TOP_HEIGHT;
-        var coordinates = tile.getCoordinates();
-        if (tile.hasBorderLeft()) {
-            context.moveTo(coordinates.x * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH + j);
-            context.lineTo(coordinates.x * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH + j);
-        }
-        /* Bordure droite */
-        if (tile.hasBorderRight()) {
-            context.moveTo((coordinates.x + 1) * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH + j);
-            context.lineTo((coordinates.x + 1) * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH + j);
-        }
-        /* Bordure haut */
-        if (tile.hasBorderTop()) {
-            context.moveTo(coordinates.x * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH + j);
-            context.lineTo((coordinates.x + 1) * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH + j);
-        }
-        /* Bordure bas */
-        if (tile.hasBorderBottom()) {
-            context.moveTo(coordinates.x * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH + j);
-            context.lineTo((coordinates.x + 1) * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH + j);
-        }
-        /* Bordure */
-        context.stroke();
-        /* Pour faire la bordure double */
-        context.globalCompositeOperation = 'destination-out';
-        context.lineWidth = 2;
-        context.stroke();
-        /* Le contexte par défaut */
-        context.globalCompositeOperation = 'source-over';
-        /* Fermeture du path */
-        context.closePath();
-        return this;
-    }
-    /**
-     * Dessine le point
-     *
-     * @param canvas
-     * @param tile
-     *
-     * @returns {LevelManager}
-     */
-    drawPacDot(canvas, tile) {
-        if (tile.hasPacDot()) {
-            var context = canvas.getContext();
-            var coordinates = tile.getCoordinates();
-            var radius = tile.getPacDot() instanceof PowerPellet ? 6 : 3;
-            var margin = Tile.TILE_WIDTH / 2;
-            context.beginPath();
-            context.arc(coordinates.x * Tile.TILE_WIDTH + margin, coordinates.y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT, radius, 0, 2 * Math.PI, false);
-            context.fillStyle = 'white';
-            context.strokeStyle = 'white';
-            context.lineWidth = 0;
-            context.fill();
-            context.closePath();
-        }
-        return this;
-    }
-    /**
-     * Récupère toutes les cases du niveau courant
-     *
-     * @returns {Array<Array<Tile>>}
-     */
-    getTiles() {
-        return this.level.get();
-    }
-    /**
-     * Lorsqu'un case a été mangée
-     *
-     * @param e
-     *
-     * @returns {LevelManager}
-     */
-    pacDotEaten(e) {
-        /* Les coordonées de la case courante */
-        var coords = e.detail;
-        /* Récupération de la case courante */
-        var tiles = this.getTiles();
-        var tile = tiles[coords.y][coords.x];
-        /* Décrémentation s'il y a un point */
-        if (tile.hasPacDot() && !(tile.getPacDot() instanceof Fruit)) {
-            this.pacDotNumber--;
-            /* Si 30 points mangés, Inky sort */
-            if (this.pacDotNumberTotal - this.pacDotNumber == GhostsManager.INKY_DOT_TO_GO) {
-                var event = new CustomEvent('InkyCanGo');
-                window.dispatchEvent(event);
-            }
-            /* Si un tier des points mangés, Clyde sort */
-            if (this.pacDotNumberTotal - this.pacDotNumber == Math.round(this.pacDotNumberTotal / 3)) {
-                var event = new CustomEvent('ClydeCanGo');
-                window.dispatchEvent(event);
-            }
-        }
-        /* Niveau terminé */
-        if (this.pacDotNumber <= 0) {
-            var event = new CustomEvent('LevelFinished');
-            window.dispatchEvent(event);
-        }
-        return this;
-    }
-    /**
-     * Récupère les gros points
-     *
-     * @returns {Array<Tile>}
-     */
-    getPowerPellet() {
-        var tiles = this.getTiles();
-        var tilesWithPowerPellet = [];
-        for (var i = 0, l = tiles.length; i < l; ++i) {
-            /* Parcourt de chaque case */
-            for (var j = 0, k = tiles[i].length; j < k; ++j) {
-                if (tiles[i][j].hasPowerPellet())
-                    tilesWithPowerPellet.push(tiles[i][j]);
-            }
-        }
-        return tilesWithPowerPellet;
-    }
-}
-/**
- * Created by thiron on 03/07/2015.
- */
-window.addEventListener("load", init, false);
-/**
- * Chargement de la fenêtre, initialisation
- */
-function init() {
-    var jeu = new Jeu();
-    jeu.init();
-}
-/* RequestAnimationFrame */
-var requestAnimFrame = (function () {
-    return window.requestAnimationFrame ||
-        window.webkitRequestAnimationFrame ||
-        window.mozRequestAnimationFrame ||
-        window.oRequestAnimationFrame ||
-        window.msRequestAnimationFrame ||
-        function (callback) {
-            window.setTimeout(callback, 1000 / 60, new Date().getTime());
+        this.wall = false;
+        this.pacDot = null;
+        this.coordinates = {
+            x: 0,
+            y: 0
         };
-})();
+        /* Initialisation des bordures */
+        this.borderLeft = true;
+        this.borderRight = true;
+        this.borderTop = true;
+        this.borderBottom = true;
+    }
+    /**
+     * Getter/Setter
+     *
+     * @returns {boolean}
+     */
+    isAWall(isAWall = null) {
+        if (isAWall !== null)
+            this.wall = isAWall;
+        return this.wall;
+    }
+    /**
+     * S'il y a une bordure à gauche
+     */
+    hasBorderLeft(hasBorder = null) {
+        if (hasBorder !== null)
+            this.borderLeft = hasBorder;
+        return this.borderLeft;
+    }
+    /**
+     * S'il y a une bordure à droite
+     */
+    hasBorderRight(hasBorder = null) {
+        if (hasBorder !== null)
+            this.borderRight = hasBorder;
+        return this.borderRight;
+    }
+    /**
+     * S'il y a une bordure en haut
+     */
+    hasBorderTop(hasBorder = null) {
+        if (hasBorder !== null)
+            this.borderTop = hasBorder;
+        return this.borderTop;
+    }
+    /**
+     * S'il y a une bordure en bas
+     */
+    hasBorderBottom(hasBorder = null) {
+        if (hasBorder !== null)
+            this.borderBottom = hasBorder;
+        return this.borderBottom;
+    }
+    /**
+     * Les coordonnées
+     *
+     * @param i
+     * @param j
+     */
+    setCoordinates(i, j) {
+        this.coordinates.x = i;
+        this.coordinates.y = j;
+    }
+    /**
+     * Retourne les coordonnées
+     *
+     * @returns {Point}
+     */
+    getCoordinates() {
+        return this.coordinates;
+    }
+    /**
+     * Ajoute le point
+     *
+     * @param pacDot
+     * @returns {Tile}
+     */
+    setPacDot(pacDot) {
+        this.pacDot = pacDot;
+        return this;
+    }
+    /**
+     * S'il y a un power pellet
+     *
+     * @returns {boolean}
+     */
+    hasPowerPellet() {
+        return this.pacDot != null && this.pacDot instanceof PowerPellet;
+    }
+    /**
+     * S'il y a un pacdot
+     *
+     * @returns {boolean}
+     */
+    hasPacDot() {
+        return this.pacDot != null;
+    }
+    /**
+     * Getter
+     *
+     * @returns {PacDot}
+     */
+    getPacDot() {
+        return this.pacDot;
+    }
+}
+Tile.TILE_WIDTH = 40;
 /**
  * Created by thiron on 01/03/2017.
  */
@@ -2273,6 +2171,270 @@ Pacman.SIZE = {
     w: 24,
     h: 24
 };
+///<reference path='Tile.ts' />
+///<reference path='Pacman.ts' />
+/**
+ * Created by thiron on 03/07/2015.
+ */
+/**
+ * Gère le design des niveaux
+ */
+class Level {
+    constructor() {
+        /* Les blocs avec cases */
+        this.tiles = new Array(20);
+        for (var i = 0, l = this.tiles.length; i < l; ++i) {
+            this.tiles[i] = new Array(15);
+            for (var j = 0, k = this.tiles[i].length; j < k; ++j) {
+                this.tiles[i][j] = new Tile();
+                this.tiles[i][j].setCoordinates(j, i);
+            }
+        }
+        /* On rempli toutes les cases murs */
+        var wallsCoordinates = [
+            [0, 7],
+            [1, 1], [1, 2], [1, 4], [1, 5], [1, 7], [1, 9], [1, 10], [1, 12], [1, 13],
+            [3, 1], [3, 2], [3, 3], [3, 4], [3, 5], [3, 7], [3, 9], [3, 10], [3, 11], [3, 12], [3, 13],
+            [4, 5], [4, 7], [4, 9],
+            [5, 1], [5, 3], [5, 5], [5, 7], [5, 9], [5, 11], [5, 13],
+            [6, 1], [6, 13],
+            [7, 1], [7, 2], [7, 3], [7, 4], [7, 5], [7, 7], [7, 9], [7, 10], [7, 11], [7, 12], [7, 13],
+            [9, 0], [9, 1], [9, 2], [9, 3], [9, 4], [9, 10], [9, 11], [9, 12], [9, 13], [9, 14],
+            [11, 0], [11, 1], [11, 2], [11, 3], [11, 5], [11, 6], [11, 7], [11, 8], [11, 9], [11, 11], [11, 12], [11, 13], [11, 14],
+            [12, 3], [12, 7], [12, 11],
+            [13, 1], [13, 3], [13, 5], [13, 7], [13, 9], [13, 11], [13, 13],
+            [14, 3], [14, 5], [14, 7], [14, 9], [14, 11],
+            [15, 1], [15, 5], [15, 9], [15, 13],
+            [16, 1], [16, 2], [16, 3], [16, 4], [16, 5], [16, 7], [16, 9], [16, 10], [16, 11], [16, 12], [16, 13],
+            [17, 7],
+            [18, 1], [18, 2], [18, 3], [18, 4], [18, 5], [18, 6], [18, 7], [18, 8], [18, 9], [18, 10], [18, 11], [18, 12], [18, 13]
+        ];
+        /* Le conteneur des fantomes */
+        wallsCoordinates.push([9, 6]);
+        wallsCoordinates.push([9, 7]);
+        wallsCoordinates.push([9, 8]);
+        /* Déclaration de tous les murs */
+        for (i = 0, l = wallsCoordinates.length; i < l; ++i)
+            this.tiles[wallsCoordinates[i][0]][wallsCoordinates[i][1]].isAWall(true);
+        /* Sinon on met un point */
+        for (i = 0, l = this.tiles.length; i < l; ++i) {
+            for (j = 0, k = this.tiles[i].length; j < k; ++j) {
+                /* Ajout du point */
+                if (!this.tiles[i][j].isAWall())
+                    this.tiles[i][j].setPacDot(new PacDot());
+            }
+        }
+        /* Ajout des power pellet, y d'abord */
+        this.tiles[2][1].setPacDot(new PowerPellet());
+        this.tiles[2][13].setPacDot(new PowerPellet());
+        this.tiles[12][2].setPacDot(new PowerPellet());
+        this.tiles[12][12].setPacDot(new PowerPellet());
+        /* Suppression de la case où y'a pacman */
+        this.tiles[Pacman.BASE_Y][Pacman.BASE_X].setPacDot(null);
+    }
+    /**
+     * Retourne le tableau désiré
+     *
+     * @returns {Array<Array<Tile>>}
+     */
+    get() {
+        return this.tiles;
+    }
+}
+/**
+ * Created by thiron on 03/07/2015.
+ */
+/**
+ * Gère et dessine les niveaux
+ */
+class LevelManager {
+    constructor() {
+        this.level = new Level();
+        this.pacDotNumber = 0;
+        /* Listener food eaten */
+        window.addEventListener('PacDotEaten', this.pacDotEaten.bind(this), false);
+    }
+    /**
+     * Dessine le niveau dans le canvas
+     *
+     * @param canvas
+     */
+    draw(canvas) {
+        var tiles = this.getTiles();
+        /* Réinitialisation du nombre de points */
+        this.pacDotNumber = 0;
+        /* Parcourt de chaque ligne */
+        for (var i = 0, l = tiles.length; i < l; ++i) {
+            var row = tiles[i];
+            /* Parcourt de chaque case */
+            for (var j = 0, k = row.length; j < k; ++j) {
+                var tile = row[j];
+                /* Détermination des bordures à supprimer */
+                var leftTile = row[j - 1] || null;
+                var rightTile = row[j + 1] || null;
+                var upTile = tiles[i - 1] != null ? tiles[i - 1][j] : null;
+                var downTile = tiles[i + 1] != null ? tiles[i + 1][j] : null;
+                /* Suppression des bordures */
+                tile.hasBorderLeft(leftTile != null && tile.isAWall() && !leftTile.isAWall());
+                tile.hasBorderRight(rightTile != null && tile.isAWall() && !rightTile.isAWall());
+                tile.hasBorderTop(upTile != null && tile.isAWall() && !upTile.isAWall());
+                tile.hasBorderBottom(downTile != null && tile.isAWall() && !downTile.isAWall());
+                /* Dessine la case courante et le point */
+                this.drawTile(canvas, tile);
+                if (tile.hasPacDot()) {
+                    this.drawPacDot(canvas, tile);
+                    /* Incrémentation du nombre de points */
+                    this.pacDotNumber++;
+                }
+            }
+        }
+        /* Pour faire sortir les fantômes */
+        this.pacDotNumberTotal = this.pacDotNumber;
+        return this;
+    }
+    /**
+     * Dessine la case courante
+     *
+     * @param canvas
+     * @param tile
+     */
+    drawTile(canvas, tile) {
+        var context = canvas.getContext();
+        context.beginPath();
+        context.strokeStyle = "#012EB6";
+        context.lineWidth = 4;
+        var j = Jeu.TOP_HEIGHT;
+        var coordinates = tile.getCoordinates();
+        if (tile.hasBorderLeft()) {
+            context.moveTo(coordinates.x * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH + j);
+            context.lineTo(coordinates.x * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH + j);
+        }
+        /* Bordure droite */
+        if (tile.hasBorderRight()) {
+            context.moveTo((coordinates.x + 1) * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH + j);
+            context.lineTo((coordinates.x + 1) * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH + j);
+        }
+        /* Bordure haut */
+        if (tile.hasBorderTop()) {
+            context.moveTo(coordinates.x * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH + j);
+            context.lineTo((coordinates.x + 1) * Tile.TILE_WIDTH, coordinates.y * Tile.TILE_WIDTH + j);
+        }
+        /* Bordure bas */
+        if (tile.hasBorderBottom()) {
+            context.moveTo(coordinates.x * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH + j);
+            context.lineTo((coordinates.x + 1) * Tile.TILE_WIDTH, (coordinates.y + 1) * Tile.TILE_WIDTH + j);
+        }
+        /* Bordure */
+        context.stroke();
+        /* Pour faire la bordure double */
+        context.globalCompositeOperation = 'destination-out';
+        context.lineWidth = 2;
+        context.stroke();
+        /* Le contexte par défaut */
+        context.globalCompositeOperation = 'source-over';
+        /* Fermeture du path */
+        context.closePath();
+        return this;
+    }
+    /**
+     * Dessine le point
+     *
+     * @param canvas
+     * @param tile
+     *
+     * @returns {LevelManager}
+     */
+    drawPacDot(canvas, tile) {
+        if (tile.hasPacDot()) {
+            var context = canvas.getContext();
+            var coordinates = tile.getCoordinates();
+            var radius = tile.getPacDot() instanceof PowerPellet ? 6 : 3;
+            var margin = Tile.TILE_WIDTH / 2;
+            context.beginPath();
+            context.arc(coordinates.x * Tile.TILE_WIDTH + margin, coordinates.y * Tile.TILE_WIDTH + margin + Jeu.TOP_HEIGHT, radius, 0, 2 * Math.PI, false);
+            context.fillStyle = 'white';
+            context.strokeStyle = 'white';
+            context.lineWidth = 0;
+            context.fill();
+            context.closePath();
+        }
+        return this;
+    }
+    /**
+     * Récupère toutes les cases du niveau courant
+     *
+     * @returns {Array<Array<Tile>>}
+     */
+    getTiles() {
+        return this.level.get();
+    }
+    /**
+     * Lorsqu'un case a été mangée
+     *
+     * @param e
+     *
+     * @returns {LevelManager}
+     */
+    pacDotEaten(e) {
+        /* Les coordonées de la case courante */
+        var coords = e.detail;
+        /* Récupération de la case courante */
+        var tiles = this.getTiles();
+        var tile = tiles[coords.y][coords.x];
+        /* Décrémentation s'il y a un point */
+        if (tile.hasPacDot() && !(tile.getPacDot() instanceof Fruit)) {
+            this.pacDotNumber--;
+            /* Si 30 points mangés, Inky sort */
+            if (this.pacDotNumberTotal - this.pacDotNumber == GhostsManager.INKY_DOT_TO_GO) {
+                var event = new CustomEvent('InkyCanGo');
+                window.dispatchEvent(event);
+            }
+            /* Si un tier des points mangés, Clyde sort */
+            if (this.pacDotNumberTotal - this.pacDotNumber == Math.round(this.pacDotNumberTotal / 3)) {
+                var event = new CustomEvent('ClydeCanGo');
+                window.dispatchEvent(event);
+            }
+        }
+        /* Niveau terminé */
+        if (this.pacDotNumber <= 0) {
+            var event = new CustomEvent('LevelFinished');
+            window.dispatchEvent(event);
+        }
+        return this;
+    }
+    /**
+     * Récupère les gros points
+     *
+     * @returns {Array<Tile>}
+     */
+    getPowerPellet() {
+        var tiles = this.getTiles();
+        var tilesWithPowerPellet = [];
+        for (var i = 0, l = tiles.length; i < l; ++i) {
+            /* Parcourt de chaque case */
+            for (var j = 0, k = tiles[i].length; j < k; ++j) {
+                if (tiles[i][j].hasPowerPellet())
+                    tilesWithPowerPellet.push(tiles[i][j]);
+            }
+        }
+        return tilesWithPowerPellet;
+    }
+}
+/**
+ * Created by thiron on 03/07/2015.
+ */
+/* RequestAnimationFrame */
+var requestAnimFrame = (function () {
+    return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+        function (callback) {
+            window.setTimeout(callback, 1000 / 60, new Date().getTime());
+        };
+})();
+(new Jeu()).init();
 /**
  * Created by mac pro on 13/03/2017.
  */
@@ -2382,172 +2544,6 @@ class PathFinder {
         return this;
     }
 }
-/**
- * Created by mac pro on 05/03/2017.
- */
-/**
- * Gère le score
- */
-class Score {
-    constructor() {
-        this.score = 0;
-    }
-    /**
-     * @returns {string}
-     */
-    toString() {
-        return 'Score : ' + this.score;
-    }
-    /**
-     * Augmente le score en fonction de la case
-     *
-     * @param tile
-     *
-     * @returns {Score}
-     */
-    update(tile) {
-        if (tile.getPacDot() instanceof PacDot)
-            this.score += tile.getPacDot().getScoreValue();
-        return this;
-    }
-    /**
-     * Met à jour le score
-     *
-     * @param ghostEatenNumber
-     *
-     * @returns {Score}
-     */
-    updateWithGhost(ghostEatenNumber) {
-        switch (ghostEatenNumber) {
-            case 1:
-                this.score += 200;
-                break;
-            case 2:
-                this.score += 400;
-                break;
-            case 3:
-                this.score += 800;
-                break;
-            case 4:
-                this.score += 1600;
-                break;
-        }
-        return this;
-    }
-}
-/**
- * Created by thiron on 03/07/2015.
- */
-class Tile {
-    constructor() {
-        this.wall = false;
-        this.pacDot = null;
-        this.coordinates = {
-            x: 0,
-            y: 0
-        };
-        /* Initialisation des bordures */
-        this.borderLeft = true;
-        this.borderRight = true;
-        this.borderTop = true;
-        this.borderBottom = true;
-    }
-    /**
-     * Getter/Setter
-     *
-     * @returns {boolean}
-     */
-    isAWall(isAWall = null) {
-        if (isAWall !== null)
-            this.wall = isAWall;
-        return this.wall;
-    }
-    /**
-     * S'il y a une bordure à gauche
-     */
-    hasBorderLeft(hasBorder = null) {
-        if (hasBorder !== null)
-            this.borderLeft = hasBorder;
-        return this.borderLeft;
-    }
-    /**
-     * S'il y a une bordure à droite
-     */
-    hasBorderRight(hasBorder = null) {
-        if (hasBorder !== null)
-            this.borderRight = hasBorder;
-        return this.borderRight;
-    }
-    /**
-     * S'il y a une bordure en haut
-     */
-    hasBorderTop(hasBorder = null) {
-        if (hasBorder !== null)
-            this.borderTop = hasBorder;
-        return this.borderTop;
-    }
-    /**
-     * S'il y a une bordure en bas
-     */
-    hasBorderBottom(hasBorder = null) {
-        if (hasBorder !== null)
-            this.borderBottom = hasBorder;
-        return this.borderBottom;
-    }
-    /**
-     * Les coordonnées
-     *
-     * @param i
-     * @param j
-     */
-    setCoordinates(i, j) {
-        this.coordinates.x = i;
-        this.coordinates.y = j;
-    }
-    /**
-     * Retourne les coordonnées
-     *
-     * @returns {Point}
-     */
-    getCoordinates() {
-        return this.coordinates;
-    }
-    /**
-     * Ajoute le point
-     *
-     * @param pacDot
-     * @returns {Tile}
-     */
-    setPacDot(pacDot) {
-        this.pacDot = pacDot;
-        return this;
-    }
-    /**
-     * S'il y a un power pellet
-     *
-     * @returns {boolean}
-     */
-    hasPowerPellet() {
-        return this.pacDot != null && this.pacDot instanceof PowerPellet;
-    }
-    /**
-     * S'il y a un pacdot
-     *
-     * @returns {boolean}
-     */
-    hasPacDot() {
-        return this.pacDot != null;
-    }
-    /**
-     * Getter
-     *
-     * @returns {PacDot}
-     */
-    getPacDot() {
-        return this.pacDot;
-    }
-}
-Tile.TILE_WIDTH = 40;
 /**
  * Created by thiron on 09/03/2017.
  */
