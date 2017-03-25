@@ -333,6 +333,10 @@ class Pacman
     {
       startAngle = 0;
       endAngle = 0;
+
+      /* Event terminé */
+      var event: Event = new Event('PacmanDied');
+      window.dispatchEvent(event);
     }
 
     /* Dessin */

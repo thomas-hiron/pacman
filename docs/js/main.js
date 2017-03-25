@@ -1161,6 +1161,8 @@ GhostsManager.INKY_DOT_TO_GO = 30;
 class Jeu {
     constructor() {
         this.time = +new Date();
+        /* Ajout des listeners */
+        this.addListeners();
     }
     /**
      * Initialise le jeu
@@ -1169,6 +1171,8 @@ class Jeu {
         try {
             /* Initialisation du canvas */
             this.canvas = new Canvas(document.querySelector("canvas"));
+            /* Nettoyage du canvas */
+            this.canvas.getContext().clearRect(0, 0, this.canvas.getElement().width, this.canvas.getElement().height);
         }
         catch (e) {
             /* Une erreur s'est produite, alert puis redirection */
@@ -1195,12 +1199,15 @@ class Jeu {
         this.pacman.setCollideFunction(this.checkCollision.bind(this));
         this.pacman.init();
         this.pacmanEaten = false;
-        /* Ajout des listeners */
-        this.addListeners();
         /* Démarrage du jeu */
         this.start();
         return this;
     }
+    /**
+     * Ajoute les listeners
+     *
+     * @returns {Jeu}
+     */
     addListeners() {
         /* Listener pour un point mangée */
         window.addEventListener('PacDotEaten', this.onPacDotEaten.bind(this), false);
@@ -1212,6 +1219,8 @@ class Jeu {
         window.addEventListener('RemoveFruit', this.onRemoveFruit.bind(this), false);
         /* Pacman mangé */
         window.addEventListener('PacmanEaten', this.onPacmanEaten.bind(this), false);
+        /* Pacman mort */
+        window.addEventListener('PacmanDied', this.onPacmanDead.bind(this), false);
         return this;
     }
     /**
@@ -1584,6 +1593,17 @@ class Jeu {
      */
     onPacmanEaten() {
         this.pacmanEaten = true;
+        return this;
+    }
+    /**
+     * Pacman est mort
+     *
+     * @returns {Jeu}
+     */
+    onPacmanDead() {
+        /* Suppression de tous les events */
+        this.init();
+        console.log('dead');
         return this;
     }
 }
@@ -2089,6 +2109,9 @@ class Pacman {
         if (startAngle < Math.PI) {
             startAngle = 0;
             endAngle = 0;
+            /* Event terminé */
+            var event = new Event('PacmanDied');
+            window.dispatchEvent(event);
         }
         /* Dessin */
         ctx.beginPath();

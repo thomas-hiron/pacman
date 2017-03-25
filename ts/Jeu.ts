@@ -30,6 +30,9 @@ class Jeu
   public constructor()
   {
     this.time = +new Date();
+
+    /* Ajout des listeners */
+    this.addListeners();
   }
 
   /**
@@ -41,6 +44,9 @@ class Jeu
     {
       /* Initialisation du canvas */
       this.canvas = new Canvas(document.querySelector("canvas"));
+
+      /* Nettoyage du canvas */
+      this.canvas.getContext().clearRect(0, 0, this.canvas.getElement().width, this.canvas.getElement().height);
     }
     catch (e)
     {
@@ -76,15 +82,17 @@ class Jeu
     this.pacman.init();
     this.pacmanEaten = false;
 
-    /* Ajout des listeners */
-    this.addListeners();
-
     /* Démarrage du jeu */
     this.start();
 
     return this;
   }
 
+  /**
+   * Ajoute les listeners
+   *
+   * @returns {Jeu}
+   */
   private addListeners(): Jeu
   {
     /* Listener pour un point mangée */
@@ -101,6 +109,9 @@ class Jeu
 
     /* Pacman mangé */
     window.addEventListener('PacmanEaten', this.onPacmanEaten.bind(this), false);
+
+    /* Pacman mort */
+    window.addEventListener('PacmanDied', this.onPacmanDead.bind(this), false);
 
     return this;
   }
@@ -603,6 +614,19 @@ class Jeu
   {
     this.pacmanEaten = true;
 
+    return this;
+  }
+
+  /**
+   * Pacman est mort
+   *
+   * @returns {Jeu}
+   */
+  private onPacmanDead(): Jeu
+  {
+    /* Suppression de tous les events */
+    this.init();
+    console.log('dead');
     return this;
   }
 }
