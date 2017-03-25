@@ -12,14 +12,14 @@
 class Jeu
 {
   /* Interval du request animation frame */
-  private static INTERVAL: number = 10;
-  private static EATEN_INTERVAL: number = 200;
+  private static INTERVAL: number = 1;
+  private static EATEN_INTERVAL: number = 10;
   /* Hauteur du panneau supérieur */
   public static TOP_HEIGHT: number = 40;
 
   private canvas: Canvas;
   private pacman: Pacman;
-  private time: number;
+  private frames: number;
   private levelManager: LevelManager;
   private fruitsManager: FruitsManager;
   private ghostsManager: GhostsManager;
@@ -29,10 +29,13 @@ class Jeu
 
   public constructor()
   {
-    this.time = +new Date();
+    this.frames = 0;
 
     /* Ajout des listeners */
     this.addListeners();
+
+    /* RequestAnimationFrame pour le pacman, les fantomes */
+    requestAnimFrame(this.draw.bind(this));
   }
 
   /**
@@ -130,9 +133,6 @@ class Jeu
     this.fruitsManager.start();
     this.ghostsManager.start();
 
-    /* RequestAnimationFrame pour le pacman, les fantomes */
-    requestAnimFrame(this.draw.bind(this));
-
     return this;
   }
 
@@ -146,7 +146,7 @@ class Jeu
     var interval: number = this.pacmanEaten ? Jeu.EATEN_INTERVAL : Jeu.INTERVAL;
 
     /* Si l'interval a été atteint */
-    if (+new Date() - this.time > interval)
+    if (this.canvas != null && this.frames >= interval)
     {
       if (!this.pacmanEaten)
       {
@@ -184,12 +184,15 @@ class Jeu
         this.animatePacman();
       }
 
-      /* Mise à jour du temps */
-      this.time = +new Date();
+      /* Redémarrage */
+      this.frames = 0;
     }
 
     /* Animation suivante */
     requestAnimFrame(this.draw.bind(this));
+
+    /* Incrémentation */
+    this.frames++;
 
     return this;
   }
