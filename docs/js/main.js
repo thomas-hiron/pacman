@@ -541,6 +541,8 @@ class Ghost {
                         /* Sorti */
                         this.outFromHome = true;
                         this.alternativeMode = null;
+                        /* Forcément à gauche */
+                        this.direction = Directions.Left;
                     }
                     else {
                         if (coords.x == 6)
@@ -603,11 +605,6 @@ class Ghost {
     changeMode(mode) {
         /* Changement */
         this.mode = mode;
-        /* S'il vient de sortir de la maison */
-        if (this.alternativeMode == Modes.OutFromHome && mode == Modes.Scatter)
-            this.direction = Directions.Right;
-        else if (this.alternativeMode == Modes.OutFromHome && mode == Modes.Chase)
-            this.direction = Directions.Left;
         /* Si scatter, changement de direction */
         if (this.mode == Modes.Scatter) {
             switch (this.direction) {

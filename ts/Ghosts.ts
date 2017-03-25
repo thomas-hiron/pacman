@@ -381,6 +381,9 @@ abstract class Ghost
             /* Sorti */
             this.outFromHome = true;
             this.alternativeMode = null;
+
+            /* Forcément à gauche */
+            this.direction = Directions.Left;
           }
           /* Aller au milieu */
           else
@@ -461,12 +464,6 @@ abstract class Ghost
     /* Changement */
     this.mode = mode;
 
-    /* S'il vient de sortir de la maison */
-    if (this.alternativeMode == Modes.OutFromHome && mode == Modes.Scatter)
-      this.direction = Directions.Right;
-    else if (this.alternativeMode == Modes.OutFromHome && mode == Modes.Chase)
-      this.direction = Directions.Left;
-
     /* Si scatter, changement de direction */
     if (this.mode == Modes.Scatter)
     {
@@ -514,7 +511,7 @@ abstract class Ghost
       }
     }
     /* Pour sortir du mode frightened */
-    else if(this.alternativeMode == Modes.Frightened)
+    else if (this.alternativeMode == Modes.Frightened)
     {
       this.alternativeMode = mode;
       /* Vitesse normale */
