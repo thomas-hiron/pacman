@@ -27,7 +27,6 @@ class GhostsManager
 
   /* Le mode courant */
   private mode: number;
-  private previousMode: number;
 
   constructor()
   {
@@ -78,6 +77,8 @@ class GhostsManager
     window.addEventListener('InkyCanGo', this.inkyCanGo.bind(this), false);
     window.addEventListener('ClydeCanGo', this.clydeCanGo.bind(this), false);
 
+    this.frightenedTime = null;
+
     return this;
   }
 
@@ -89,8 +90,8 @@ class GhostsManager
   {
     this.time = +new Date();
 
-    /* Blinky doit bouger directement */
-    this.blinky.changeMode(this.mode, true);
+    /* Changement du mode */
+    this.changeMode(this.mode);
 
     /* Pinky doit sortir immédiatement */
     this.pinky.getOutFromHome();
@@ -107,8 +108,11 @@ class GhostsManager
    */
   public moveGhosts(pacmanCenter: PointAndDirection): GhostsManager
   {
+    /* Gestion du mode frightened */
+    var mode: number = this.frightenedTime != null ? Modes.Frightened : this.mode;
+
     /* Vérification du chrono */
-    switch (this.mode)
+    switch (mode)
     {
       case Modes.Chase:
 
@@ -148,9 +152,10 @@ class GhostsManager
         {
           /* Comme si on avait stoppé le timer précédent */
           this.time += this.frightenedInterval;
+          this.frightenedTime = null;
 
-          /* Remise du mode */
-          this.changeMode(this.previousMode);
+          /* Suppression du mode alternatif */
+          this.changeAlternativeMode(null);
         }
 
         break;
@@ -197,6 +202,24 @@ class GhostsManager
     this.blinky.changeMode(this.mode);
     this.inky.changeMode(this.mode);
     this.clyde.changeMode(this.mode);
+
+    return this;
+  }
+
+  /**
+   * Change le mode alternatif
+   *
+   * @param mode
+   *
+   * @returns {GhostsManager}
+   */
+  private changeAlternativeMode(mode: number): GhostsManager
+  {
+    /* Changement pour les fantômes */
+    this.pinky.changeAlternativeMode(mode);
+    this.blinky.changeAlternativeMode(mode);
+    this.inky.changeAlternativeMode(mode);
+    this.clyde.changeAlternativeMode(mode);
 
     return this;
   }
@@ -285,11 +308,10 @@ class GhostsManager
   public goToFrightenedMode(): GhostsManager
   {
     /* Pour remettre le mode à la fin */
-    this.previousMode = this.mode;
     this.frightenedTime = +new Date();
 
     /* Changement */
-    this.changeMode(Modes.Frightened);
+    this.changeAlternativeMode(Modes.Frightened);
 
     return this;
   }

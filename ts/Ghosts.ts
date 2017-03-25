@@ -20,8 +20,9 @@ abstract class Ghost
 
   /* La direction */
   protected direction: number;
-  /* Le mode courant */
+  /* Le mode courant et l'alternatif */
   protected mode: number;
+  protected alternativeMode: number;
   /* Les coordonnées du fantôme */
   protected coordinates: Point;
   /* Les coordonées des coins respectifs */
@@ -29,6 +30,8 @@ abstract class Ghost
   /* La couleur du fantôme */
   protected color: string;
   protected frightenedColor: string = "#2121ff";
+  /* Sorti */
+  protected outFromHome: boolean;
 
   /* Le canvas de chaque fantôme */
   private canvas: Canvas;
@@ -71,12 +74,16 @@ abstract class Ghost
     this.draw();
 
     /* Mode par défaut */
-    this.mode = Modes.Idle;
+    this.alternativeMode = null;
     this.direction = null;
+    this.outFromHome = false;
 
     /* Pour que blinky aille à gauche obligatoirement */
     if (this instanceof Blinky)
+    {
       this.direction = Directions.Right;
+      this.outFromHome = true;
+    }
 
     return this;
   }
@@ -99,31 +106,36 @@ abstract class Ghost
     context.rect(0, Ghost.SIZE.h / 2, Ghost.SIZE.w, Ghost.SIZE.h / 2);
 
     /* Remplissage */
-    context.fillStyle = this.mode == Modes.Frightened ? this.frightenedColor : this.color;
+    context.fillStyle = this.alternativeMode == Modes.Frightened ? this.frightenedColor : this.color;
     context.fill();
     context.closePath();
 
     /* Les yeux */
     var x: number = 0;
     var y: number = 0;
-    switch (this.direction)
+
+    /* Ils bougent que si sorti ou en train */
+    if (this.outFromHome || this.alternativeMode == Modes.OutFromHome)
     {
-      case Directions.Left:
-        x = -2;
-        break;
-      case Directions.Right:
-        x = 2;
-        break;
-      case Directions.Up:
-        y = -2;
-        break;
-      case Directions.Down:
-        y = 2;
-        break;
+      switch (this.direction)
+      {
+        case Directions.Left:
+          x = -2;
+          break;
+        case Directions.Right:
+          x = 2;
+          break;
+        case Directions.Up:
+          y = -2;
+          break;
+        case Directions.Down:
+          y = 2;
+          break;
+      }
     }
 
     context.beginPath();
-    if (this.mode == Modes.Frightened)
+    if (this.alternativeMode == Modes.Frightened)
     {
       /* Petits yeux */
       context.arc(Ghost.SIZE.w / 2 - 4, Ghost.SIZE.h / 2 - 2, 2, 0, 2 * Math.PI, false);
@@ -142,7 +154,7 @@ abstract class Ghost
     context.closePath();
 
     /* Les pupilles si pas apeuré */
-    if (this.mode != Modes.Frightened)
+    if (this.alternativeMode != Modes.Frightened)
     {
       context.beginPath();
       context.ellipse(Ghost.SIZE.w / 2 - 5 + x * 2, Ghost.SIZE.h / 2 + y * 2, 1, 2, 0, 2 * Math.PI, false);
@@ -167,7 +179,7 @@ abstract class Ghost
       context.lineTo(18, Ghost.SIZE.h / 2 + 6);
 
       /* Remplissage */
-      context.strokeStyle = 'white'
+      context.strokeStyle = 'white';
       context.stroke();
       context.closePath();
     }
@@ -291,14 +303,17 @@ abstract class Ghost
    */
   public move(pacmanCenter: PointAndDirection, blinkyCoords: Point = null): Ghost
   {
-    /* Pas de déplacement si à l'arrêt */
-    if (this.mode == Modes.Idle)
+    /* Pas de déplacement si à l'arrêt ou pas en train de sortir */
+    if (!this.outFromHome && this.alternativeMode != Modes.OutFromHome)
       return this;
+
+    /* Le mode, l'alertnatif prendra le dessus */
+    var mode: number = this.alternativeMode || this.mode;
 
     /* Si dans une case */
     if (this.coordinates.x % Tile.TILE_WIDTH == 0 && this.coordinates.y % Tile.TILE_WIDTH == 0)
     {
-      switch (this.mode)
+      switch (mode)
       {
         /* Dans le coin attribué */
         case Modes.Scatter :
@@ -362,6 +377,10 @@ abstract class Ghost
 
             /* Vitesse normale */
             this.stepPx = Ghost.NORMAL;
+
+            /* Sorti */
+            this.outFromHome = true;
+            this.alternativeMode = null;
           }
           /* Aller au milieu */
           else
@@ -423,7 +442,7 @@ abstract class Ghost
    */
   public getOutFromHome(): Ghost
   {
-    this.mode = Modes.OutFromHome;
+    this.alternativeMode = Modes.OutFromHome;
 
     this.stepPx = Ghost.OUT_FROM_HOME;
 
@@ -431,37 +450,25 @@ abstract class Ghost
   }
 
   /**
-   * Renvoie la direction pour
-   *
-   * @returns {number}
-   */
-  public getDirection(): number
-  {
-    return this.direction;
-  }
-
-  /**
    * Modifie le mode
    *
    * @param mode
-   * @param force Si le mode doit être changé de force (pour quitter le mode iddle)
+   *
    * @returns {Ghost}
    */
-  public changeMode(mode: number, force: boolean = false): Ghost
+  public changeMode(mode: number): Ghost
   {
-    /* S'il était apeuré */
-    var wasFrightened: boolean = this.mode == Modes.Frightened;
+    /* Changement */
+    this.mode = mode;
 
     /* S'il vient de sortir de la maison */
-    if (this.mode == Modes.OutFromHome && mode == Modes.Scatter)
+    if (this.alternativeMode == Modes.OutFromHome && mode == Modes.Scatter)
       this.direction = Directions.Right;
-    else if (this.mode == Modes.OutFromHome && mode == Modes.Chase)
+    else if (this.alternativeMode == Modes.OutFromHome && mode == Modes.Chase)
       this.direction = Directions.Left;
-    if (this.mode != Modes.Idle || force)
-      this.mode = mode;
 
-    /* Si scatter, changement de direction (et si pas frightened juste avant) */
-    if (!wasFrightened && this.mode == Modes.Scatter)
+    /* Si scatter, changement de direction */
+    if (this.mode == Modes.Scatter)
     {
       switch (this.direction)
       {
@@ -480,12 +487,37 @@ abstract class Ghost
           break;
       }
     }
-    /* Si frightened, réduction de la vitesse */
-    else if (this.mode == Modes.Frightened)
-      this.stepPx = Ghost.FRIGHTENED;
-    /* Plus apeuré, vitesse normale */
-    else if (wasFrightened && this.mode != Modes.Frightened)
+
+    return this;
+  }
+
+  /**
+   * Changement du mode alternatif
+   *
+   * @param mode
+   *
+   * @returns {Ghost}
+   */
+  public changeAlternativeMode(mode: number): Ghost
+  {
+    /* Que si pas dans un mode alternatif */
+    if (this.alternativeMode == null)
     {
+      /* Si le mode alternatif est frightened, il faut qu'il soit sorti */
+      if (mode == Modes.Frightened && this.outFromHome || mode != Modes.Frightened)
+      {
+        this.alternativeMode = mode;
+
+        /* Si frightened, réduction de la vitesse */
+        if (mode == Modes.Frightened)
+          this.stepPx = Ghost.FRIGHTENED;
+      }
+    }
+    /* Pour sortir du mode frightened */
+    else if(this.alternativeMode == Modes.Frightened)
+    {
+      this.alternativeMode = mode;
+      /* Vitesse normale */
       this.stepPx = Ghost.NORMAL;
 
       /* Vérification de l'intégrité des données (pas de pixels impairs) */

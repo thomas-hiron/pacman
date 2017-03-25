@@ -67,8 +67,7 @@ var Modes;
     Modes[Modes["Chase"] = 0] = "Chase";
     Modes[Modes["Scatter"] = 1] = "Scatter";
     Modes[Modes["Frightened"] = 2] = "Frightened";
-    Modes[Modes["Idle"] = 3] = "Idle";
-    Modes[Modes["OutFromHome"] = 4] = "OutFromHome";
+    Modes[Modes["OutFromHome"] = 3] = "OutFromHome";
 })(Modes || (Modes = {}));
 /**
  * Created by mac pro on 04/03/2017.
@@ -303,11 +302,14 @@ class Ghost {
         /* Dessin */
         this.draw();
         /* Mode par défaut */
-        this.mode = Modes.Idle;
+        this.alternativeMode = null;
         this.direction = null;
+        this.outFromHome = false;
         /* Pour que blinky aille à gauche obligatoirement */
-        if (this instanceof Blinky)
+        if (this instanceof Blinky) {
             this.direction = Directions.Right;
+            this.outFromHome = true;
+        }
         return this;
     }
     /**
@@ -324,28 +326,31 @@ class Ghost {
         /* Le corps */
         context.rect(0, Ghost.SIZE.h / 2, Ghost.SIZE.w, Ghost.SIZE.h / 2);
         /* Remplissage */
-        context.fillStyle = this.mode == Modes.Frightened ? this.frightenedColor : this.color;
+        context.fillStyle = this.alternativeMode == Modes.Frightened ? this.frightenedColor : this.color;
         context.fill();
         context.closePath();
         /* Les yeux */
         var x = 0;
         var y = 0;
-        switch (this.direction) {
-            case Directions.Left:
-                x = -2;
-                break;
-            case Directions.Right:
-                x = 2;
-                break;
-            case Directions.Up:
-                y = -2;
-                break;
-            case Directions.Down:
-                y = 2;
-                break;
+        /* Ils bougent que si sorti ou en train */
+        if (this.outFromHome || this.alternativeMode == Modes.OutFromHome) {
+            switch (this.direction) {
+                case Directions.Left:
+                    x = -2;
+                    break;
+                case Directions.Right:
+                    x = 2;
+                    break;
+                case Directions.Up:
+                    y = -2;
+                    break;
+                case Directions.Down:
+                    y = 2;
+                    break;
+            }
         }
         context.beginPath();
-        if (this.mode == Modes.Frightened) {
+        if (this.alternativeMode == Modes.Frightened) {
             /* Petits yeux */
             context.arc(Ghost.SIZE.w / 2 - 4, Ghost.SIZE.h / 2 - 2, 2, 0, 2 * Math.PI, false);
             context.arc(Ghost.SIZE.w / 2 + 4, Ghost.SIZE.h / 2 - 2, 2, 0, 2 * Math.PI, false);
@@ -360,7 +365,7 @@ class Ghost {
         context.fill();
         context.closePath();
         /* Les pupilles si pas apeuré */
-        if (this.mode != Modes.Frightened) {
+        if (this.alternativeMode != Modes.Frightened) {
             context.beginPath();
             context.ellipse(Ghost.SIZE.w / 2 - 5 + x * 2, Ghost.SIZE.h / 2 + y * 2, 1, 2, 0, 2 * Math.PI, false);
             context.ellipse(Ghost.SIZE.w / 2 + 5 + x * 2, Ghost.SIZE.h / 2 + y * 2, 1, 2, 0, 2 * Math.PI, false);
@@ -480,12 +485,14 @@ class Ghost {
      * @returns {Ghost}
      */
     move(pacmanCenter, blinkyCoords = null) {
-        /* Pas de déplacement si à l'arrêt */
-        if (this.mode == Modes.Idle)
+        /* Pas de déplacement si à l'arrêt ou pas en train de sortir */
+        if (!this.outFromHome && this.alternativeMode != Modes.OutFromHome)
             return this;
+        /* Le mode, l'alertnatif prendra le dessus */
+        var mode = this.alternativeMode || this.mode;
         /* Si dans une case */
         if (this.coordinates.x % Tile.TILE_WIDTH == 0 && this.coordinates.y % Tile.TILE_WIDTH == 0) {
-            switch (this.mode) {
+            switch (mode) {
                 /* Dans le coin attribué */
                 case Modes.Scatter:
                     this.direction = this.findBestPath(this.cornerCoordinates);
@@ -531,6 +538,9 @@ class Ghost {
                         window.dispatchEvent(event);
                         /* Vitesse normale */
                         this.stepPx = Ghost.NORMAL;
+                        /* Sorti */
+                        this.outFromHome = true;
+                        this.alternativeMode = null;
                     }
                     else {
                         if (coords.x == 6)
@@ -579,37 +589,27 @@ class Ghost {
      * @returns {Ghost}
      */
     getOutFromHome() {
-        this.mode = Modes.OutFromHome;
+        this.alternativeMode = Modes.OutFromHome;
         this.stepPx = Ghost.OUT_FROM_HOME;
         return this;
-    }
-    /**
-     * Renvoie la direction pour
-     *
-     * @returns {number}
-     */
-    getDirection() {
-        return this.direction;
     }
     /**
      * Modifie le mode
      *
      * @param mode
-     * @param force Si le mode doit être changé de force (pour quitter le mode iddle)
+     *
      * @returns {Ghost}
      */
-    changeMode(mode, force = false) {
-        /* S'il était apeuré */
-        var wasFrightened = this.mode == Modes.Frightened;
+    changeMode(mode) {
+        /* Changement */
+        this.mode = mode;
         /* S'il vient de sortir de la maison */
-        if (this.mode == Modes.OutFromHome && mode == Modes.Scatter)
+        if (this.alternativeMode == Modes.OutFromHome && mode == Modes.Scatter)
             this.direction = Directions.Right;
-        else if (this.mode == Modes.OutFromHome && mode == Modes.Chase)
+        else if (this.alternativeMode == Modes.OutFromHome && mode == Modes.Chase)
             this.direction = Directions.Left;
-        if (this.mode != Modes.Idle || force)
-            this.mode = mode;
-        /* Si scatter, changement de direction (et si pas frightened juste avant) */
-        if (!wasFrightened && this.mode == Modes.Scatter) {
+        /* Si scatter, changement de direction */
+        if (this.mode == Modes.Scatter) {
             switch (this.direction) {
                 case Directions.Left:
                     this.direction = Directions.Right;
@@ -626,9 +626,29 @@ class Ghost {
                     break;
             }
         }
-        else if (this.mode == Modes.Frightened)
-            this.stepPx = Ghost.FRIGHTENED;
-        else if (wasFrightened && this.mode != Modes.Frightened) {
+        return this;
+    }
+    /**
+     * Changement du mode alternatif
+     *
+     * @param mode
+     *
+     * @returns {Ghost}
+     */
+    changeAlternativeMode(mode) {
+        /* Que si pas dans un mode alternatif */
+        if (this.alternativeMode == null) {
+            /* Si le mode alternatif est frightened, il faut qu'il soit sorti */
+            if (mode == Modes.Frightened && this.outFromHome || mode != Modes.Frightened) {
+                this.alternativeMode = mode;
+                /* Si frightened, réduction de la vitesse */
+                if (mode == Modes.Frightened)
+                    this.stepPx = Ghost.FRIGHTENED;
+            }
+        }
+        else if (this.alternativeMode == Modes.Frightened) {
+            this.alternativeMode = mode;
+            /* Vitesse normale */
             this.stepPx = Ghost.NORMAL;
             /* Vérification de l'intégrité des données (pas de pixels impairs) */
             this.checkCoordsIntegrity();
@@ -920,6 +940,7 @@ class GhostsManager {
         window.addEventListener('OutFromHome', this.ghostGotOut.bind(this), false);
         window.addEventListener('InkyCanGo', this.inkyCanGo.bind(this), false);
         window.addEventListener('ClydeCanGo', this.clydeCanGo.bind(this), false);
+        this.frightenedTime = null;
         return this;
     }
     /**
@@ -928,8 +949,8 @@ class GhostsManager {
      */
     start() {
         this.time = +new Date();
-        /* Blinky doit bouger directement */
-        this.blinky.changeMode(this.mode, true);
+        /* Changement du mode */
+        this.changeMode(this.mode);
         /* Pinky doit sortir immédiatement */
         this.pinky.getOutFromHome();
         return this;
@@ -942,8 +963,10 @@ class GhostsManager {
      * @returns {GhostsManager}
      */
     moveGhosts(pacmanCenter) {
+        /* Gestion du mode frightened */
+        var mode = this.frightenedTime != null ? Modes.Frightened : this.mode;
         /* Vérification du chrono */
-        switch (this.mode) {
+        switch (mode) {
             case Modes.Chase:
                 /* Si intervalle atteint et 4e vague pas dépassée */
                 if (+new Date() - this.time > this.chaseInterval && this.waveNumber < 4) {
@@ -968,8 +991,9 @@ class GhostsManager {
                 if (+new Date() - this.frightenedTime > this.frightenedInterval) {
                     /* Comme si on avait stoppé le timer précédent */
                     this.time += this.frightenedInterval;
-                    /* Remise du mode */
-                    this.changeMode(this.previousMode);
+                    this.frightenedTime = null;
+                    /* Suppression du mode alternatif */
+                    this.changeAlternativeMode(null);
                 }
                 break;
         }
@@ -1007,6 +1031,21 @@ class GhostsManager {
         this.blinky.changeMode(this.mode);
         this.inky.changeMode(this.mode);
         this.clyde.changeMode(this.mode);
+        return this;
+    }
+    /**
+     * Change le mode alternatif
+     *
+     * @param mode
+     *
+     * @returns {GhostsManager}
+     */
+    changeAlternativeMode(mode) {
+        /* Changement pour les fantômes */
+        this.pinky.changeAlternativeMode(mode);
+        this.blinky.changeAlternativeMode(mode);
+        this.inky.changeAlternativeMode(mode);
+        this.clyde.changeAlternativeMode(mode);
         return this;
     }
     /**
@@ -1079,10 +1118,9 @@ class GhostsManager {
      */
     goToFrightenedMode() {
         /* Pour remettre le mode à la fin */
-        this.previousMode = this.mode;
         this.frightenedTime = +new Date();
         /* Changement */
-        this.changeMode(Modes.Frightened);
+        this.changeAlternativeMode(Modes.Frightened);
         return this;
     }
 }
@@ -1757,6 +1795,28 @@ class LevelManager {
     }
 }
 /**
+ * Created by thiron on 03/07/2015.
+ */
+window.addEventListener("load", init, false);
+/**
+ * Chargement de la fenêtre, initialisation
+ */
+function init() {
+    var jeu = new Jeu();
+    jeu.init();
+}
+/* RequestAnimationFrame */
+var requestAnimFrame = (function () {
+    return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+        function (callback) {
+            window.setTimeout(callback, 1000 / 60, new Date().getTime());
+        };
+})();
+/**
  * Created by thiron on 01/03/2017.
  */
 /**
@@ -2362,25 +2422,3 @@ class TileFunctions {
         };
     }
 }
-/**
- * Created by thiron on 03/07/2015.
- */
-window.addEventListener("load", init, false);
-/**
- * Chargement de la fenêtre, initialisation
- */
-function init() {
-    var jeu = new Jeu();
-    jeu.init();
-}
-/* RequestAnimationFrame */
-var requestAnimFrame = (function () {
-    return window.requestAnimationFrame ||
-        window.webkitRequestAnimationFrame ||
-        window.mozRequestAnimationFrame ||
-        window.oRequestAnimationFrame ||
-        window.msRequestAnimationFrame ||
-        function (callback) {
-            window.setTimeout(callback, 1000 / 60, new Date().getTime());
-        };
-})();
