@@ -83,6 +83,7 @@ abstract class Ghost
     this.direction = null;
     this.outFromHome = false;
     this.isFlashing = false;
+    this.stepPx = Ghost.NORMAL;
 
     /* Pour que blinky aille à gauche obligatoirement */
     if (this instanceof Blinky)
@@ -618,6 +619,42 @@ abstract class Ghost
   public getCanvas(): Canvas
   {
     return this.canvas;
+  }
+
+  /**
+   * @returns {HTMLCanvasElement}
+   */
+  public getCanvasElem(): HTMLCanvasElement
+  {
+    return this.canvas.getElement();
+  }
+
+  /**
+   * Ralenti le fantome
+   *
+   * @returns {Ghost}
+   */
+  public slow(): Ghost
+  {
+    /* Il ralenti que s'il rentre pas */
+    if (this.alternativeMode != Modes.GoingHome)
+      this.stepPx = Ghost.FRIGHTENED;
+
+    return this;
+  }
+
+  /**
+   * Accélère le fantome
+   *
+   * @returns {Ghost}
+   */
+  public speedUp(): Ghost
+  {
+    /* Il accélère que s'il est pas apeuré et qu'il rentre pas */
+    if (this.alternativeMode != Modes.Frightened && this.alternativeMode != Modes.GoingHome)
+      this.stepPx = Ghost.NORMAL;
+
+    return this;
   }
 
   /**

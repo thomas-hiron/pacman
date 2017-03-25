@@ -11,7 +11,8 @@ class Tunnel
    */
   public static checkEntry(object, context, margin): Tunnel
   {
-    var canvas: HTMLCanvasElement = object instanceof Pacman ? object.getCanvasElem() : object.canvas.getElement();
+    var isGhost: boolean = object instanceof Ghost;
+    var canvas: HTMLCanvasElement = object.getCanvasElem();
     var coords: Point = object.getCoordinates();
 
     /* Gestion du tunnel à droite */
@@ -21,13 +22,22 @@ class Tunnel
       context.clearRect(x, coords.y + margin + Jeu.TOP_HEIGHT, Pacman.SIZE.w + margin + 2, Tile.TILE_WIDTH - margin * 2);
       context.drawImage(canvas, x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
 
-      /* Terminé */
       object.setX(x);
-      if (x > -10)
+
+      if (x > -10 && !isGhost)
       {
         /* Point mangé */
         var event: CustomEvent = new CustomEvent('PacDotEaten', {detail: {x: 0, y: 10}});
         Jeu.ELEMENT.dispatchEvent(event);
+      }
+
+      /* Ralentissement si fantome */
+      if (isGhost)
+      {
+        if (x == 0)
+          object.speedUp();
+        else
+          object.slow();
       }
     }
     /* A gauche */
@@ -40,10 +50,19 @@ class Tunnel
       object.setX(x);
 
       /* Point mangé */
-      if (x > 14 * Tile.TILE_WIDTH + 10)
+      if (x > 14 * Tile.TILE_WIDTH + 10 && !isGhost)
       {
         var event: CustomEvent = new CustomEvent('PacDotEaten', {detail: {x: 14, y: 10}});
         Jeu.ELEMENT.dispatchEvent(event);
+      }
+
+      /* Accélération si fantome */
+      if (isGhost)
+      {
+        if (x == 14 * Tile.TILE_WIDTH)
+          object.speedUp();
+        else
+          object.slow();
       }
     }
 

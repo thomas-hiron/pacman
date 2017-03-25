@@ -320,6 +320,7 @@ class Ghost {
         this.direction = null;
         this.outFromHome = false;
         this.isFlashing = false;
+        this.stepPx = Ghost.NORMAL;
         /* Pour que blinky aille à gauche obligatoirement */
         if (this instanceof Blinky) {
             this.direction = Directions.Right;
@@ -737,6 +738,34 @@ class Ghost {
      */
     getCanvas() {
         return this.canvas;
+    }
+    /**
+     * @returns {HTMLCanvasElement}
+     */
+    getCanvasElem() {
+        return this.canvas.getElement();
+    }
+    /**
+     * Ralenti le fantome
+     *
+     * @returns {Ghost}
+     */
+    slow() {
+        /* Il ralenti que s'il rentre pas */
+        if (this.alternativeMode != Modes.GoingHome)
+            this.stepPx = Ghost.FRIGHTENED;
+        return this;
+    }
+    /**
+     * Accélère le fantome
+     *
+     * @returns {Ghost}
+     */
+    speedUp() {
+        /* Il accélère que s'il est pas apeuré et qu'il rentre pas */
+        if (this.alternativeMode != Modes.Frightened && this.alternativeMode != Modes.GoingHome)
+            this.stepPx = Ghost.NORMAL;
+        return this;
     }
     /**
      * Vérifie que pacman est mangé ou a été mangé
@@ -2638,19 +2667,26 @@ class Tunnel {
      * @returns {Tunnel}
      */
     static checkEntry(object, context, margin) {
-        var canvas = object instanceof Pacman ? object.getCanvasElem() : object.canvas.getElement();
+        var isGhost = object instanceof Ghost;
+        var canvas = object.getCanvasElem();
         var coords = object.getCoordinates();
         /* Gestion du tunnel à droite */
         if (coords.x >= 14 * Tile.TILE_WIDTH && coords.y == 10 * Tile.TILE_WIDTH) {
             var x = coords.x - context.canvas.width;
             context.clearRect(x, coords.y + margin + Jeu.TOP_HEIGHT, Pacman.SIZE.w + margin + 2, Tile.TILE_WIDTH - margin * 2);
             context.drawImage(canvas, x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
-            /* Terminé */
             object.setX(x);
-            if (x > -10) {
+            if (x > -10 && !isGhost) {
                 /* Point mangé */
                 var event = new CustomEvent('PacDotEaten', { detail: { x: 0, y: 10 } });
                 Jeu.ELEMENT.dispatchEvent(event);
+            }
+            /* Ralentissement si fantome */
+            if (isGhost) {
+                if (x == 0)
+                    object.speedUp();
+                else
+                    object.slow();
             }
         }
         else if (coords.x <= 0 && coords.y == 10 * Tile.TILE_WIDTH) {
@@ -2659,9 +2695,16 @@ class Tunnel {
             context.drawImage(canvas, x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
             object.setX(x);
             /* Point mangé */
-            if (x > 14 * Tile.TILE_WIDTH + 10) {
+            if (x > 14 * Tile.TILE_WIDTH + 10 && !isGhost) {
                 var event = new CustomEvent('PacDotEaten', { detail: { x: 14, y: 10 } });
                 Jeu.ELEMENT.dispatchEvent(event);
+            }
+            /* Accélération si fantome */
+            if (isGhost) {
+                if (x == 14 * Tile.TILE_WIDTH)
+                    object.speedUp();
+                else
+                    object.slow();
             }
         }
         return this;
