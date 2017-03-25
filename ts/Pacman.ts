@@ -63,19 +63,11 @@ class Pacman
   }
 
   /**
-   * @returns {number}
+   * @returns {Point}
    */
-  public getX(): number
+  public getCoordinates(): Point
   {
-    return this.coordinates.x;
-  }
-
-  /**
-   * @returns {number}
-   */
-  public getY(): number
-  {
-    return this.coordinates.y;
+    return this.coordinates;
   }
 
   /**

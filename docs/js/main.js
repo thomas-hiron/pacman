@@ -1398,15 +1398,16 @@ class Jeu {
      */
     clearAll() {
         var context = this.canvas.getContext();
-        var mPacman = (Tile.TILE_WIDTH - Ghost.SIZE.w) / 2;
-        var mGhost = (Tile.TILE_WIDTH - Ghost.SIZE.w) / 2;
+        var pacman = (Tile.TILE_WIDTH - Ghost.SIZE.w) / 2;
+        var ghost = (Tile.TILE_WIDTH - Ghost.SIZE.w) / 2;
+        var coords = this.pacman.getCoordinates();
         /* Suppression de pacman */
-        context.clearRect(this.pacman.getX() + mPacman, this.pacman.getY() + mPacman + Jeu.TOP_HEIGHT, Pacman.SIZE.w, Pacman.SIZE.h);
+        context.clearRect(coords.x + pacman, coords.y + pacman + Jeu.TOP_HEIGHT, Pacman.SIZE.w, Pacman.SIZE.h);
         /* Suppression des fantômes */
         var coordsAndCanvas = this.ghostsManager.getGhostsCoordsAndCanvas();
         for (var i = 0, l = coordsAndCanvas.length; i < l; ++i) {
             var obj = coordsAndCanvas[i];
-            context.clearRect(obj.coords.x + mGhost, obj.coords.y + mGhost + Jeu.TOP_HEIGHT, Ghost.SIZE.w, Ghost.SIZE.h);
+            context.clearRect(obj.coords.x + ghost, obj.coords.y + ghost + Jeu.TOP_HEIGHT, Ghost.SIZE.w, Ghost.SIZE.h);
             /* Suppression de la case derrière */
             this.drawCurrentPacDot(TileFunctions.getTileCoordinates({
                 x: obj.coords.x + Tile.TILE_WIDTH / 2,
@@ -1424,6 +1425,7 @@ class Jeu {
      */
     animatePacman() {
         var pacman = this.pacman;
+        var coords = pacman.getCoordinates();
         /* Pour centrer dans la case */
         var margin = (Tile.TILE_WIDTH - Pacman.SIZE.w) / 2;
         var context = this.canvas.getContext();
@@ -1438,7 +1440,7 @@ class Jeu {
         else
             this.pacman.die();
         /* Dessin dans le canvas principal */
-        context.drawImage(pacman.getCanvasElem(), pacman.getX() + margin, pacman.getY() + margin + Jeu.TOP_HEIGHT);
+        context.drawImage(pacman.getCanvasElem(), coords.x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
         return this;
     }
     /**
@@ -1450,10 +1452,11 @@ class Jeu {
         var context = this.canvas.getContext();
         var margin = (Tile.TILE_WIDTH - Ghost.SIZE.w) / 2;
         var coordsAndCanvas = this.ghostsManager.getGhostsCoordsAndCanvas();
+        var coords = this.pacman.getCoordinates();
         /* Déplacement des fantômes en passant le centre de pacman en paramètre */
         this.ghostsManager.moveGhosts({
-            x: this.pacman.getX() + Tile.TILE_WIDTH / 2,
-            y: this.pacman.getY() + Tile.TILE_WIDTH / 2,
+            x: coords.x + Tile.TILE_WIDTH / 2,
+            y: coords.y + Tile.TILE_WIDTH / 2,
             direction: this.pacman.getDirection()
         });
         /* Anime les fantômes */
@@ -1877,16 +1880,10 @@ class Pacman {
         return this;
     }
     /**
-     * @returns {number}
+     * @returns {Point}
      */
-    getX() {
-        return this.coordinates.x;
-    }
-    /**
-     * @returns {number}
-     */
-    getY() {
-        return this.coordinates.y;
+    getCoordinates() {
+        return this.coordinates;
     }
     /**
      * Renvoie le canvas de pacman pour pouvoir être dessiné dans le jeu

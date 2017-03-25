@@ -184,18 +184,19 @@ class Jeu
   private clearAll(): Jeu
   {
     var context: CanvasRenderingContext2D = this.canvas.getContext();
-    var mPacman: number = (Tile.TILE_WIDTH - Ghost.SIZE.w) / 2;
-    var mGhost: number = (Tile.TILE_WIDTH - Ghost.SIZE.w) / 2;
+    var pacman: number = (Tile.TILE_WIDTH - Ghost.SIZE.w) / 2;
+    var ghost: number = (Tile.TILE_WIDTH - Ghost.SIZE.w) / 2;
+    var coords: Point = this.pacman.getCoordinates();
 
     /* Suppression de pacman */
-    context.clearRect(this.pacman.getX() + mPacman, this.pacman.getY() + mPacman + Jeu.TOP_HEIGHT, Pacman.SIZE.w, Pacman.SIZE.h);
+    context.clearRect(coords.x + pacman, coords.y + pacman + Jeu.TOP_HEIGHT, Pacman.SIZE.w, Pacman.SIZE.h);
 
     /* Suppression des fantômes */
     var coordsAndCanvas: Array<CanvasAndCoords> = this.ghostsManager.getGhostsCoordsAndCanvas();
     for (var i = 0, l = coordsAndCanvas.length ; i < l ; ++i)
     {
       var obj: CanvasAndCoords = coordsAndCanvas[i];
-      context.clearRect(obj.coords.x + mGhost, obj.coords.y + mGhost + Jeu.TOP_HEIGHT, Ghost.SIZE.w, Ghost.SIZE.h);
+      context.clearRect(obj.coords.x + ghost, obj.coords.y + ghost + Jeu.TOP_HEIGHT, Ghost.SIZE.w, Ghost.SIZE.h);
 
       /* Suppression de la case derrière */
       this.drawCurrentPacDot(TileFunctions.getTileCoordinates({
@@ -218,6 +219,7 @@ class Jeu
   private animatePacman(): Jeu
   {
     var pacman: Pacman = this.pacman;
+    var coords: Point = pacman.getCoordinates();
     /* Pour centrer dans la case */
     var margin: number = (Tile.TILE_WIDTH - Pacman.SIZE.w) / 2;
     var context = this.canvas.getContext();
@@ -238,7 +240,7 @@ class Jeu
       this.pacman.die();
 
     /* Dessin dans le canvas principal */
-    context.drawImage(pacman.getCanvasElem(), pacman.getX() + margin, pacman.getY() + margin + Jeu.TOP_HEIGHT);
+    context.drawImage(pacman.getCanvasElem(), coords.x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
 
     return this;
   }
@@ -253,11 +255,12 @@ class Jeu
     var context: CanvasRenderingContext2D = this.canvas.getContext();
     var margin: number = (Tile.TILE_WIDTH - Ghost.SIZE.w) / 2;
     var coordsAndCanvas: Array<CanvasAndCoords> = this.ghostsManager.getGhostsCoordsAndCanvas();
+    var coords = this.pacman.getCoordinates();
 
     /* Déplacement des fantômes en passant le centre de pacman en paramètre */
     this.ghostsManager.moveGhosts({
-      x: this.pacman.getX() + Tile.TILE_WIDTH / 2,
-      y: this.pacman.getY() + Tile.TILE_WIDTH / 2,
+      x: coords.x + Tile.TILE_WIDTH / 2,
+      y: coords.y + Tile.TILE_WIDTH / 2,
       direction: this.pacman.getDirection()
     });
 
