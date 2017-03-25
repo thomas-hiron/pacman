@@ -18,7 +18,7 @@ class FruitsManager
    * Démarrage
    * @returns {FruitsManager}
    */
-  public start(): FruitsManager
+  public init(): FruitsManager
   {
     this.hasFruit = false;
     this.frames = 0;
@@ -37,7 +37,6 @@ class FruitsManager
 
     /* Gestion des secondes */
     var date: number = +new Date();
-
 
     /* Un nouveau fruit au bout de 30 secondes */
     if (!this.hasFruit && this.frames > FruitsManager.APPEARANCE_INTEVERVAL)
@@ -106,7 +105,7 @@ class FruitsManager
   private removeFruit(): FruitsManager
   {
     /* Démarrage */
-    this.start();
+    this.init();
 
     /* Dispatch event */
     var event: CustomEvent = new CustomEvent('RemoveFruit');

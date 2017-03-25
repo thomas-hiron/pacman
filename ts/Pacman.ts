@@ -103,16 +103,6 @@ class Pacman
    */
   public constructor()
   {
-    this.coordinates = {
-      x: 7 * Tile.TILE_WIDTH,
-      y: 10 * Tile.TILE_WIDTH
-    };
-
-    this.currentStep = 0;
-    this.stepNumber = 12;
-    this.stepPx = 2;
-    this.angle = 0;
-
     /* Ajout de l'event des flèches */
     window.addEventListener("keydown", this.rotate.bind(this), false);
   }
@@ -124,6 +114,16 @@ class Pacman
    */
   public init(): Pacman
   {
+    this.coordinates = {
+      x: 7 * Tile.TILE_WIDTH,
+      y: 10 * Tile.TILE_WIDTH
+    };
+
+    this.currentStep = 0;
+    this.stepNumber = 12;
+    this.stepPx = 2;
+    this.angle = 0;
+
     /* Création du canvas */
     this.canvas = new Canvas();
 

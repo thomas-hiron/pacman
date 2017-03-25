@@ -11,16 +11,21 @@ class Level
 {
   private tiles: Array<Array<Tile>>;
 
-  constructor()
+  /**
+   * Init
+   *
+   * @returns {Level}
+   */
+  public init(): Level
   {
     /* Les blocs avec cases */
     this.tiles = new Array(20);
 
-    for (var i: number = 0, l: number = this.tiles.length; i < l; ++i)
+    for (var i: number = 0, l: number = this.tiles.length ; i < l ; ++i)
     {
       this.tiles[i] = new Array(15);
 
-      for (var j = 0, k = this.tiles[i].length; j < k; ++j)
+      for (var j = 0, k = this.tiles[i].length ; j < k ; ++j)
       {
         this.tiles[i][j] = new Tile();
         this.tiles[i][j].setCoordinates(j, i);
@@ -53,13 +58,13 @@ class Level
     wallsCoordinates.push([9, 8]);
 
     /* Déclaration de tous les murs */
-    for (i = 0, l = wallsCoordinates.length; i < l; ++i)
+    for (i = 0, l = wallsCoordinates.length ; i < l ; ++i)
       this.tiles[wallsCoordinates[i][0]][wallsCoordinates[i][1]].isAWall(true);
 
     /* Sinon on met un point */
-    for (i = 0, l = this.tiles.length; i < l; ++i)
+    for (i = 0, l = this.tiles.length ; i < l ; ++i)
     {
-      for (j = 0, k = this.tiles[i].length; j < k; ++j)
+      for (j = 0, k = this.tiles[i].length ; j < k ; ++j)
       {
         /* Ajout du point */
         if (!this.tiles[i][j].isAWall())
@@ -75,6 +80,8 @@ class Level
 
     /* Suppression de la case où y'a pacman */
     this.tiles[Pacman.BASE_Y][Pacman.BASE_X].setPacDot(null);
+
+    return this;
   }
 
   /**

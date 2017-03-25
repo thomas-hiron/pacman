@@ -7,7 +7,19 @@
  */
 class Score
 {
-  private score: number = 0;
+  private score: number;
+
+  /**
+   * Init
+   *
+   * @returns {Score}
+   */
+  public init(): Score
+  {
+    this.score = 0;
+
+    return this;
+  }
 
   /**
    * @returns {string}

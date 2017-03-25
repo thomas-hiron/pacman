@@ -36,9 +36,6 @@ class GhostsManager
     this.chaseInterval = 20 * 60;
     this.scatterInterval = 7 * 60;
     this.frightenedInterval = 7 * 60;
-    this.waveNumber = 1;
-    this.mode = Modes.Scatter;
-    this.areFrightened = false;
 
     /* Instanciation des fantômes */
     this.pinky = new Pinky();
@@ -75,21 +72,16 @@ class GhostsManager
    */
   public init(): GhostsManager
   {
+    this.waveNumber = 1;
+    this.mode = Modes.Scatter;
+    this.areFrightened = false;
+
     /* Initialisation des fantômes et des canvas */
     this.pinky.init();
     this.blinky.init();
     this.inky.init();
     this.clyde.init();
 
-    return this;
-  }
-
-  /**
-   * Démarrage du chrono
-   * @returns {GhostsManager}
-   */
-  public start(): GhostsManager
-  {
     this.frames = 0;
     this.frightenedFrames = 0;
     this.numberEaten = 0;

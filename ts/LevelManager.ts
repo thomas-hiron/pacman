@@ -23,6 +23,18 @@ class LevelManager
   }
 
   /**
+   * Init
+   *
+   * @returns {LevelManager}
+   */
+  public init(): LevelManager
+  {
+    this.level.init();
+
+    return this;
+  }
+
+  /**
    * Dessine le niveau dans le canvas
    *
    * @param canvas

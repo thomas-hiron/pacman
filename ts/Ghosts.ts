@@ -25,6 +25,7 @@ abstract class Ghost
   protected alternativeMode: number;
   /* Les coordonnées du fantôme */
   protected coordinates: Point;
+  protected startCoordinates: Point;
   /* Les coordonées des coins respectifs */
   protected cornerCoordinates: Point;
   /* La couleur du fantôme */
@@ -70,6 +71,9 @@ abstract class Ghost
   {
     this.canvas = new Canvas();
     this.canvas.setSize(Ghost.SIZE.w, Ghost.SIZE.h);
+
+    /* Clone pour réinitialiser les params */
+    this.coordinates = JSON.parse(JSON.stringify(this.startCoordinates));
 
     /* Dessin */
     this.draw();
@@ -661,9 +665,8 @@ class Pinky extends Ghost
   constructor()
   {
     super();
-
     this.mode = null;
-    this.coordinates = {
+    this.startCoordinates = {
       x: 7 * Tile.TILE_WIDTH,
       y: 9 * Tile.TILE_WIDTH
     };
@@ -720,7 +723,7 @@ class Blinky extends Ghost
     super();
 
     this.mode = null;
-    this.coordinates = {
+    this.startCoordinates = {
       x: 7 * Tile.TILE_WIDTH,
       y: 8 * Tile.TILE_WIDTH
     };
@@ -757,7 +760,7 @@ class Inky extends Ghost
     super();
 
     this.mode = null;
-    this.coordinates = {
+    this.startCoordinates = {
       x: 6 * Tile.TILE_WIDTH,
       y: 9 * Tile.TILE_WIDTH
     };
@@ -839,7 +842,7 @@ class Clyde extends Ghost
     super();
 
     this.mode = null;
-    this.coordinates = {
+    this.startCoordinates = {
       x: 8 * Tile.TILE_WIDTH,
       y: 9 * Tile.TILE_WIDTH
     };

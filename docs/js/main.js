@@ -179,7 +179,7 @@ class FruitsManager {
      * Démarrage
      * @returns {FruitsManager}
      */
-    start() {
+    init() {
         this.hasFruit = false;
         this.frames = 0;
         return this;
@@ -240,7 +240,7 @@ class FruitsManager {
             fruit = new Cherry();
         /* Dispatch event pour que le jeu l'ajoute */
         var event = new CustomEvent('NewFruit', { 'detail': fruit });
-        window.dispatchEvent(event);
+        Jeu.ELEMENT.dispatchEvent(event);
         return this;
     }
     /**
@@ -250,10 +250,10 @@ class FruitsManager {
      */
     removeFruit() {
         /* Démarrage */
-        this.start();
+        this.init();
         /* Dispatch event */
         var event = new CustomEvent('RemoveFruit');
-        window.dispatchEvent(event);
+        Jeu.ELEMENT.dispatchEvent(event);
         return this;
     }
 }
@@ -311,6 +311,8 @@ class Ghost {
     init() {
         this.canvas = new Canvas();
         this.canvas.setSize(Ghost.SIZE.w, Ghost.SIZE.h);
+        /* Clone pour réinitialiser les params */
+        this.coordinates = JSON.parse(JSON.stringify(this.startCoordinates));
         /* Dessin */
         this.draw();
         /* Mode par défaut */
@@ -782,7 +784,7 @@ class Pinky extends Ghost {
     constructor() {
         super();
         this.mode = null;
-        this.coordinates = {
+        this.startCoordinates = {
             x: 7 * Tile.TILE_WIDTH,
             y: 9 * Tile.TILE_WIDTH
         };
@@ -830,7 +832,7 @@ class Blinky extends Ghost {
     constructor() {
         super();
         this.mode = null;
-        this.coordinates = {
+        this.startCoordinates = {
             x: 7 * Tile.TILE_WIDTH,
             y: 8 * Tile.TILE_WIDTH
         };
@@ -861,7 +863,7 @@ class Inky extends Ghost {
     constructor() {
         super();
         this.mode = null;
-        this.coordinates = {
+        this.startCoordinates = {
             x: 6 * Tile.TILE_WIDTH,
             y: 9 * Tile.TILE_WIDTH
         };
@@ -930,7 +932,7 @@ class Clyde extends Ghost {
     constructor() {
         super();
         this.mode = null;
-        this.coordinates = {
+        this.startCoordinates = {
             x: 8 * Tile.TILE_WIDTH,
             y: 9 * Tile.TILE_WIDTH
         };
@@ -973,9 +975,6 @@ class GhostsManager {
         this.chaseInterval = 20 * 60;
         this.scatterInterval = 7 * 60;
         this.frightenedInterval = 7 * 60;
-        this.waveNumber = 1;
-        this.mode = Modes.Scatter;
-        this.areFrightened = false;
         /* Instanciation des fantômes */
         this.pinky = new Pinky();
         this.blinky = new Blinky();
@@ -1005,18 +1004,14 @@ class GhostsManager {
      * @returns {GhostsManager}
      */
     init() {
+        this.waveNumber = 1;
+        this.mode = Modes.Scatter;
+        this.areFrightened = false;
         /* Initialisation des fantômes et des canvas */
         this.pinky.init();
         this.blinky.init();
         this.inky.init();
         this.clyde.init();
-        return this;
-    }
-    /**
-     * Démarrage du chrono
-     * @returns {GhostsManager}
-     */
-    start() {
         this.frames = 0;
         this.frightenedFrames = 0;
         this.numberEaten = 0;
@@ -1212,7 +1207,7 @@ class GhostsManager {
         this.numberEaten++;
         /* Information de jeu pour augmenter le score */
         var event = new CustomEvent('UpdateScoreAfterGhostEaten', { 'detail': this.numberEaten });
-        window.dispatchEvent(event);
+        Jeu.ELEMENT.dispatchEvent(event);
         return this;
     }
 }
@@ -1228,8 +1223,14 @@ GhostsManager.INKY_DOT_TO_GO = 30;
  * Gère le score
  */
 class Score {
-    constructor() {
+    /**
+     * Init
+     *
+     * @returns {Score}
+     */
+    init() {
         this.score = 0;
+        return this;
     }
     /**
      * @returns {string}
@@ -1307,18 +1308,22 @@ class Jeu {
         /* Nettoyage du canvas */
         this.canvas.clear();
         /* Les niveaux */
+        this.levelManager.init();
         this.levelManager.draw(this.canvas);
         /* Le ghosts manager */
         this.ghostsManager.setCollideFunction(this.checkCollision.bind(this));
         this.ghostsManager.init();
+        this.score.init();
         /* Dessin du haut */
         this.drawTop();
         /* Pacman */
         this.pacman.setCollideFunction(this.checkCollision.bind(this));
         this.pacman.init();
         this.pacmanEaten = false;
-        /* Démarrage du jeu */
-        this.start();
+        /* Récupération de toutes les power pellet pour les faire clignoter */
+        this.powerPelletTiles = this.levelManager.getPowerPellet();
+        /* Date de début pour le fruit manager */
+        this.fruitsManager.init();
         return this;
     }
     /**
@@ -1341,19 +1346,6 @@ class Jeu {
         Jeu.ELEMENT.addEventListener('PacmanDied', this.onPacmanDead.bind(this), false);
         /* Fantôme(s) mangé */
         Jeu.ELEMENT.addEventListener('UpdateScoreAfterGhostEaten', this.onGhostEaten.bind(this), false);
-        return this;
-    }
-    /**
-     * Démarre le jeu, appelé à chaque nouveau niveau
-     *
-     * @returns {Jeu}
-     */
-    start() {
-        /* Récupération de toutes les power pellet pour les faire clignoter */
-        this.powerPelletTiles = this.levelManager.getPowerPellet();
-        /* Date de début pour le fruit manager */
-        this.fruitsManager.start();
-        this.ghostsManager.start();
         return this;
     }
     /**
@@ -1622,7 +1614,7 @@ class Jeu {
         this.score.update(currentTile);
         /* Si c'est un fruit, on recommence le compteur */
         if (currentTile.getPacDot() instanceof Fruit)
-            this.fruitsManager.start();
+            this.fruitsManager.init();
         else if (currentTile.getPacDot() instanceof PowerPellet)
             this.ghostsManager.goToFrightenedMode();
         /* Suppression du point */
@@ -1868,14 +1860,6 @@ class Pacman {
      * Le constructeur qui initialise les variables
      */
     constructor() {
-        this.coordinates = {
-            x: 7 * Tile.TILE_WIDTH,
-            y: 10 * Tile.TILE_WIDTH
-        };
-        this.currentStep = 0;
-        this.stepNumber = 12;
-        this.stepPx = 2;
-        this.angle = 0;
         /* Ajout de l'event des flèches */
         window.addEventListener("keydown", this.rotate.bind(this), false);
     }
@@ -1922,6 +1906,14 @@ class Pacman {
      * @returns {Pacman}
      */
     init() {
+        this.coordinates = {
+            x: 7 * Tile.TILE_WIDTH,
+            y: 10 * Tile.TILE_WIDTH
+        };
+        this.currentStep = 0;
+        this.stepNumber = 12;
+        this.stepPx = 2;
+        this.angle = 0;
         /* Création du canvas */
         this.canvas = new Canvas();
         /* Initialisation de la taille du canvas */
@@ -2182,7 +2174,12 @@ Pacman.SIZE = {
  * Gère le design des niveaux
  */
 class Level {
-    constructor() {
+    /**
+     * Init
+     *
+     * @returns {Level}
+     */
+    init() {
         /* Les blocs avec cases */
         this.tiles = new Array(20);
         for (var i = 0, l = this.tiles.length; i < l; ++i) {
@@ -2233,6 +2230,7 @@ class Level {
         this.tiles[12][12].setPacDot(new PowerPellet());
         /* Suppression de la case où y'a pacman */
         this.tiles[Pacman.BASE_Y][Pacman.BASE_X].setPacDot(null);
+        return this;
     }
     /**
      * Retourne le tableau désiré
@@ -2255,6 +2253,15 @@ class LevelManager {
         this.pacDotNumber = 0;
         /* Listener food eaten */
         Jeu.ELEMENT.addEventListener('PacDotEaten', this.pacDotEaten.bind(this), false);
+    }
+    /**
+     * Init
+     *
+     * @returns {LevelManager}
+     */
+    init() {
+        this.level.init();
+        return this;
     }
     /**
      * Dessine le niveau dans le canvas

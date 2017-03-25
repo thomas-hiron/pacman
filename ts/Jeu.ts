@@ -59,11 +59,13 @@ class Jeu
     this.canvas.clear();
 
     /* Les niveaux */
+    this.levelManager.init();
     this.levelManager.draw(this.canvas);
 
     /* Le ghosts manager */
     this.ghostsManager.setCollideFunction(this.checkCollision.bind(this));
     this.ghostsManager.init();
+    this.score.init();
 
     /* Dessin du haut */
     this.drawTop();
@@ -73,8 +75,11 @@ class Jeu
     this.pacman.init();
     this.pacmanEaten = false;
 
-    /* Démarrage du jeu */
-    this.start();
+    /* Récupération de toutes les power pellet pour les faire clignoter */
+    this.powerPelletTiles = this.levelManager.getPowerPellet();
+
+    /* Date de début pour le fruit manager */
+    this.fruitsManager.init();
 
     return this;
   }
@@ -106,23 +111,6 @@ class Jeu
 
     /* Fantôme(s) mangé */
     Jeu.ELEMENT.addEventListener('UpdateScoreAfterGhostEaten', this.onGhostEaten.bind(this), false);
-
-    return this;
-  }
-
-  /**
-   * Démarre le jeu, appelé à chaque nouveau niveau
-   *
-   * @returns {Jeu}
-   */
-  private start(): Jeu
-  {
-    /* Récupération de toutes les power pellet pour les faire clignoter */
-    this.powerPelletTiles = this.levelManager.getPowerPellet();
-
-    /* Date de début pour le fruit manager */
-    this.fruitsManager.start();
-    this.ghostsManager.start();
 
     return this;
   }
@@ -488,7 +476,7 @@ class Jeu
 
     /* Si c'est un fruit, on recommence le compteur */
     if (currentTile.getPacDot() instanceof Fruit)
-      this.fruitsManager.start();
+      this.fruitsManager.init();
     /* Si power pellet, on informe le ghostManager */
     else if (currentTile.getPacDot() instanceof PowerPellet)
       this.ghostsManager.goToFrightenedMode();
