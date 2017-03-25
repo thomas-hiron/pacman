@@ -242,38 +242,8 @@ class Jeu
     /* Dessin dans le canvas principal */
     context.drawImage(pacman.getCanvasElem(), coords.x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
 
-    /* Gestion du tunnel à droite */
-    if (coords.x >= 14 * Tile.TILE_WIDTH && coords.y == 10 * Tile.TILE_WIDTH)
-    {
-      var x: number = coords.x - context.canvas.width;
-      context.clearRect(x, coords.y + margin + Jeu.TOP_HEIGHT, Pacman.SIZE.w + margin + 2, Tile.TILE_WIDTH - margin * 2);
-      context.drawImage(pacman.getCanvasElem(), x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
-
-      /* Terminé */
-      this.pacman.setX(x);
-      if (x > -10)
-      {
-        /* Point mangé */
-        var event: CustomEvent = new CustomEvent('PacDotEaten', {detail: {x: 0, y: 10}});
-        Jeu.ELEMENT.dispatchEvent(event);
-      }
-    }
-    /* A gauche */
-    else if (coords.x <= 0 && coords.y == 10 * Tile.TILE_WIDTH)
-    {
-      var x: number = coords.x + context.canvas.width;
-      context.clearRect(x + margin - 2, coords.y + margin + Jeu.TOP_HEIGHT, Pacman.SIZE.w + margin, Tile.TILE_WIDTH - margin * 2);
-      context.drawImage(pacman.getCanvasElem(), x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
-
-      this.pacman.setX(x);
-
-      /* Point mangé */
-      if (x > 14 * Tile.TILE_WIDTH + 10)
-      {
-        var event: CustomEvent = new CustomEvent('PacDotEaten', {detail: {x: 14, y: 10}});
-        Jeu.ELEMENT.dispatchEvent(event);
-      }
-    }
+    /* Gestion du tunnel */
+    Tunnel.checkEntry(coords, context, margin, pacman);
 
     return this;
   }
