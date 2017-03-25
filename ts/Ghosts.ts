@@ -553,15 +553,11 @@ abstract class Ghost
     switch (this.direction)
     {
       case Directions.Left:
-        this.coordinates.x += this.coordinates.x % modulo;
-        break;
       case Directions.Right:
       default:
         this.coordinates.x -= this.coordinates.x % modulo;
         break;
       case Directions.Up:
-        this.coordinates.y += this.coordinates.y % modulo;
-        break;
       case Directions.Down:
         this.coordinates.y -= this.coordinates.y % modulo;
         break;

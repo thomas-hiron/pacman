@@ -676,15 +676,11 @@ class Ghost {
         var modulo = this.alternativeMode == Modes.GoingHome ? Ghost.GOING_HOME : Ghost.NORMAL;
         switch (this.direction) {
             case Directions.Left:
-                this.coordinates.x += this.coordinates.x % modulo;
-                break;
             case Directions.Right:
             default:
                 this.coordinates.x -= this.coordinates.x % modulo;
                 break;
             case Directions.Up:
-                this.coordinates.y += this.coordinates.y % modulo;
-                break;
             case Directions.Down:
                 this.coordinates.y -= this.coordinates.y % modulo;
                 break;
@@ -991,7 +987,7 @@ class GhostsManager {
         /* Changement du mode */
         this.changeMode(this.mode);
         /* Pinky doit sortir immédiatement */
-        this.pinky.getOutFromHome();
+        // this.pinky.getOutFromHome();
         return this;
     }
     /**
@@ -1623,7 +1619,6 @@ class Jeu {
     onPacmanDead() {
         /* Suppression de tous les events */
         this.init();
-        console.log('dead');
         return this;
     }
 }
