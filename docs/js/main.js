@@ -180,8 +180,8 @@ class FruitsManager {
      * @returns {FruitsManager}
      */
     start() {
-        this.startTime = +new Date();
-        this.addTime = null;
+        this.hasFruit = false;
+        this.frames = 0;
         return this;
     }
     /**
@@ -190,10 +190,13 @@ class FruitsManager {
      * @returns {FruitsManager}
      */
     onRequestAnimFrame() {
+        this.frames++;
+        /* Gestion des secondes */
+        var date = +new Date();
         /* Un nouveau fruit au bout de 30 secondes */
-        if (this.startTime != null && +new Date() - this.startTime > FruitsManager.APPEARANCE_INTEVERVAL)
+        if (!this.hasFruit && this.frames > FruitsManager.APPEARANCE_INTEVERVAL)
             this.newFruit();
-        else if (this.addTime != null && +new Date() - this.addTime > FruitsManager.APPEARANCE_DURATION)
+        else if (this.hasFruit && this.frames > FruitsManager.APPEARANCE_DURATION)
             this.removeFruit();
         return this;
     }
@@ -203,10 +206,9 @@ class FruitsManager {
      * @returns {FruitsManager}
      */
     newFruit() {
-        /* Suppression du startTime */
-        this.startTime = null;
-        /* Ajout du addTime */
-        this.addTime = +new Date();
+        /* Redémarrage du compteur */
+        this.frames = 0;
+        this.hasFruit = true;
         /* Les proba de chaque fruit, en se basant à 1 seule chance pour la clé */
         var keyProbability = 1;
         var bellProbability = keyProbability + Key.SCORE_VALUE / Bell.SCORE_VALUE;
@@ -256,8 +258,8 @@ class FruitsManager {
     }
 }
 /* Chaque fois qu'un fruit apparait */
-FruitsManager.APPEARANCE_INTEVERVAL = 30000;
-FruitsManager.APPEARANCE_DURATION = 10000;
+FruitsManager.APPEARANCE_INTEVERVAL = 30 * 60;
+FruitsManager.APPEARANCE_DURATION = 10 * 60;
 /**
  * Created by thiron on 13/03/2017.
  */
@@ -950,11 +952,12 @@ class Clyde extends Ghost {
 class GhostsManager {
     constructor() {
         /* Initialisation des intervalles et autres */
-        this.chaseInterval = 20000;
-        this.scatterInterval = 7000;
-        this.frightenedInterval = 7000;
+        this.chaseInterval = 20 * 60;
+        this.scatterInterval = 7 * 60;
+        this.frightenedInterval = 7 * 60;
         this.waveNumber = 1;
-        this.mode = Modes.Chase;
+        this.mode = Modes.Scatter;
+        this.areFrightened = false;
         /* Instanciation des fantômes */
         this.pinky = new Pinky();
         this.blinky = new Blinky();
@@ -988,7 +991,6 @@ class GhostsManager {
         window.addEventListener('OutFromHome', this.ghostGotOut.bind(this), false);
         window.addEventListener('InkyCanGo', this.inkyCanGo.bind(this), false);
         window.addEventListener('ClydeCanGo', this.clydeCanGo.bind(this), false);
-        this.frightenedTime = null;
         return this;
     }
     /**
@@ -996,7 +998,8 @@ class GhostsManager {
      * @returns {GhostsManager}
      */
     start() {
-        this.time = +new Date();
+        this.frames = 0;
+        this.frightenedFrames = 0;
         /* Changement du mode */
         this.changeMode(this.mode);
         /* Pinky doit sortir immédiatement */
@@ -1011,13 +1014,17 @@ class GhostsManager {
      * @returns {GhostsManager}
      */
     moveGhosts(pacmanCenter) {
+        if (!this.areFrightened)
+            this.frames++;
+        else
+            this.frightenedFrames++;
         /* Gestion du mode frightened */
-        var mode = this.frightenedTime != null ? Modes.Frightened : this.mode;
+        var mode = this.frightenedFrames != 0 ? Modes.Frightened : this.mode;
         /* Vérification du chrono */
         switch (mode) {
             case Modes.Chase:
                 /* Si intervalle atteint et 4e vague pas dépassée */
-                if (+new Date() - this.time > this.chaseInterval && this.waveNumber < 4) {
+                if (this.frames > this.chaseInterval && this.waveNumber < 4) {
                     this.changeMode(Modes.Scatter);
                     /* Modification de la vague */
                     this.waveNumber++;
@@ -1025,21 +1032,20 @@ class GhostsManager {
                     if (this.waveNumber > 2)
                         this.scatterInterval = 5000;
                     /* Réinitialisation du chrono */
-                    this.time = +new Date();
+                    this.frames = 0;
                 }
                 break;
             case Modes.Scatter:
-                if (+new Date() - this.time > this.scatterInterval) {
+                if (this.frames > this.scatterInterval) {
                     this.changeMode(Modes.Chase);
                     /* Réinitialisation du chrono */
-                    this.time = +new Date();
+                    this.frames = 0;
                 }
                 break;
             case Modes.Frightened:
-                if (+new Date() - this.frightenedTime > this.frightenedInterval) {
+                if (this.frightenedFrames > this.frightenedInterval) {
                     /* Comme si on avait stoppé le timer précédent */
-                    this.time += this.frightenedInterval;
-                    this.frightenedTime = null;
+                    this.areFrightened = false;
                     /* Suppression du mode alternatif */
                     this.changeAlternativeMode(null);
                 }
@@ -1095,17 +1101,6 @@ class GhostsManager {
         this.inky.changeAlternativeMode(mode);
         this.clyde.changeAlternativeMode(mode);
         return this;
-    }
-    /**
-     * Renvoie les coordonnées des fantômes
-     *
-     * @returns {Array}
-     */
-    getGhostsCoords() {
-        return [{
-                x: 0,
-                y: 0
-            }];
     }
     /**
      * Retourne la position des fantômes et leur canvas pour les redissiner
@@ -1166,7 +1161,8 @@ class GhostsManager {
      */
     goToFrightenedMode() {
         /* Pour remettre le mode à la fin */
-        this.frightenedTime = +new Date();
+        this.frightenedFrames = 0;
+        this.areFrightened = true;
         /* Changement */
         this.changeAlternativeMode(Modes.Frightened);
         return this;
@@ -1189,9 +1185,11 @@ GhostsManager.INKY_DOT_TO_GO = 30;
  */
 class Jeu {
     constructor() {
-        this.time = +new Date();
+        this.frames = 0;
         /* Ajout des listeners */
         this.addListeners();
+        /* RequestAnimationFrame pour le pacman, les fantomes */
+        requestAnimFrame(this.draw.bind(this));
     }
     /**
      * Initialise le jeu
@@ -1263,8 +1261,6 @@ class Jeu {
         /* Date de début pour le fruit manager */
         this.fruitsManager.start();
         this.ghostsManager.start();
-        /* RequestAnimationFrame pour le pacman, les fantomes */
-        requestAnimFrame(this.draw.bind(this));
         return this;
     }
     /**
@@ -1275,7 +1271,7 @@ class Jeu {
     draw() {
         var interval = this.pacmanEaten ? Jeu.EATEN_INTERVAL : Jeu.INTERVAL;
         /* Si l'interval a été atteint */
-        if (+new Date() - this.time > interval) {
+        if (this.canvas != null && this.frames >= interval) {
             if (!this.pacmanEaten) {
                 /* Nettoyage des éléments pour pas avoir de carrés qui trainent */
                 this.clearAll();
@@ -1300,11 +1296,13 @@ class Jeu {
                 /* Animation de pacman */
                 this.animatePacman();
             }
-            /* Mise à jour du temps */
-            this.time = +new Date();
+            /* Redémarrage */
+            this.frames = 0;
         }
         /* Animation suivante */
         requestAnimFrame(this.draw.bind(this));
+        /* Incrémentation */
+        this.frames++;
         return this;
     }
     /**
@@ -1636,8 +1634,8 @@ class Jeu {
     }
 }
 /* Interval du request animation frame */
-Jeu.INTERVAL = 10;
-Jeu.EATEN_INTERVAL = 200;
+Jeu.INTERVAL = 1;
+Jeu.EATEN_INTERVAL = 10;
 /* Hauteur du panneau supérieur */
 Jeu.TOP_HEIGHT = 40;
 /**

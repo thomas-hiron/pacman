@@ -19,8 +19,9 @@ class GhostsManager
   private clyde: Clyde;
 
   /* Pour gérer l'intervalle */
-  private time: number;
-  private frightenedTime: number;
+  private frames: number;
+  private frightenedFrames: number;
+  private areFrightened: boolean;
 
   /* Gère le numéro de la vague */
   private waveNumber: number;
@@ -31,11 +32,12 @@ class GhostsManager
   constructor()
   {
     /* Initialisation des intervalles et autres */
-    this.chaseInterval = 20000;
-    this.scatterInterval = 7000;
-    this.frightenedInterval = 7000;
+    this.chaseInterval = 20 * 60;
+    this.scatterInterval = 7 * 60;
+    this.frightenedInterval = 7 * 60;
     this.waveNumber = 1;
     this.mode = Modes.Scatter;
+    this.areFrightened = false;
 
     /* Instanciation des fantômes */
     this.pinky = new Pinky();
@@ -77,8 +79,6 @@ class GhostsManager
     window.addEventListener('InkyCanGo', this.inkyCanGo.bind(this), false);
     window.addEventListener('ClydeCanGo', this.clydeCanGo.bind(this), false);
 
-    this.frightenedTime = null;
-
     return this;
   }
 
@@ -88,7 +88,8 @@ class GhostsManager
    */
   public start(): GhostsManager
   {
-    this.time = +new Date();
+    this.frames = 0;
+    this.frightenedFrames = 0;
 
     /* Changement du mode */
     this.changeMode(this.mode);
@@ -108,8 +109,13 @@ class GhostsManager
    */
   public moveGhosts(pacmanCenter: PointAndDirection): GhostsManager
   {
+    if (!this.areFrightened)
+      this.frames++;
+    else
+      this.frightenedFrames++;
+
     /* Gestion du mode frightened */
-    var mode: number = this.frightenedTime != null ? Modes.Frightened : this.mode;
+    var mode: number = this.frightenedFrames != 0 ? Modes.Frightened : this.mode;
 
     /* Vérification du chrono */
     switch (mode)
@@ -117,7 +123,7 @@ class GhostsManager
       case Modes.Chase:
 
         /* Si intervalle atteint et 4e vague pas dépassée */
-        if (+new Date() - this.time > this.chaseInterval && this.waveNumber < 4)
+        if (this.frames > this.chaseInterval && this.waveNumber < 4)
         {
           this.changeMode(Modes.Scatter);
 
@@ -129,30 +135,29 @@ class GhostsManager
             this.scatterInterval = 5000;
 
           /* Réinitialisation du chrono */
-          this.time = +new Date();
+          this.frames = 0;
         }
 
         break;
 
       case Modes.Scatter:
 
-        if (+new Date() - this.time > this.scatterInterval)
+        if (this.frames > this.scatterInterval)
         {
           this.changeMode(Modes.Chase);
 
           /* Réinitialisation du chrono */
-          this.time = +new Date();
+          this.frames = 0;
         }
 
         break;
 
       case Modes.Frightened:
 
-        if (+new Date() - this.frightenedTime > this.frightenedInterval)
+        if (this.frightenedFrames > this.frightenedInterval)
         {
           /* Comme si on avait stoppé le timer précédent */
-          this.time += this.frightenedInterval;
-          this.frightenedTime = null;
+          this.areFrightened = false;
 
           /* Suppression du mode alternatif */
           this.changeAlternativeMode(null);
@@ -222,19 +227,6 @@ class GhostsManager
     this.clyde.changeAlternativeMode(mode);
 
     return this;
-  }
-
-  /**
-   * Renvoie les coordonnées des fantômes
-   *
-   * @returns {Array}
-   */
-  public getGhostsCoords(): Array<Point>
-  {
-    return [{
-      x: 0,
-      y: 0
-    }];
   }
 
   /**
@@ -308,7 +300,8 @@ class GhostsManager
   public goToFrightenedMode(): GhostsManager
   {
     /* Pour remettre le mode à la fin */
-    this.frightenedTime = +new Date();
+    this.frightenedFrames = 0;
+    this.areFrightened = true;
 
     /* Changement */
     this.changeAlternativeMode(Modes.Frightened);
