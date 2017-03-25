@@ -348,6 +348,10 @@ class Jeu
     /* Fermeture du path */
     context.closePath();
 
+    /* Trous pour le tunnel */
+    context.clearRect(15 * Tile.TILE_WIDTH - 5, 11 * Tile.TILE_WIDTH + 2, Tile.TILE_WIDTH, Tile.TILE_WIDTH - 4);
+    context.clearRect(-1 * Tile.TILE_WIDTH + 5, 11 * Tile.TILE_WIDTH + 2, Tile.TILE_WIDTH, Tile.TILE_WIDTH - 4);
+
     /* Propriété des fonts */
     context.fillStyle = 'white';
     context.font = "16px Arial";
