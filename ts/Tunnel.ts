@@ -9,7 +9,7 @@ class Tunnel
    *
    * @returns {Tunnel}
    */
-  public static checkEntry(object, context, margin): Tunnel
+  public static checkEntry(object: any, context: CanvasRenderingContext2D, margin: number): Tunnel
   {
     var isGhost: boolean = object instanceof Ghost;
     var canvas: HTMLCanvasElement = object.getCanvasElem();

@@ -780,6 +780,10 @@ class Ghost {
             y: this.coordinates.y + Tile.TILE_WIDTH / 2
         };
         /* Mangé */
+        // if (
+        //   (Math.abs(pacmanCenter.x - center.x) < 10 || Math.abs(pacmanCenter.x - center.x) > 590) &&
+        //   Math.abs(pacmanCenter.y - center.y) < 10
+        // )
         if (Math.abs(pacmanCenter.x - center.x) < 10 && Math.abs(pacmanCenter.y - center.y) < 10) {
             /* Dispatch que s'il rentre pas */
             if (this.alternativeMode != Modes.GoingHome) {
