@@ -626,7 +626,7 @@ class Jeu
   {
     /* Suppression de tous les events */
     this.init();
-    console.log('dead');
+
     return this;
   }
 }
