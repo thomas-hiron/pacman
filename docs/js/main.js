@@ -925,7 +925,7 @@ class GhostsManager {
         this.scatterInterval = 7000;
         this.frightenedInterval = 7000;
         this.waveNumber = 1;
-        this.mode = Modes.Chase;
+        this.mode = Modes.Scatter;
         /* Instanciation des fantômes */
         this.pinky = new Pinky();
         this.blinky = new Blinky();
