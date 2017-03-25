@@ -1441,6 +1441,10 @@ class Jeu {
             this.pacman.die();
         /* Dessin dans le canvas principal */
         context.drawImage(pacman.getCanvasElem(), coords.x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
+        /* Gestion du tunnel */
+        if (coords.x >= 14 * Tile.TILE_WIDTH && coords.y == 10 * Tile.TILE_WIDTH) {
+            console.log('going to the tunnel');
+        }
         return this;
     }
     /**
@@ -1618,14 +1622,16 @@ class Jeu {
         var tiles = this.levelManager.getTiles();
         var currentTile = tiles[coords.y][coords.x];
         /* Augmentation du score */
-        this.score.update(currentTile);
-        /* Si c'est un fruit, on recommence le compteur */
-        if (currentTile.getPacDot() instanceof Fruit)
-            this.fruitsManager.init();
-        else if (currentTile.getPacDot() instanceof PowerPellet)
-            this.ghostsManager.goToFrightenedMode();
-        /* Suppression du point */
-        currentTile.setPacDot(null);
+        if (currentTile != void 0) {
+            this.score.update(currentTile);
+            /* Si c'est un fruit, on recommence le compteur */
+            if (currentTile.getPacDot() instanceof Fruit)
+                this.fruitsManager.init();
+            else if (currentTile.getPacDot() instanceof PowerPellet)
+                this.ghostsManager.goToFrightenedMode();
+            /* Suppression du point */
+            currentTile.setPacDot(null);
+        }
         return this;
     }
     /**
@@ -1995,6 +2001,11 @@ class Pacman {
             /* Vérification que pas de collision */
             collisionWithNextDirection = this.checkCollision(nextTileCoordsWithNextDirection.x, nextTileCoordsWithNextDirection.y);
             collisionWithCurrentDirection = this.checkCollision(nextTileCoordsWithCurrentDirection.x, nextTileCoordsWithCurrentDirection.y);
+            /* S'il va dans le tunnel */
+            if (this.direction == Directions.Right && nextTileCoordsWithCurrentDirection.x == 15 && nextTileCoordsWithCurrentDirection.y == 10)
+                collisionWithCurrentDirection = false;
+            if (this.direction == Directions.Left && nextTileCoordsWithCurrentDirection.x == -1 && nextTileCoordsWithCurrentDirection.y == 10)
+                collisionWithCurrentDirection = false;
             /* Changement de direction que si pas de collision avec la prochaine direction */
             if (!collisionWithNextDirection)
                 this.direction = this.nextDirection;
@@ -2392,7 +2403,7 @@ class LevelManager {
         var tiles = this.getTiles();
         var tile = tiles[coords.y][coords.x];
         /* Décrémentation s'il y a un point */
-        if (tile.hasPacDot() && !(tile.getPacDot() instanceof Fruit)) {
+        if (tile != void 0 && tile.hasPacDot() && !(tile.getPacDot() instanceof Fruit)) {
             this.pacDotNumber--;
             /* Si 30 points mangés, Inky sort */
             if (this.pacDotNumberTotal - this.pacDotNumber == GhostsManager.INKY_DOT_TO_GO) {

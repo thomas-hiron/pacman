@@ -242,6 +242,12 @@ class Jeu
     /* Dessin dans le canvas principal */
     context.drawImage(pacman.getCanvasElem(), coords.x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
 
+    /* Gestion du tunnel */
+    if (coords.x >= 14 * Tile.TILE_WIDTH && coords.y == 10 * Tile.TILE_WIDTH)
+    {
+      console.log('going to the tunnel');
+    }
+
     return this;
   }
 
@@ -479,17 +485,20 @@ class Jeu
     var currentTile: Tile = tiles[coords.y][coords.x];
 
     /* Augmentation du score */
-    this.score.update(currentTile);
+    if (currentTile != void 0)
+    {
+      this.score.update(currentTile);
 
-    /* Si c'est un fruit, on recommence le compteur */
-    if (currentTile.getPacDot() instanceof Fruit)
-      this.fruitsManager.init();
-    /* Si power pellet, on informe le ghostManager */
-    else if (currentTile.getPacDot() instanceof PowerPellet)
-      this.ghostsManager.goToFrightenedMode();
+      /* Si c'est un fruit, on recommence le compteur */
+      if (currentTile.getPacDot() instanceof Fruit)
+        this.fruitsManager.init();
+      /* Si power pellet, on informe le ghostManager */
+      else if (currentTile.getPacDot() instanceof PowerPellet)
+        this.ghostsManager.goToFrightenedMode();
 
-    /* Suppression du point */
-    currentTile.setPacDot(null);
+      /* Suppression du point */
+      currentTile.setPacDot(null);
+    }
 
     return this;
   }

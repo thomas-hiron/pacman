@@ -217,6 +217,12 @@ class Pacman
       collisionWithNextDirection = this.checkCollision(nextTileCoordsWithNextDirection.x, nextTileCoordsWithNextDirection.y);
       collisionWithCurrentDirection = this.checkCollision(nextTileCoordsWithCurrentDirection.x, nextTileCoordsWithCurrentDirection.y);
 
+      /* S'il va dans le tunnel */
+      if (this.direction == Directions.Right && nextTileCoordsWithCurrentDirection.x == 15 && nextTileCoordsWithCurrentDirection.y == 10)
+        collisionWithCurrentDirection = false;
+      if (this.direction == Directions.Left && nextTileCoordsWithCurrentDirection.x == -1 && nextTileCoordsWithCurrentDirection.y == 10)
+        collisionWithCurrentDirection = false;
+
       /* Changement de direction que si pas de collision avec la prochaine direction */
       if (!collisionWithNextDirection)
         this.direction = this.nextDirection;

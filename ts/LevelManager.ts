@@ -204,7 +204,7 @@ class LevelManager
     var tile: Tile = tiles[coords.y][coords.x];
 
     /* Décrémentation s'il y a un point */
-    if (tile.hasPacDot() && !(tile.getPacDot() instanceof Fruit))
+    if (tile != void 0 && tile.hasPacDot() && !(tile.getPacDot() instanceof Fruit))
     {
       this.pacDotNumber--;
 
