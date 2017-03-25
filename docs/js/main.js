@@ -317,6 +317,7 @@ class Ghost {
         this.alternativeMode = null;
         this.direction = null;
         this.outFromHome = false;
+        this.isFlashing = false;
         /* Pour que blinky aille à gauche obligatoirement */
         if (this instanceof Blinky) {
             this.direction = Directions.Right;
@@ -340,8 +341,15 @@ class Ghost {
             context.arc(Ghost.SIZE.w / 2, Ghost.SIZE.h / 2, Ghost.SIZE.w / 2, 0, 2 * Math.PI, false);
             /* Le corps */
             context.rect(0, Ghost.SIZE.h / 2, Ghost.SIZE.w, Ghost.SIZE.h / 2);
+            var color = this.alternativeMode == Modes.Frightened ? this.frightenedColor : this.color;
+            /* Si flash, couleur blanche */
+            if (this.isFlashing && this.alternativeMode == Modes.Frightened) {
+                var date = new Date();
+                var milliseconds = date.getMilliseconds();
+                color = milliseconds > 250 && milliseconds < 500 || milliseconds > 750 ? "#ffffff" : color;
+            }
             /* Remplissage */
-            context.fillStyle = this.alternativeMode == Modes.Frightened ? this.frightenedColor : this.color;
+            context.fillStyle = color;
             context.fill();
             context.closePath();
         }
@@ -674,8 +682,9 @@ class Ghost {
         }
         else if (this.alternativeMode == Modes.Frightened) {
             this.alternativeMode = mode;
-            /* Vitesse normale */
+            /* Vitesse normale et pas de flash */
             this.stepPx = Ghost.NORMAL;
+            this.isFlashing = false;
         }
         /* Vérification de l'intégrité des données (pas de pixels impairs) */
         this.checkCoordsIntegrity();
@@ -742,6 +751,15 @@ class Ghost {
             if (this.alternativeMode == Modes.Frightened)
                 this.changeAlternativeMode(Modes.GoingHome);
         }
+        return this;
+    }
+    /**
+     * Fait flasher
+     *
+     * @returns {Ghost}
+     */
+    flash() {
+        this.isFlashing = true;
         return this;
     }
 }
@@ -1052,6 +1070,8 @@ class GhostsManager {
                     /* Suppression du mode alternatif */
                     this.changeAlternativeMode(null);
                 }
+                else if (this.frightenedFrames > this.frightenedInterval - 2 * 60)
+                    this.flashGhosts();
                 break;
         }
         /* Déplacements */
@@ -1103,6 +1123,18 @@ class GhostsManager {
         this.blinky.changeAlternativeMode(mode);
         this.inky.changeAlternativeMode(mode);
         this.clyde.changeAlternativeMode(mode);
+        return this;
+    }
+    /**
+     * Fait flasher les fantômes
+     *
+     * @returns {GhostsManager}
+     */
+    flashGhosts() {
+        this.pinky.flash();
+        this.blinky.flash();
+        this.inky.flash();
+        this.clyde.flash();
         return this;
     }
     /**

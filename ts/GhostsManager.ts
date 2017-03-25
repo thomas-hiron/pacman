@@ -166,6 +166,9 @@ class GhostsManager
           /* Suppression du mode alternatif */
           this.changeAlternativeMode(null);
         }
+        /* S'il reste moins de 2 secondes */
+        else if (this.frightenedFrames > this.frightenedInterval - 2 * 60)
+          this.flashGhosts();
 
         break;
     }
@@ -229,6 +232,21 @@ class GhostsManager
     this.blinky.changeAlternativeMode(mode);
     this.inky.changeAlternativeMode(mode);
     this.clyde.changeAlternativeMode(mode);
+
+    return this;
+  }
+
+  /**
+   * Fait flasher les fantômes
+   *
+   * @returns {GhostsManager}
+   */
+  private flashGhosts(): GhostsManager
+  {
+    this.pinky.flash();
+    this.blinky.flash();
+    this.inky.flash();
+    this.clyde.flash();
 
     return this;
   }

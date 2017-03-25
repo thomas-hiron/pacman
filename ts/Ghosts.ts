@@ -40,6 +40,7 @@ abstract class Ghost
   /* L'étape courante d'animation */
   private stepNumber: number = 10;
   private currentStep: number = 0;
+  private isFlashing: boolean;
 
   /* La méthode de détection de collison */
   protected checkCollision: any;
@@ -77,6 +78,7 @@ abstract class Ghost
     this.alternativeMode = null;
     this.direction = null;
     this.outFromHome = false;
+    this.isFlashing = false;
 
     /* Pour que blinky aille à gauche obligatoirement */
     if (this instanceof Blinky)
@@ -109,8 +111,18 @@ abstract class Ghost
       /* Le corps */
       context.rect(0, Ghost.SIZE.h / 2, Ghost.SIZE.w, Ghost.SIZE.h / 2);
 
+      var color: string = this.alternativeMode == Modes.Frightened ? this.frightenedColor : this.color;
+
+      /* Si flash, couleur blanche */
+      if (this.isFlashing && this.alternativeMode == Modes.Frightened)
+      {
+        var date: Date = new Date();
+        var milliseconds: number = date.getMilliseconds();
+        color = milliseconds > 250 && milliseconds < 500 || milliseconds > 750 ? "#ffffff" : color;
+      }
+
       /* Remplissage */
-      context.fillStyle = this.alternativeMode == Modes.Frightened ? this.frightenedColor : this.color;
+      context.fillStyle = color;
       context.fill();
       context.closePath();
     }
@@ -535,8 +547,9 @@ abstract class Ghost
     else if (this.alternativeMode == Modes.Frightened)
     {
       this.alternativeMode = mode;
-      /* Vitesse normale */
+      /* Vitesse normale et pas de flash */
       this.stepPx = Ghost.NORMAL;
+      this.isFlashing = false;
     }
 
     /* Vérification de l'intégrité des données (pas de pixels impairs) */
@@ -620,6 +633,18 @@ abstract class Ghost
       if (this.alternativeMode == Modes.Frightened)
         this.changeAlternativeMode(Modes.GoingHome);
     }
+
+    return this;
+  }
+
+  /**
+   * Fait flasher
+   *
+   * @returns {Ghost}
+   */
+  public flash(): Ghost
+  {
+    this.isFlashing = true;
 
     return this;
   }
