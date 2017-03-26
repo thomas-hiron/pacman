@@ -261,7 +261,10 @@ class Pacman
         this.angle = 180;
         break;
       case Directions.Right:
-        percentInTile = this.coordinates.x % tileWidth * 100 / tileWidth;
+        /* Bigfix traversée du tunnel, simulation d'une case en plus */
+        percentInTile = this.coordinates.x < 0 ?
+                        (this.coordinates.x + Tile.TILE_WIDTH) % tileWidth * 100 / tileWidth :
+                        this.coordinates.x % tileWidth * 100 / tileWidth;
         newX += this.stepPx;
         this.angle = 0;
         break;

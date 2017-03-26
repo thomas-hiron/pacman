@@ -1043,7 +1043,7 @@ class GhostsManager {
      */
     init() {
         this.waveNumber = 1;
-        this.mode = Modes.Chase;
+        this.mode = Modes.Scatter;
         this.areFrightened = false;
         /* Initialisation des fantômes et des canvas */
         this.pinky.init();
@@ -2062,7 +2062,10 @@ class Pacman {
                 this.angle = 180;
                 break;
             case Directions.Right:
-                percentInTile = this.coordinates.x % tileWidth * 100 / tileWidth;
+                /* Bigfix traversée du tunnel, simulation d'une case en plus */
+                percentInTile = this.coordinates.x < 0 ?
+                    (this.coordinates.x + Tile.TILE_WIDTH) % tileWidth * 100 / tileWidth :
+                    this.coordinates.x % tileWidth * 100 / tileWidth;
                 newX += this.stepPx;
                 this.angle = 0;
                 break;
@@ -2685,12 +2688,8 @@ class Tunnel {
             /* Modification du x à la moitié du tunnel */
             if (toTheRight && x >= -Tile.TILE_WIDTH / 2 || toTheLeft && x <= 14 * Tile.TILE_WIDTH + Tile.TILE_WIDTH / 2)
                 object.setX(x);
-            if (!isGhost && (toTheRight && x > -10 || toTheLeft && x <= 14 * Tile.TILE_WIDTH + 10)) {
-                /* Point mangé */
-                var event = new CustomEvent('PacDotEaten', { detail: { x: toTheRight ? 0 : 14, y: 10 } });
-                Jeu.ELEMENT.dispatchEvent(event);
-            }
-            else if (isGhost) {
+            /* Ralentissement/accélération si fantome */
+            if (isGhost) {
                 if (toTheRight && x <= -Tile.TILE_WIDTH || toTheLeft && x >= 15 * Tile.TILE_WIDTH)
                     object.speedUp();
                 else

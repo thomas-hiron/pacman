@@ -35,14 +35,8 @@ class Tunnel
       if (toTheRight && x >= -Tile.TILE_WIDTH / 2 || toTheLeft && x <= 14 * Tile.TILE_WIDTH + Tile.TILE_WIDTH / 2)
         object.setX(x);
 
-      if (!isGhost && (toTheRight && x > -10 || toTheLeft && x <= 14 * Tile.TILE_WIDTH + 10))
-      {
-        /* Point mangé */
-        var event: CustomEvent = new CustomEvent('PacDotEaten', {detail: {x: toTheRight ? 0 : 14, y: 10}});
-        Jeu.ELEMENT.dispatchEvent(event);
-      }
-      /* Ralentissement si fantome */
-      else if (isGhost)
+      /* Ralentissement/accélération si fantome */
+      if (isGhost)
       {
         if (toTheRight && x <= -Tile.TILE_WIDTH || toTheLeft && x >= 15 * Tile.TILE_WIDTH)
           object.speedUp();
