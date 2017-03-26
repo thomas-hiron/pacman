@@ -44,7 +44,7 @@ class Tunnel
       /* Ralentissement si fantome */
       else if (isGhost)
       {
-        if (toTheRight && x == 0 || toTheLeft && x == 14 * Tile.TILE_WIDTH)
+        if (toTheRight && x <= -Tile.TILE_WIDTH || toTheLeft && x >= 15 * Tile.TILE_WIDTH)
           object.speedUp();
         else
           object.slow();

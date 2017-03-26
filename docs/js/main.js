@@ -1043,7 +1043,7 @@ class GhostsManager {
      */
     init() {
         this.waveNumber = 1;
-        this.mode = Modes.Scatter;
+        this.mode = Modes.Chase;
         this.areFrightened = false;
         /* Initialisation des fantômes et des canvas */
         this.pinky.init();
@@ -2691,7 +2691,7 @@ class Tunnel {
                 Jeu.ELEMENT.dispatchEvent(event);
             }
             else if (isGhost) {
-                if (toTheRight && x == 0 || toTheLeft && x == 14 * Tile.TILE_WIDTH)
+                if (toTheRight && x <= -Tile.TILE_WIDTH || toTheLeft && x >= 15 * Tile.TILE_WIDTH)
                     object.speedUp();
                 else
                     object.slow();
