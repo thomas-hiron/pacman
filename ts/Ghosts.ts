@@ -136,24 +136,24 @@ abstract class Ghost
     var x: number = 0;
     var y: number = 0;
 
-    /* Ils bougent que si sorti ou en train */
-    if (this.outFromHome || this.alternativeMode == Modes.OutFromHome)
+    /* S'ils sont dans la maison, on génère une direction aléatoire */
+    if (!this.outFromHome && this.alternativeMode != Modes.OutFromHome)
+      this.getDirectionBasedOnTime();
+
+    switch (this.direction)
     {
-      switch (this.direction)
-      {
-        case Directions.Left:
-          x = -2;
-          break;
-        case Directions.Right:
-          x = 2;
-          break;
-        case Directions.Up:
-          y = -2;
-          break;
-        case Directions.Down:
-          y = 2;
-          break;
-      }
+      case Directions.Left:
+        x = -2;
+        break;
+      case Directions.Right:
+        x = 2;
+        break;
+      case Directions.Up:
+        y = -2;
+        break;
+      case Directions.Down:
+        y = 2;
+        break;
     }
 
     context.beginPath();
@@ -698,6 +698,30 @@ abstract class Ghost
   public flash(state: boolean): Ghost
   {
     this.isFlashing = state;
+
+    return this;
+  }
+
+  /**
+   * Renvoie une direction basée sur le temps
+   *
+   * @returns {Ghost}
+   */
+  private getDirectionBasedOnTime(): Ghost
+  {
+    var directions: Array<number> = [
+      Directions.Left,
+      Directions.Right,
+      Directions.Up,
+      Directions.Down
+    ];
+    var date: Date = new Date();
+    var rand: number = Math.floor(Math.random() * directions.length);
+    var randDate: number = Math.floor(Math.random() * 1000);
+
+    /* Si dans une période de 10ms pour pas faire de flickering */
+    if (date.getMilliseconds() >= randDate && date.getMilliseconds() <= randDate + 10)
+      this.direction = directions[rand];
 
     return this;
   }
