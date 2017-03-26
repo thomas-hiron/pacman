@@ -127,7 +127,7 @@ class GhostsManager
 
           /* Diminution des intervalles */
           if (this.waveNumber > 2)
-            this.scatterInterval = 5000;
+            this.scatterInterval = 5 * 60;
 
           /* Réinitialisation du chrono */
           this.frames = 0;
