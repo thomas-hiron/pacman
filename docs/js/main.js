@@ -780,10 +780,6 @@ class Ghost {
             y: this.coordinates.y + Tile.TILE_WIDTH / 2
         };
         /* Mangé */
-        // if (
-        //   (Math.abs(pacmanCenter.x - center.x) < 10 || Math.abs(pacmanCenter.x - center.x) > 590) &&
-        //   Math.abs(pacmanCenter.y - center.y) < 10
-        // )
         if (Math.abs(pacmanCenter.x - center.x) < 10 && Math.abs(pacmanCenter.y - center.y) < 10) {
             /* Dispatch que s'il rentre pas */
             if (this.alternativeMode != Modes.GoingHome) {
@@ -1047,7 +1043,7 @@ class GhostsManager {
      */
     init() {
         this.waveNumber = 1;
-        this.mode = Modes.Chase;
+        this.mode = Modes.Scatter;
         this.areFrightened = false;
         /* Initialisation des fantômes et des canvas */
         this.pinky.init();
@@ -2686,7 +2682,9 @@ class Tunnel {
             else
                 context.clearRect(x + margin - 2, coords.y + margin + Jeu.TOP_HEIGHT, Pacman.SIZE.w + margin, Tile.TILE_WIDTH - margin * 2);
             context.drawImage(canvas, x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
-            object.setX(x);
+            /* Modification du x à la moitié du tunnel */
+            if (toTheRight && x >= -Tile.TILE_WIDTH / 2 || toTheLeft && x <= 14 * Tile.TILE_WIDTH + Tile.TILE_WIDTH / 2)
+                object.setX(x);
             if (!isGhost && (toTheRight && x > -10 || toTheLeft && x <= 14 * Tile.TILE_WIDTH + 10)) {
                 /* Point mangé */
                 var event = new CustomEvent('PacDotEaten', { detail: { x: toTheRight ? 0 : 14, y: 10 } });

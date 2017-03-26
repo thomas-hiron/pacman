@@ -31,7 +31,9 @@ class Tunnel
         context.clearRect(x + margin - 2, coords.y + margin + Jeu.TOP_HEIGHT, Pacman.SIZE.w + margin, Tile.TILE_WIDTH - margin * 2);
       context.drawImage(canvas, x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
 
-      object.setX(x);
+      /* Modification du x à la moitié du tunnel */
+      if (toTheRight && x >= -Tile.TILE_WIDTH / 2 || toTheLeft && x <= 14 * Tile.TILE_WIDTH + Tile.TILE_WIDTH / 2)
+        object.setX(x);
 
       if (!isGhost && (toTheRight && x > -10 || toTheLeft && x <= 14 * Tile.TILE_WIDTH + 10))
       {

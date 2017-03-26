@@ -73,7 +73,7 @@ class GhostsManager
   public init(): GhostsManager
   {
     this.waveNumber = 1;
-    this.mode = Modes.Chase;
+    this.mode = Modes.Scatter;
     this.areFrightened = false;
 
     /* Initialisation des fantômes et des canvas */
