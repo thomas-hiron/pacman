@@ -222,6 +222,9 @@ class LevelManager
       }
     }
 
+    var event: CustomEvent = new CustomEvent('PacDotEatenProcessed', {detail: e.detail});
+    Jeu.ELEMENT.dispatchEvent(event);
+
     /* Niveau terminé */
     if (this.pacDotNumber <= 0)
     {

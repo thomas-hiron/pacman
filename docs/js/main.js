@@ -1360,7 +1360,7 @@ class Jeu {
      */
     addListeners() {
         /* Listener pour un point mangée */
-        Jeu.ELEMENT.addEventListener('PacDotEaten', this.onPacDotEaten.bind(this), false);
+        Jeu.ELEMENT.addEventListener('PacDotEatenProcessed', this.onPacDotEaten.bind(this), false);
         /* Listener pour niveau terminé */
         Jeu.ELEMENT.addEventListener('LevelFinished', this.onLevelFinished.bind(this), false);
         /* Listener pour un nouveau fruit */
@@ -1637,7 +1637,7 @@ class Jeu {
         return tiles[y] == void 0 || tiles[y][x] === void 0 || tiles[y][x].isAWall();
     }
     /**
-     * Mange le point
+     * Mange le point, après avoir été traité par le levelManager pour libérer un fantôme
      *
      * @returns {Jeu}
      */
@@ -2456,6 +2456,8 @@ class LevelManager {
                 Jeu.ELEMENT.dispatchEvent(event);
             }
         }
+        var event = new CustomEvent('PacDotEatenProcessed', { detail: e.detail });
+        Jeu.ELEMENT.dispatchEvent(event);
         /* Niveau terminé */
         if (this.pacDotNumber <= 0) {
             var event = new CustomEvent('LevelFinished');
