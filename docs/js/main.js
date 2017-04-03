@@ -1336,6 +1336,7 @@ class Score {
 class Jeu {
     constructor() {
         this.frames = 0;
+        this.stopFrames = false;
         /* Ajout des listeners */
         this.addListeners();
         /* Init des elem */
@@ -1407,6 +1408,8 @@ class Jeu {
      */
     play(e) {
         e.currentTarget.style.display = "none";
+        /* Pour redémarrer */
+        this.stopFrames = false;
         /* RequestAnimationFrame pour le pacman, les fantomes */
         requestAnimFrame(this.draw.bind(this));
         return this;
@@ -1448,7 +1451,8 @@ class Jeu {
             this.frames = 0;
         }
         /* Animation suivante */
-        requestAnimFrame(this.draw.bind(this));
+        if (this.stopFrames === false)
+            requestAnimFrame(this.draw.bind(this));
         /* Incrémentation */
         this.frames++;
         return this;
@@ -1502,7 +1506,8 @@ class Jeu {
         else
             this.pacman.die();
         /* Dessin dans le canvas principal */
-        context.drawImage(pacman.getCanvasElem(), coords.x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
+        if (this.stopFrames === false)
+            context.drawImage(pacman.getCanvasElem(), coords.x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
         /* Gestion du tunnel */
         Tunnel.checkEntry(pacman, context, margin);
         return this;
@@ -1789,6 +1794,9 @@ class Jeu {
      */
     onPacmanDead() {
         /* Suppression de tous les events */
+        document.querySelector('.jouer').style.display = "block";
+        /* Réinitialisation */
+        this.stopFrames = true;
         this.init();
         return this;
     }
