@@ -4,34 +4,35 @@
 @import "{{ site.theme }}";
 
 @font-face {
-    font-family: Pacman;
-    src: url('../../pacman.ttf');
+  font-family: Pacman;
+  src: url('../../pacman.ttf');
 }
 
 .main-content {
-    position: relative;
+  position: relative;
 }
 
 .jouer {
-    position: absolute;
-    top: 430px;
-    left: 0;
-    width: 100%;
-    font-size: 30px;
-    margin: auto;
-    font-family: Pacman, Arial;
-    color: yellow;
+  position: absolute;
+  top: 430px;
+  left: 0;
+  width: 100%;
+  font-size: 30px;
+  margin: auto;
+  font-family: Pacman, Arial;
+  color: yellow;
+  text-align: center;
 }
 
 canvas {
-    display: block;
-    background-color: black;
-    border-radius: 5px;
-    -webkit-border-radius: 5px;
-    padding: 2px;
-    margin: auto;
+  display: block;
+  background-color: black;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  padding: 2px;
+  margin: auto;
 }
 
 .hide {
-    display: none;
+  display: none;
 }
