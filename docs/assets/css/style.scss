@@ -8,6 +8,21 @@
     src: url('../../pacman.ttf');
 }
 
+.main-content {
+    position: relative;
+}
+
+.jouer {
+    position: absolute;
+    top: 430px;
+    left: 0;
+    width: 100%;
+    font-size: 30px;
+    margin: auto;
+    font-family: Pacman, Arial;
+    color: yellow;
+}
+
 canvas {
     display: block;
     background-color: black;
