@@ -22,18 +22,24 @@
                 padding: 2px;
             }
 
+            @font-face {
+                font-family: Pacman;
+                src: url('docs/pacman.ttf');
+            }
+
+
             .hide {
                 display: none;
             }
 
             .jouer {
-                position: relative;
-                top: 460px;
+                position: absolute;
+                top: 407px;
+                width: 100%;
                 font-size: 30px;
-                color: #ffffff;
-                width: 70px;
                 margin: auto;
-                font-family: Arial;
+                font-family: Pacman, Arial;
+                color: yellow;
             }
 
             .jouer:hover {
@@ -48,7 +54,7 @@
 
     <body>
         <div>
-            <!--<p style="visibility:visible;" class="jouer">Jouer</p>-->
+            <p style="visibility:visible;" class="jouer">Jouer</p>
             <canvas width="600" height="840">
                 Ce jeu n'est pas compatible sur votre navigateur.
             </canvas>

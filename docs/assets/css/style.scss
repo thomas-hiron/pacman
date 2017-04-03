@@ -3,6 +3,11 @@
 
 @import "{{ site.theme }}";
 
+@font-face {
+    font-family: Pacman;
+    src: url('../../pacman.ttf');
+}
+
 canvas {
     display: block;
     background-color: black;

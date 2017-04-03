@@ -1345,8 +1345,6 @@ class Jeu {
         this.ghostsManager = new GhostsManager();
         this.score = new Score();
         this.pacman = new Pacman();
-        /* RequestAnimationFrame pour le pacman, les fantomes */
-        requestAnimFrame(this.draw.bind(this));
     }
     /**
      * Initialise le jeu
@@ -1367,6 +1365,11 @@ class Jeu {
         this.pacman.setCollideFunction(this.checkCollision.bind(this));
         this.pacman.init();
         this.pacmanEaten = false;
+        /* Dessin dans le canvas principal */
+        this.pacman.draw();
+        var coords = this.pacman.getCoordinates();
+        var margin = (Tile.TILE_WIDTH - Pacman.SIZE.w) / 2;
+        this.canvas.getContext().drawImage(this.pacman.getCanvasElem(), coords.x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
         /* Récupération de toutes les power pellet pour les faire clignoter */
         this.powerPelletTiles = this.levelManager.getPowerPellet();
         /* Date de début pour le fruit manager */
@@ -1393,6 +1396,19 @@ class Jeu {
         Jeu.ELEMENT.addEventListener('PacmanDied', this.onPacmanDead.bind(this), false);
         /* Fantôme(s) mangé */
         Jeu.ELEMENT.addEventListener('UpdateScoreAfterGhostEaten', this.onGhostEaten.bind(this), false);
+        /* Play */
+        document.querySelector('.jouer').addEventListener('click', this.play.bind(this), false);
+        return this;
+    }
+    /**
+     * Démarre le jeu et cache le bouton
+     *
+     * @returns {Jeu}
+     */
+    play(e) {
+        e.currentTarget.style.display = "none";
+        /* RequestAnimationFrame pour le pacman, les fantomes */
+        requestAnimFrame(this.draw.bind(this));
         return this;
     }
     /**
