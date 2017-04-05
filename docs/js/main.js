@@ -1336,7 +1336,7 @@ class Score {
 class Jeu {
     constructor() {
         this.frames = 0;
-        this.stopFrames = false;
+        this.playing = false;
         /* Ajout des listeners */
         this.addListeners();
         /* Init des elem */
@@ -1399,6 +1399,7 @@ class Jeu {
         Jeu.ELEMENT.addEventListener('UpdateScoreAfterGhostEaten', this.onGhostEaten.bind(this), false);
         /* Play */
         document.querySelector('.jouer').addEventListener('click', this.play.bind(this), false);
+        window.addEventListener('keydown', this.onKeyDown.bind(this), false);
         return this;
     }
     /**
@@ -1406,10 +1407,10 @@ class Jeu {
      *
      * @returns {Jeu}
      */
-    play(e) {
-        e.currentTarget.style.display = "none";
+    play() {
+        document.querySelector('.jouer').style.display = "none";
         /* Pour redémarrer */
-        this.stopFrames = false;
+        this.playing = true;
         /* RequestAnimationFrame pour le pacman, les fantomes */
         requestAnimFrame(this.draw.bind(this));
         return this;
@@ -1451,7 +1452,7 @@ class Jeu {
             this.frames = 0;
         }
         /* Animation suivante */
-        if (this.stopFrames === false)
+        if (this.playing === true)
             requestAnimFrame(this.draw.bind(this));
         /* Incrémentation */
         this.frames++;
@@ -1506,7 +1507,7 @@ class Jeu {
         else
             this.pacman.die();
         /* Dessin dans le canvas principal */
-        if (this.stopFrames === false)
+        if (this.playing === true)
             context.drawImage(pacman.getCanvasElem(), coords.x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
         /* Gestion du tunnel */
         Tunnel.checkEntry(pacman, context, margin);
@@ -1796,7 +1797,7 @@ class Jeu {
         /* Suppression de tous les events */
         document.querySelector('.jouer').style.display = "block";
         /* Réinitialisation */
-        this.stopFrames = true;
+        this.playing = false;
         this.init();
         return this;
     }
@@ -1809,6 +1810,19 @@ class Jeu {
      */
     onGhostEaten(e) {
         this.score.updateWithGhost(e.detail);
+        return this;
+    }
+    /**
+     * Gère le démarrage aux touches
+     *
+     * @param e
+     *
+     * @returns {Jeu}
+     */
+    onKeyDown(e) {
+        /* Entrée ou espace */
+        if (!this.playing && (e.keyCode == 32 || e.keyCode == 13))
+            this.play();
         return this;
     }
 }

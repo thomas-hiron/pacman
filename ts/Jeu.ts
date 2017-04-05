@@ -30,12 +30,12 @@ class Jeu
   private score: Score;
   private powerPelletTiles: Array<Tile>;
   private pacmanEaten: boolean;
-  private stopFrames: boolean;
+  private playing: boolean;
 
   public constructor()
   {
     this.frames = 0;
-    this.stopFrames = false;
+    this.playing = false;
 
     /* Ajout des listeners */
     this.addListeners();
@@ -118,6 +118,7 @@ class Jeu
 
     /* Play */
     document.querySelector('.jouer').addEventListener('click', this.play.bind(this), false);
+    window.addEventListener('keydown', this.onKeyDown.bind(this), false);
 
     return this;
   }
@@ -127,12 +128,12 @@ class Jeu
    *
    * @returns {Jeu}
    */
-  private play(e: Event): Jeu
+  private play(): Jeu
   {
-    e.currentTarget.style.display = "none";
+    (<HTMLElement>document.querySelector('.jouer')).style.display = "none";
 
     /* Pour redémarrer */
-    this.stopFrames = false;
+    this.playing = true;
 
     /* RequestAnimationFrame pour le pacman, les fantomes */
     requestAnimFrame(this.draw.bind(this));
@@ -193,7 +194,7 @@ class Jeu
     }
 
     /* Animation suivante */
-    if (this.stopFrames === false)
+    if (this.playing === true)
       requestAnimFrame(this.draw.bind(this));
 
     /* Incrémentation */
@@ -266,7 +267,7 @@ class Jeu
       this.pacman.die();
 
     /* Dessin dans le canvas principal */
-    if (this.stopFrames === false)
+    if (this.playing === true)
       context.drawImage(pacman.getCanvasElem(), coords.x + margin, coords.y + margin + Jeu.TOP_HEIGHT);
 
     /* Gestion du tunnel */
@@ -650,10 +651,10 @@ class Jeu
   private onPacmanDead(): Jeu
   {
     /* Suppression de tous les events */
-    document.querySelector('.jouer').style.display = "block";
+    (<HTMLElement>document.querySelector('.jouer')).style.display = "block";
 
     /* Réinitialisation */
-    this.stopFrames = true;
+    this.playing = false;
     this.init();
 
     return this;
@@ -669,6 +670,22 @@ class Jeu
   private onGhostEaten(e: CustomEvent): Jeu
   {
     this.score.updateWithGhost(e.detail);
+
+    return this;
+  }
+
+  /**
+   * Gère le démarrage aux touches
+   *
+   * @param e
+   *
+   * @returns {Jeu}
+   */
+  private onKeyDown(e: KeyboardEvent): Jeu
+  {
+    /* Entrée ou espace */
+    if (!this.playing && (e.keyCode == 32 || e.keyCode == 13))
+      this.play();
 
     return this;
   }
