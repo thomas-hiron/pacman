@@ -32,7 +32,7 @@
                 display: none;
             }
 
-            .jouer {
+            .jouer, .continuer {
                 position: absolute;
                 top: 407px;
                 width: 100%;
@@ -42,7 +42,11 @@
                 color: yellow;
             }
 
-            .jouer:hover {
+            .continuer {
+                display: none;
+            }
+
+            .jouer:hover, .continuer:hover {
                 cursor: pointer;
             }
 
@@ -55,6 +59,7 @@
     <body>
         <div>
             <p class="jouer">Jouer</p>
+            <p class="continuer">Continuer</p>
             <canvas width="600" height="840">
                 Ce jeu n'est pas compatible sur votre navigateur.
             </canvas>

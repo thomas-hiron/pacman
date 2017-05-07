@@ -31,11 +31,13 @@ class Jeu
   private powerPelletTiles: Array<Tile>;
   private pacmanEaten: boolean;
   private playing: boolean;
+  private level: number;
 
   public constructor()
   {
     this.frames = 0;
     this.playing = false;
+    this.level = 1;
 
     /* Ajout des listeners */
     this.addListeners();
@@ -52,7 +54,7 @@ class Jeu
   /**
    * Initialise le jeu
    */
-  public init(): Jeu
+  public init(newGame: boolean = true): Jeu
   {
     /* Nettoyage du canvas */
     this.canvas.clear();
@@ -64,7 +66,9 @@ class Jeu
     /* Le ghosts manager */
     this.ghostsManager.setCollideFunction(this.checkCollision.bind(this));
     this.ghostsManager.init();
-    this.score.init();
+
+    if (newGame)
+      this.score.init();
 
     /* Dessin du haut */
     this.drawTop();
@@ -118,6 +122,7 @@ class Jeu
 
     /* Play */
     document.querySelector('.jouer').addEventListener('click', this.play.bind(this), false);
+    document.querySelector('.continuer').addEventListener('click', this.play.bind(this), false);
     window.addEventListener('keydown', this.onKeyDown.bind(this), false);
 
     return this;
@@ -131,6 +136,7 @@ class Jeu
   private play(): Jeu
   {
     (<HTMLElement>document.querySelector('.jouer')).style.display = "none";
+    (<HTMLElement>document.querySelector('.continuer')).style.display = "none";
 
     /* Pour redémarrer */
     this.playing = true;
@@ -402,7 +408,7 @@ class Jeu
 
     /* Affichage du niveau */
     context.textAlign = 'right';
-    context.fillText("Niveau 1", this.canvas.getElement().width - 10, Jeu.TOP_HEIGHT / 2 + 5);
+    context.fillText("Niveau " + this.level, this.canvas.getElement().width - 10, Jeu.TOP_HEIGHT / 2 + 5);
 
     return this;
   }
@@ -538,7 +544,21 @@ class Jeu
    */
   private onLevelFinished(): Jeu
   {
-    console.log('Todo : Niveau terminé');
+    /* Niveau suivant */
+    this.level++;
+
+    /* Redessin du haut avec le nouveau niveau */
+    this.canvas.getContext().clearRect(0, 0, this.canvas.getElement().width, Jeu.TOP_HEIGHT);
+    this.drawTop();
+
+    /* Bouton continuer */
+    (<HTMLElement>document.querySelector('.continuer')).style.display = 'block';
+
+    /* Stop frames */
+    this.playing = false;
+
+    /* Reinit values */
+    this.init(false);
 
     return this;
   }

@@ -1337,6 +1337,7 @@ class Jeu {
     constructor() {
         this.frames = 0;
         this.playing = false;
+        this.level = 1;
         /* Ajout des listeners */
         this.addListeners();
         /* Init des elem */
@@ -1350,7 +1351,7 @@ class Jeu {
     /**
      * Initialise le jeu
      */
-    init() {
+    init(newGame = true) {
         /* Nettoyage du canvas */
         this.canvas.clear();
         /* Les niveaux */
@@ -1359,7 +1360,8 @@ class Jeu {
         /* Le ghosts manager */
         this.ghostsManager.setCollideFunction(this.checkCollision.bind(this));
         this.ghostsManager.init();
-        this.score.init();
+        if (newGame)
+            this.score.init();
         /* Dessin du haut */
         this.drawTop();
         /* Pacman */
@@ -1399,6 +1401,7 @@ class Jeu {
         Jeu.ELEMENT.addEventListener('UpdateScoreAfterGhostEaten', this.onGhostEaten.bind(this), false);
         /* Play */
         document.querySelector('.jouer').addEventListener('click', this.play.bind(this), false);
+        document.querySelector('.continuer').addEventListener('click', this.play.bind(this), false);
         window.addEventListener('keydown', this.onKeyDown.bind(this), false);
         return this;
     }
@@ -1409,6 +1412,7 @@ class Jeu {
      */
     play() {
         document.querySelector('.jouer').style.display = "none";
+        document.querySelector('.continuer').style.display = "none";
         /* Pour redémarrer */
         this.playing = true;
         /* RequestAnimationFrame pour le pacman, les fantomes */
@@ -1609,7 +1613,7 @@ class Jeu {
         context.fillText("Pacman", this.canvas.getElement().width / 2, Jeu.TOP_HEIGHT / 2 + 5);
         /* Affichage du niveau */
         context.textAlign = 'right';
-        context.fillText("Niveau 1", this.canvas.getElement().width - 10, Jeu.TOP_HEIGHT / 2 + 5);
+        context.fillText("Niveau " + this.level, this.canvas.getElement().width - 10, Jeu.TOP_HEIGHT / 2 + 5);
         return this;
     }
     /**
@@ -1708,7 +1712,17 @@ class Jeu {
      * @returns {Jeu}
      */
     onLevelFinished() {
-        console.log('Todo : Niveau terminé');
+        /* Niveau suivant */
+        this.level++;
+        /* Redessin du haut avec le nouveau niveau */
+        this.canvas.getContext().clearRect(0, 0, this.canvas.getElement().width, Jeu.TOP_HEIGHT);
+        this.drawTop();
+        /* Bouton continuer */
+        document.querySelector('.continuer').style.display = 'block';
+        /* Stop frames */
+        this.playing = false;
+        /* Reinit values */
+        this.init(false);
         return this;
     }
     /**
