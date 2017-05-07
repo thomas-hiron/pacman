@@ -12,7 +12,7 @@
   position: relative;
 }
 
-.jouer {
+.jouer, .continuer {
   position: absolute;
   top: 430px;
   left: 0;
@@ -23,6 +23,10 @@
   color: yellow;
   text-align: center;
   cursor: pointer;
+}
+
+.continuer {
+  display: none;
 }
 
 canvas {
