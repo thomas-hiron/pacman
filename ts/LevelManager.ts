@@ -246,7 +246,7 @@ class LevelManager
    *
    * @returns {Array<Tile>}
    */
-  public getPowerPellet()
+  public getPowerPellet(): Array<Tile>
   {
     var tiles: Array<Array<Tile>> = this.getTiles();
     var tilesWithPowerPellet: Array<Tile> = [];

@@ -26,17 +26,13 @@ class GhostsManager
 
   /* Gère le numéro de la vague */
   private waveNumber: number;
+  private level: number;
 
   /* Le mode courant */
   private mode: number;
 
   constructor()
   {
-    /* Initialisation des intervalles et autres */
-    this.chaseInterval = 20 * 60;
-    this.scatterInterval = 7 * 60;
-    this.frightenedInterval = 7 * 60;
-
     /* Instanciation des fantômes */
     this.pinky = new Pinky();
     this.blinky = new Blinky();
@@ -72,9 +68,15 @@ class GhostsManager
    */
   public init(): GhostsManager
   {
+    /* Initialisation des intervalles et autres */
+    this.chaseInterval = 20 * 60;
+    this.scatterInterval = 7 * 60;
+    this.frightenedInterval = 7 * 60;
+
     this.waveNumber = 1;
     this.mode = Modes.Scatter;
     this.areFrightened = false;
+    this.level = 1;
 
     /* Initialisation des fantômes et des canvas */
     this.pinky.init();
@@ -126,7 +128,17 @@ class GhostsManager
           this.waveNumber++;
 
           /* Diminution des intervalles */
-          if (this.waveNumber > 2)
+          if (this.waveNumber > 2 && this.level >= 5)
+          {
+            this.chaseInterval = 1037 * 60;
+            this.scatterInterval = 1;
+          }
+          else if (this.waveNumber > 2 && this.level >= 2)
+          {
+            this.chaseInterval = 1033 * 60;
+            this.scatterInterval = 1;
+          }
+          else if (this.waveNumber > 2)
             this.scatterInterval = 5 * 60;
 
           /* Réinitialisation du chrono */
@@ -325,8 +337,29 @@ class GhostsManager
     this.numberEaten++;
 
     /* Information de jeu pour augmenter le score */
-    var event: CustomEvent = new CustomEvent('UpdateScoreAfterGhostEaten', {'detail': this.numberEaten})
+    var event: CustomEvent = new CustomEvent('UpdateScoreAfterGhostEaten', {'detail': this.numberEaten});
     Jeu.ELEMENT.dispatchEvent(event);
+
+    return this;
+  }
+
+  /**
+   * Modifie les valeurs des durées
+   *
+   * @param level
+   *
+   * @returns {GhostsManager}
+   */
+  public nextLevel(level: number): GhostsManager
+  {
+    this.level = level;
+
+    /* Diminue le temps de l'interval apeuré, 6.5s au niveau 2, 5s au niveau 5, 2.5s au niveau 10, avec minimum de 1s */
+    this.frightenedInterval = Math.max(60, 7 * 60 - (0.5 * (level - 1)) * 60);
+
+    /* 5s pour le mode scatter à partir du 5e niveau */
+    if (level >= 5)
+      this.scatterInterval = 5 * 60;
 
     return this;
   }

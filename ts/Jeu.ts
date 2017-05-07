@@ -560,6 +560,9 @@ class Jeu
     /* Reinit values */
     this.init(false);
 
+    /* Diminution des durées */
+    this.ghostsManager.nextLevel(this.level);
+
     return this;
   }
 
