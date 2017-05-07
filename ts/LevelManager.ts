@@ -231,6 +231,12 @@ class LevelManager
       var event: CustomEvent = new CustomEvent('LevelFinished');
       Jeu.ELEMENT.dispatchEvent(event);
     }
+    /* 70 points mangés, premier fruit, 170 deuxième fruit */
+    else if (this.pacDotNumberTotal - this.pacDotNumber === 70 || this.pacDotNumberTotal - this.pacDotNumber === 170)
+    {
+      var event: CustomEvent = new CustomEvent('AddNewFruit');
+      Jeu.ELEMENT.dispatchEvent(event);
+    }
 
     return this;
   }

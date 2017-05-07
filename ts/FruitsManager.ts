@@ -7,12 +7,17 @@
  */
 class FruitsManager
 {
-  /* Chaque fois qu'un fruit apparait */
-  private static APPEARANCE_INTEVERVAL = 30 * 60;
+  /* Durée d'un fruit */
   private static APPEARANCE_DURATION = 10 * 60;
 
   private frames: number;
   private hasFruit: boolean;
+
+  public constructor()
+  {
+    /* Pour ajouter un fruit */
+    Jeu.ELEMENT.addEventListener('AddNewFruit', this.newFruit.bind(this), false);
+  }
 
   /**
    * Démarrage
@@ -35,13 +40,8 @@ class FruitsManager
   {
     this.frames++;
 
-    /* Gestion des secondes */
-    var date: number = +new Date();
-
-    /* Un nouveau fruit au bout de 30 secondes */
-    if (!this.hasFruit && this.frames > FruitsManager.APPEARANCE_INTEVERVAL)
-      this.newFruit();
-    else if (this.hasFruit && this.frames > FruitsManager.APPEARANCE_DURATION)
+    /* Suppression du fruit */
+    if (this.hasFruit && this.frames > FruitsManager.APPEARANCE_DURATION)
       this.removeFruit();
 
     return this;

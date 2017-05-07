@@ -175,6 +175,10 @@ Key.SCORE_VALUE = 5000;
  * Gère tous les fruits
  */
 class FruitsManager {
+    constructor() {
+        /* Pour ajouter un fruit */
+        Jeu.ELEMENT.addEventListener('AddNewFruit', this.newFruit.bind(this), false);
+    }
     /**
      * Démarrage
      * @returns {FruitsManager}
@@ -191,12 +195,8 @@ class FruitsManager {
      */
     onRequestAnimFrame() {
         this.frames++;
-        /* Gestion des secondes */
-        var date = +new Date();
-        /* Un nouveau fruit au bout de 30 secondes */
-        if (!this.hasFruit && this.frames > FruitsManager.APPEARANCE_INTEVERVAL)
-            this.newFruit();
-        else if (this.hasFruit && this.frames > FruitsManager.APPEARANCE_DURATION)
+        /* Suppression du fruit */
+        if (this.hasFruit && this.frames > FruitsManager.APPEARANCE_DURATION)
             this.removeFruit();
         return this;
     }
@@ -257,8 +257,7 @@ class FruitsManager {
         return this;
     }
 }
-/* Chaque fois qu'un fruit apparait */
-FruitsManager.APPEARANCE_INTEVERVAL = 30 * 60;
+/* Durée d'un fruit */
 FruitsManager.APPEARANCE_DURATION = 10 * 60;
 /**
  * Created by thiron on 13/03/2017.
@@ -2533,6 +2532,10 @@ class LevelManager {
         /* Niveau terminé */
         if (this.pacDotNumber <= 0) {
             var event = new CustomEvent('LevelFinished');
+            Jeu.ELEMENT.dispatchEvent(event);
+        }
+        else if (this.pacDotNumberTotal - this.pacDotNumber === 70 || this.pacDotNumberTotal - this.pacDotNumber === 170) {
+            var event = new CustomEvent('AddNewFruit');
             Jeu.ELEMENT.dispatchEvent(event);
         }
         return this;
